@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace SimulatableApi
 {
@@ -19,7 +20,12 @@ namespace SimulatableApi
 			return File.ReadAllText(path.Absolute);
 		}
 
-		public void CreateDir(FSPath path)
+	    public byte[] RawContents(FSPath path)
+	    {
+	        return File.ReadAllBytes(path.Absolute);
+	    }
+
+	    public void CreateDir(FSPath path)
 		{
 			Directory.CreateDirectory(path.Absolute);
 		}
