@@ -1,7 +1,7 @@
 @echo off
 
-rmdir /sq build
 mkdir build
+del /q build\*.*
 
 echo Packing SimulatableApi.StreamStore...
 pushd SimulatableApi.StreamStore

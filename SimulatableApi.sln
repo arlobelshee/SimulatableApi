@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F1F6CE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4837BA90-252C-40C2-819C-567BB0CA85AD}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 		SimulatableApi.nuspec = SimulatableApi.nuspec
 	EndProjectSection

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimulatableApi")]
+[assembly: AssemblyTitle("SimulatableApi.StreamStore")]
 [assembly: AssemblyDescription("A port that represents a transactional view over a set of streams. Adaptors implement this backed by disk or by memory.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Arlo Belshee")]
-[assembly: AssemblyProduct("SimulatableApi")]
+[assembly: AssemblyProduct("SimulatableApi.StreamStore")]
 [assembly: AssemblyCopyright("Copyright © Arlo Belshee 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
