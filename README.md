@@ -1,15 +1,18 @@
 SimulatableApi
 ==============
 
-Implements several simulators for common dependencies. These abstractions make it easier to write highly-testable code.
+Implements ports and adaptors (including simulators) for common dependencies. These abstractions make it easier to write highly-testable code.
 
-The main project page is at http://arlobelshee.github.com/SimulatableApi/. All the docs are on the project page. The rest of this readme is just a teaser to let you know what's in the library.
+The project page is at http://arlobelshee.github.com/SimulatableApi/. It describes the abstractions used in this library and which simulators I currently intend to write. It also gives much more complete documentation for each completed simulator.
+
+The rest of this readme is just a teaser to let you know what's in the library.
 
 File System
 -----------
 
-This class represents a transactional view on a file system. Actually, it represents a transactional view on an arbitrary storage medium, and this is where the Simulator comes in.
+There is a port for a transactional stream store. It has two adaptors:
 
-There are three ways to get a FileSystem. The first two, FileSystem.Real() and FileSystem.Simulated(), return a new view wrapped around some storage. The last, FileSystem.Clone() creates a view from another view. They share the same underlying storage, but each have their own change tracking and undo facilities.
+ * Disk-backed
+ * Memory-backed
 
-The first thing to notice from just the above is that this is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system, and all the instances related to a single file system share consistent state.</description>
+This lets you easily code using stream I/O without caring where the stream is stored, even when you have to create streams or load streams from a path.
