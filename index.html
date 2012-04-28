@@ -25,17 +25,108 @@
         </ul>
       </header>
       <section>
-        <h1>Simulatable Api</h1>
+        <h2>Why Simulate?</h2>
 
-<p>Implements several simulators for common dependencies. These abstractions make it easier to write highly-testable code.</p>
+<p>Your program needs to run on several platforms or it depends on slow components (databases, files, networks, or users).</p>
 
-<h2>File System</h2>
+<ul>
+<li>How do you keep your tests fast?</li>
+<li>How do you test it without running all of your tests on every platform?</li>
+<li>How can you keep the majority of the code platform agnostic?</li>
+</ul>
 
-<p>This class represents a transactional view on a file system. Actually, it represents a transactional view on an arbitrary storage medium, and this is where the Simulator comes in.</p>
+<p>The first part of the solution is to use a <a href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal Architecture</a>. In this architecture, your program has 4 parts:</p>
 
-<p>There are three ways to get a FileSystem. The first two, FileSystem.Real() and FileSystem.Simulated(), return a new view wrapped around some storage. The last, FileSystem.Clone() creates a view from another view. They share the same underlying storage, but each have their own change tracking and undo facilities.</p>
+<dl>
+<dt>Model</dt>
+<dd>
+Your business model is the core of everything. This should contain all the domain logic for your domain. Use Domain Driven Design techniques.
+</dd>
+<dt>Manipulation</dt>
+<dd>
+Your application manipulates the business model. The manipulation code wraps your model and connects to various ports. It responds to port events by manipulating the model. It notifies ports when the model changes is ways they care about.
+</dd>
+<dt>Ports</dt>
+<dd>
+Ports are abstractions for external actors that your application interacts with. Examples include file systems, users, the internet, and queryable persistant storage. Some ports trigger events to which your application reacts. Some just do whatever your application tells them to do. Some do both.
+</dd>
+<dt>Adaptors</dt>
+<dd>
+Adaptors adapt a particular port to a particular external system. For example, an adaptor may adapt the user port to a GUI, while another adapts it to a batch processing system and a third adapts it to a test double.
+</dd>
+</dl>
 
-<p>The first thing to notice from just the above is that this is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system, and all the instances related to a single file system share consistent state.</p>
+<p>The next step is to define a set of test cases that operate on the ports. These ensure that each adaptor for a given port behaves exactly the same&mdash;to whatever degree your application wants uniformity.</p>
+
+<p>All of your system other than the adaptors and ports is now platform independent. It can be fully unit tested. The few parts of your system that depend on a port can use the simplest adaptor that will possibly work. Likely, this is an in-memory simulator or a memory-based caching adaptor. So even your integration tests will run quickly.</p>
+
+<p>Platform testing is simple. You run your port test suite against on each target platform, using the adaptor for that platform. Because you run the same tests everywhere, you know that your adaptors are ensuring consistency between your platforms.</p>
+
+<p>The remaining work is to continually ensure that your port tests include all behavior that your application depends on. When you need more out of a port you update the suite for that port to include the new behavior. You then extend all the adaptors to pass the new tests.</p>
+
+<h2>Why use this library?</h2>
+
+<p>As I've used this architecture and testing pattern on several projects, I've found certain ports come up over and over. I finally got around to extracting them so that I could share them between projects. If you find similar patterns, I invite you to use my simulators.</p>
+
+<p>Note: different applications require different types of uniformity in their ports. So some of these implementations may not work for your project. I think they're a good starting point. These ports have proven to be good abstractions in numerous projects. However, I do expect that you'll modify them some to fit each particular project.</p>
+
+<p>I've released this library as binaries for those who can use the port abstractions as-is. I've released it as source for those who need to modify the abstractions to fit their domains.</p>
+
+<h2>So, what ports can I expect in this library?</h2>
+
+<p>My first release contains only one port, and only two adaptors. I will add more ports and adpators over time. Here is the list of planned ports, with a description of each. I'll add full documentation for each as I add it to the library.</p>
+
+<dl>
+<dt>Stream Storage</dt>
+<dd>
+This port is a transactional view on an arbitrary storage medium. There are two adaptors. One is backed by a file system. The other is backed by memory. I may eventually add an adaptor for an async read- & write-through cache.</dd>
+<dt>Structured Data Store (not implemented yet)</dt>
+<dd>
+This port is a view of a structured data store. It supports both Queryable Repository and Loader/Saver patterns for interaction with the store. There will be adaptors for an in-memory non-persitent caching store and for Sql Server. I may add adaptors for other data stores over time.
+</dd>
+<dt>Time (not implemented yet)</dt>
+<dd>
+This port manages time. Adaptors will include wall-clock time, simuation frame time, and event sequence time. There are numerous other definitions of time; I may add adaptors for them eventually.
+</dd>
+<dt>User Interaction (not implemented yet)</dt>
+<dd>
+This port represents interaction with the user. The first three adaptors will be for WPF, a DSL for batch files or other automation, and a test adaptor. The test adaptor makes it easy to force the system to an initial state and provides low-level control. The automation adaptor allows the aplication to present abstractions that make it easier to write automation scripts.
+</dd>
+<dt>Internet (not implemented yet)</dt>
+<dd>
+This is a generic port that represents the internet as a whole. Initial adaptors will be for async HTTP and for an in-memory internet cache.
+</dd>
+<dt></dt>
+<dt>Remote Service (not implemented yet)</dt>
+<dd>
+This port represents a single remote service. Usage examples include a credit-card processing service or a read-write REST API. Initial adaptors will include an adaptor that connects to the live service, one that connects to a testing or pre-production service, and one that provides canned responses to canned operations. This port differs from the others in that it is designed to be tested in an approval style and be incorporated into your site monitoring. It protects you against unexpected changes in a third-party service that will affect your product.
+</dd>
+<dt>Parallel Computation (not implemented yet)</dt>
+<dd>
+This port represents parallelism. its purpose is to allow you to code with high-level APIs (Task, PLinq, etc), but still break that abstraction in test code so that you can force a particular execution order. This helps when trying to pin down race conditions or deadlocks. This port depends heavily on the Time port.
+</dd>
+<dt>.Net Platform (not implemented yet)</dt>
+<dd>
+This port abstracts over the .Net runtime in use. Adaptors will exist for Azure, Windows Client, Windows Server, Phone, Silverlight, and WindowsRT. This port will eventually get very large. This is not at attempt to create a full common subset for these platforms. You will still need to compile your code differently for each one. However, it should abstract away platform differences such as Reflection semmantics.
+</dd>
+</dl>
+
+<h2>Stream Storage</h2>
+
+<p>This port represents a transactional view on an arbitrary storage medium.</p>
+
+<p>The port's core class is <code>FileSystem</code>.</p>
+
+<p>There are three ways to get a <code>FileSystem</code>. The first two, <code>FileSystem.Real()</code> and <code>FileSystem.Simulated()</code>, return a new view wrapped around some storage.</p>
+
+<p>The last, <code>FileSystem.Clone()</code>, creates a view from another view. The two views share the same underlying storage but each has its own change tracking and undo facilities.</p>
+
+<p>The first thing to notice is that this is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system.</p>
+
+<p>All the instances related to a single file system share consistent state. If you create two file objects pointing to the same path in a particular file system and then write to one, you will immediately see the changes in the second.</p>
+
+<p>No promise is made about consistency between multiple <code>FileSystem</code>s unless they are clones of each other. For example, the in-memory adaptor has disjoint state between <code>FileSystem</code> instances. The on disk adaptor shares state between separate <code>FileSystem</code> instances, if those instances refer to the same directories. For this reason, I recommend that you only create one adaptor instance. If you need multiple views then clone your instance. Do not create a new, unrelated instance.</p>
+
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/arlobelshee">arlobelshee</a></p>
