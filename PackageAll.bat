@@ -1,5 +1,6 @@
 @echo off
 
+rmdir /sq build
 mkdir build
 
 echo Packing SimulatableApi.StreamStore...
