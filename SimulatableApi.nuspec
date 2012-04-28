@@ -4,7 +4,7 @@
     <id>SimulatableApi</id>
     <title>Simulatable API</title>
     <version>0.0.0-build1</version>
-    <authors>Arlo Belshee</authors>
+    <authors>Arlo Belshee, Anthony Mastrean</authors>
     <owners>Anthony Mastrean</owners>
     <summary>This class represents a transactional view on a file system. Actually, it represents a transactional view on an arbitrary storage medium, and this is where the Simulator comes in.</summary>
     <description>This class represents a transactional view on a file system. Actually, it represents a transactional view on an arbitrary storage medium, and this is where the Simulator comes in.
