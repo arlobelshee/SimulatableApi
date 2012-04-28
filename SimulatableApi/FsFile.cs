@@ -81,6 +81,11 @@ namespace SimulatableApi
 			return _allFiles._Disk.TextContents(_path);
 		}
 
+        public byte[] ReadAllBytes()
+        {
+            return _allFiles._Disk.RawContents(_path);
+        }
+
 		public override string ToString()
 		{
 			return string.Format("File({0})", _path);

@@ -22,14 +22,18 @@ namespace SimulatableApi
 		public string TextContents(FSPath path)
 		{
 			var storage = _GetStorage(path);
-			if (storage.Kind == _StorageKind.Missing)
-				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
-			if (storage.Kind == _StorageKind.Directory)
-				throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
-			return storage.TextContents;
+			_ValidateStorage(path, storage);
+		    return storage.TextContents;
 		}
 
-		public void CreateDir(FSPath path)
+	    public byte[] RawContents(FSPath path)
+	    {
+            var storage = _GetStorage(path);
+	        _ValidateStorage(path, storage);
+            return storage.RawContents;
+	    }
+
+	    public void CreateDir(FSPath path)
 		{
 			while (true)
 			{
@@ -71,6 +75,14 @@ namespace SimulatableApi
 			_data.Remove(src);
 		}
 
+        private void _ValidateStorage(FSPath path, _Node storage)
+        {
+            if (storage.Kind == _StorageKind.Missing)
+                throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
+            if (storage.Kind == _StorageKind.Directory)
+                throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
+        }
+
 		[NotNull]
 		private _Node _GetStorage([NotNull] FSPath path)
 		{
@@ -86,10 +98,12 @@ namespace SimulatableApi
 			{
 				Kind = storageKind;
 				TextContents = string.Empty;
+			    RawContents = new byte[0];
 			}
 
 			public _StorageKind Kind { get; private set; }
 			public string TextContents { get; set; }
+		    public byte[] RawContents { get; set; }
 		}
 
 		private enum _StorageKind
