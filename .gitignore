@@ -50,6 +50,7 @@ _ReSharper*/
 
 #NuGet
 packages/
+.nuget/NuGet.Config
 
 #ncrunch
 *.local.xml
