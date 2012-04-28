@@ -3,6 +3,8 @@ SimulatableApi
 
 Implements several simulators for common dependencies. These abstractions make it easier to write highly-testable code.
 
+The main project page is at http://arlobelshee.github.com/SimulatableApi/. All the docs are on the project page. The rest of this readme is just a teaser to let you know what's in the library.
+
 File System
 -----------
 
