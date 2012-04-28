@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+	<id>$id$</id>
+	<version>$version$</version>
+	<title>$title$</title>
+	<authors>Arlo Belshee, Anthony Mastrean</authors>
+	<owners>$author$</owners>
+	<licenseUrl>http://www.opensource.org/licenses/mit-license</licenseUrl>
+	<projectUrl>http://arlobelshee.github.com/SimulatableApi/</projectUrl>
+	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<summary>$description$</summary>
+	<description>This class represents a transactional view on a file system. Actually, it represents a transactional view on an arbitrary stream-oriented storage medium and this is where the Simulator comes in.
+
+There are three ways to get a FileSystem. The first two, FileSystem.Real() and FileSystem.Simulated(), return a new view wrapped around some storage. The last, FileSystem.Clone() creates a view from another view. They share the same underlying storage, but each have their own change tracking and undo facilities.
+
+The first thing to notice is that this is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system, and all the instances related to a single file system share consistent state.
+	</description>
+	<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+	<copyright>Copyright 2011</copyright>
+	<tags>filesystem simulator</tags>
+  </metadata>
+</package>
