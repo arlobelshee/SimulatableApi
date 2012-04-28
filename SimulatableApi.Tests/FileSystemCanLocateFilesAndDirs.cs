@@ -11,12 +11,15 @@ namespace SimulatableApi.Tests
 		private const string OriginalContents = "Original contents";
 		private const string NewContents = "New contents";
 		[NotNull] private FileSystem _testSubject;
+		[NotNull] private FsDirectory _runRootFolder;
 
 		[SetUp]
 		public void Setup()
 		{
 			_testSubject = MakeTestSubject();
 			_testSubject.EnableRevertToHere();
+			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
+			_testSubject.TempDirectory.Create();
 		}
 
 		[TearDown]
@@ -64,14 +67,14 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void CannotGetContentsOfMissingFile()
 		{
-			var testFile = _TestFile(_testSubject);
+			var testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
 			_Throws<FileNotFoundException>(() => { var foo = testFile.ReadAllText(); }, string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
 		public void CannotGetContentsOfFolder()
 		{
-			var testFile = _TestFile(_testSubject);
+			var testFile = _runRootFolder.File("CreatedByTest.txt");
 			_testSubject.Directory(testFile.FullPath).Create();
 			_Throws<UnauthorizedAccessException>(() => { var foo = testFile.ReadAllText(); },
 				string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
@@ -80,22 +83,21 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void CreatingADirectoryThatAlreadyExistsDoesNothingAndRollbackDoesNothing()
 		{
-			var theFolder = _testSubject.Directory(ArbitraryMissingFolder);
-			theFolder.Create();
-			Assert.That(theFolder.Exists);
+			_runRootFolder.Create();
+			Assert.That(_runRootFolder.Exists);
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.Directory(theFolder.Path).Create();
-				Assert.That(theFolder.Exists);
+				secondView.Directory(_runRootFolder.Path).Create();
+				Assert.That(_runRootFolder.Exists);
 			}
-			Assert.That(theFolder.Exists);
+			Assert.That(_runRootFolder.Exists);
 		}
 
 		[Test]
 		public void CreatingAPathWithMultipleDirsThenRollingBackRemovesAllCreatedDirs()
 		{
-			var theFolder = _testSubject.Directory(ArbitraryMissingFolder);
+			var theFolder = _runRootFolder.Dir("A");
 			var parentFolderCreatedInPassing = theFolder.Parent;
 			var root = parentFolderCreatedInPassing.Parent;
 
@@ -116,7 +118,7 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void OverwritingAFileInAMissingFolderCreatesThatFolder()
 		{
-			var parentFolder = _testSubject.Directory(ArbitraryMissingFolder);
+			var parentFolder = _runRootFolder;
 			var file = parentFolder.File("CreatedByTest.txt");
 			file.Overwrite(NewContents);
 			Assert.That(parentFolder.Exists);
@@ -145,7 +147,7 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void CanCreateDirectoryAndRevertIt()
 		{
-			var newDir = _testSubject.TempDirectory.Dir("CreatedByTest");
+			var newDir = _runRootFolder;
 			_AssertIsMissing(newDir);
 			newDir.Create();
 			_AssertIsDir(newDir);
@@ -156,7 +158,7 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void CanCreateFileAndRevertIt()
 		{
-			var newFile = _TestFile(_testSubject);
+			var newFile = _runRootFolder.File("CreatedByTest.txt");
 			_AssertIsMissing(newFile);
 			newFile.Overwrite(OriginalContents);
 			_AssertIsFile(newFile, OriginalContents);
@@ -167,13 +169,13 @@ namespace SimulatableApi.Tests
 		[Test]
 		public void CanOverwriteFileAndRevertIt()
 		{
-			var newFile = _TestFile(_testSubject);
+			var newFile = _runRootFolder.File("CreatedByTest.txt");
 			newFile.Overwrite(OriginalContents);
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
 				_AssertIsFile(newFile, OriginalContents);
-				_TestFile(secondView).Overwrite(NewContents);
+				secondView.Directory(_runRootFolder.Path).File("CreatedByTest.txt").Overwrite(NewContents);
 				_AssertIsFile(newFile, NewContents);
 			}
 			_AssertIsFile(newFile, OriginalContents);
@@ -184,9 +186,8 @@ namespace SimulatableApi.Tests
 		{
 			const string fileName = "ArbitraryFile.txt";
 			const string extension = ".txt";
-			var dir = _testSubject.TempDirectory;
-			var f = dir.File(fileName);
-			Assert.That(f.ContainingFolder, Is.EqualTo(dir));
+			var f = _runRootFolder.File(fileName);
+			Assert.That(f.ContainingFolder, Is.EqualTo(_runRootFolder));
 			Assert.That(f.FileName, Is.EqualTo(fileName));
 			Assert.That(f.Extension, Is.EqualTo(extension));
 		}
@@ -195,13 +196,7 @@ namespace SimulatableApi.Tests
 		public void FileSystemCanMakeAFileFromAString()
 		{
 			const string fileName = "SomeFileName.html";
-			var dir = _testSubject.TempDirectory;
-			Assert.That(_testSubject.File((dir.Path/fileName).Absolute), Is.EqualTo(dir.File(fileName)));
-		}
-
-		private static FsFile _TestFile([NotNull] FileSystem fs)
-		{
-			return fs.TempDirectory.File("CreatedByTest.txt");
+			Assert.That(_testSubject.File((_runRootFolder.Path/fileName).Absolute), Is.EqualTo(_runRootFolder.File(fileName)));
 		}
 
 		private static void _AssertIsMissing(object node)
