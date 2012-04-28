@@ -1,9 +1,9 @@
-SimulatableApi
-==============
+Simulatable Api
+===============
 
 Implements ports and adaptors (including simulators) for common dependencies. These abstractions make it easier to write highly-testable code.
 
-The project page is at http://arlobelshee.github.com/SimulatableApi/. It describes the abstractions used in this library and which simulators I currently intend to write. It also gives much more complete documentation for each completed simulator.
+The project page (http://arlobelshee.github.com/SimulatableApi/) describes the abstractions used in this library and which simulators I currently intend to write. It also gives much more complete documentation for each completed simulator.
 
 The rest of this readme is just a teaser to let you know what's in the library.
 
