@@ -12,6 +12,8 @@ namespace SimulatableApi.StreamStore
 		{
 			if (string.IsNullOrEmpty(absolutePath))
 				throw new ArgumentNullException("absolutePath", "A path cannot be null or empty.");
+			if(!absolutePath.Substring(1,2).Equals(":\\"))
+				throw new ArgumentException(string.Format("The path must be absolute. '{0}' is not an absolute path.", absolutePath), "absolutePath");
 			_absolutePath = absolutePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 		}
 

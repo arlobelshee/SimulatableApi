@@ -21,7 +21,6 @@ namespace SimulatableApi.StreamStore.Tests
 			_testSubject = MakeTestSubject();
 			_testSubject.EnableRevertToHere();
 			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-			_testSubject.TempDirectory.Create();
 		}
 
 		[TearDown]
@@ -40,18 +39,6 @@ namespace SimulatableApi.StreamStore.Tests
 		public void CanCheckForExistence()
 		{
 			Assert.That(_testSubject.Directory(ArbitraryMissingFolder), Has.Property("Exists").False);
-		}
-
-		[Test]
-		public void CanMakeDirectoryReference()
-		{
-			Assert.That(_testSubject.Directory(ArbitraryMissingFolder).Path.Absolute, Is.EqualTo(ArbitraryMissingFolder));
-		}
-
-		[Test]
-		public void RejectsInvalidDirectories()
-		{
-			_Throws<ArgumentNullException>(() => _testSubject.Directory(string.Empty), "A path cannot be null or empty.\r\nParameter name: absolutePath");
 		}
 
 		[Test]
@@ -153,14 +140,6 @@ namespace SimulatableApi.StreamStore.Tests
 		public void CanGetTheParentOfADirectory()
 		{
 			Assert.That(_testSubject.Directory(@"C:\Base\Second").Parent, Is.EqualTo(_testSubject.Directory(@"C:\Base\")));
-		}
-
-		[Test]
-		public void CanLocateTempFolder()
-		{
-			string tempPath = Path.GetTempPath();
-			tempPath = tempPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-			Assert.That(_testSubject.TempDirectory.Path.Absolute, Is.EqualTo(tempPath));
 		}
 
 		[Test]

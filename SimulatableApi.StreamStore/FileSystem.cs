@@ -19,10 +19,11 @@ namespace SimulatableApi.StreamStore
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
-		private FileSystem([NotNull] IFsDisk disk)
+		private FileSystem([NotNull] IFsDisk disk, bool shouldCreateTempFolder)
 		{
 			_Changes = new _FsUndo();
 			_Disk = disk;
+			TempDirectory.Create();
 		}
 
 		/// <summary>
@@ -59,7 +60,7 @@ namespace SimulatableApi.StreamStore
 		[NotNull]
 		public static FileSystem Real()
 		{
-			return new FileSystem(new _FsDiskReal());
+			return new FileSystem(new _FsDiskReal(), false);
 		}
 
 		/// <summary>
@@ -69,7 +70,7 @@ namespace SimulatableApi.StreamStore
 		[NotNull]
 		public static FileSystem Simulated()
 		{
-			return new FileSystem(new _FsDiskSimulated());
+			return new FileSystem(new _FsDiskSimulated(), true);
 		}
 
 		/// <summary>
@@ -182,7 +183,7 @@ namespace SimulatableApi.StreamStore
 		[NotNull]
 		public FileSystem Clone()
 		{
-			return new FileSystem(_Disk);
+			return new FileSystem(_Disk, false);
 		}
 	}
 }
