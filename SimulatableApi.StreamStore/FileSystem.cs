@@ -2,7 +2,7 @@
 using System.IO;
 using JetBrains.Annotations;
 
-namespace SimulatableApi
+namespace SimulatableApi.StreamStore
 {
 	/// <summary>
 	/// Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory) one. In either case, FileSystem and its

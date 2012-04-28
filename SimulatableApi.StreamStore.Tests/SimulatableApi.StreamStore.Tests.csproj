@@ -5,15 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D863C640-2171-4E10-A9B4-EA8ED876809C}</ProjectGuid>
+    <ProjectGuid>{DF78229E-26D5-42C9-B910-AF0433970079}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimulatableApi.Tests</RootNamespace>
-    <AssemblyName>SimulatableApi.Tests</AssemblyName>
+    <RootNamespace>SimulatableApi.StreamStore.Tests</RootNamespace>
+    <AssemblyName>SimulatableApi.StreamStore.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\SimulatableAPI\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -60,9 +59,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimulatableApi\SimulatableApi.csproj">
-      <Project>{AC7848B3-CD1E-4302-8FC6-A18F1D26C861}</Project>
-      <Name>SimulatableApi</Name>
+    <ProjectReference Include="..\SimulatableApi.StreamStore\SimulatableApi.StreamStore.csproj">
+      <Project>{134CF601-FCE5-40E6-BDDB-1B850E7A8BB8}</Project>
+      <Name>SimulatableApi.StreamStore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

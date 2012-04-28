@@ -3,7 +3,7 @@ using System.IO;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
-namespace SimulatableApi.Tests
+namespace SimulatableApi.StreamStore.Tests
 {
 	public class RealFileSystemCanLocateFilesAndDirs
 	{

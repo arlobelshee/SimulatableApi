@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace SimulatableApi
+namespace SimulatableApi.StreamStore
 {
 	public class FsDirectory : IEquatable<FsDirectory>
 	{

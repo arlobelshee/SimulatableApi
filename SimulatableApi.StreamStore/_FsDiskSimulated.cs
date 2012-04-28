@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 
-namespace SimulatableApi
+namespace SimulatableApi.StreamStore
 {
 	internal class _FsDiskSimulated : IFsDisk
 	{

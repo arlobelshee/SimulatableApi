@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using JetBrains.Annotations;
 
-namespace SimulatableApi
+namespace SimulatableApi.StreamStore
 {
 	public class FsFile : IEquatable<FsFile>
 	{

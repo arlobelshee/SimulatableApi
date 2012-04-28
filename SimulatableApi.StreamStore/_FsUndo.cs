@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace SimulatableApi
+namespace SimulatableApi.StreamStore
 {
 	internal class _FsUndo
 	{
