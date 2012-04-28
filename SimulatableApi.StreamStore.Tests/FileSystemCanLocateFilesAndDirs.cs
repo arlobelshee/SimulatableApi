@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using FluentAssertions;
 
 namespace SimulatableApi.StreamStore.Tests
 {
@@ -9,7 +11,7 @@ namespace SimulatableApi.StreamStore.Tests
 	{
 		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
 		private const string OriginalContents = "Original contents";
-		private const string NewContents = "New contents";
+		private const string NewContents = "helȽo ﺷ";
 		[NotNull] private FileSystem _testSubject;
 		[NotNull] private FsDirectory _runRootFolder;
 
@@ -61,23 +63,40 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CannotAskForTheParentOfRoot()
 		{
-			_Throws<InvalidOperationException>(() => { var foo = _testSubject.Directory(@"C:\").Parent; }, "The root directory does not have a parent.");
+			_Throws<InvalidOperationException>(() => { FsDirectory foo = _testSubject.Directory(@"C:\").Parent; }, "The root directory does not have a parent.");
 		}
 
 		[Test]
 		public void CannotGetContentsOfMissingFile()
 		{
-			var testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
-			_Throws<FileNotFoundException>(() => { var foo = testFile.ReadAllText(); }, string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
+			FsFile testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
+			_Throws<FileNotFoundException>(() => testFile.ReadAllText(), string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
 		public void CannotGetContentsOfFolder()
 		{
-			var testFile = _runRootFolder.File("CreatedByTest.txt");
+			FsFile testFile = _runRootFolder.File("CreatedByTest.txt");
 			_testSubject.Directory(testFile.FullPath).Create();
-			_Throws<UnauthorizedAccessException>(() => { var foo = testFile.ReadAllText(); },
-				string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
+			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
+		}
+
+		[Test]
+		public void StringsShouldBeEncodedInUtf8ByDefault()
+		{
+			FsFile testFile = _runRootFolder.File("CreatedByTest.txt");
+			testFile.Overwrite(NewContents);
+			var asString = testFile.ReadAllBytes();
+			asString.Should().Equal(Encoding.UTF8.GetBytes(NewContents));
+		}
+
+		[Test]
+		public void BinaryFilesWithValidStringsCanBeReadAsText()
+		{
+			FsFile testFile = _runRootFolder.File("CreatedByTest.txt");
+			testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
+			var asString = testFile.ReadAllText();
+			asString.Should().Be(NewContents);
 		}
 
 		[Test]
@@ -85,7 +104,7 @@ namespace SimulatableApi.StreamStore.Tests
 		{
 			_runRootFolder.Create();
 			Assert.That(_runRootFolder.Exists);
-			using (var secondView = _testSubject.Clone())
+			using (FileSystem secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
 				secondView.Directory(_runRootFolder.Path).Create();
@@ -97,9 +116,9 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CreatingAPathWithMultipleDirsThenRollingBackRemovesAllCreatedDirs()
 		{
-			var theFolder = _runRootFolder.Dir("A");
-			var parentFolderCreatedInPassing = theFolder.Parent;
-			var root = parentFolderCreatedInPassing.Parent;
+			FsDirectory theFolder = _runRootFolder.Dir("A");
+			FsDirectory parentFolderCreatedInPassing = theFolder.Parent;
+			FsDirectory root = parentFolderCreatedInPassing.Parent;
 
 			Assert.That(!parentFolderCreatedInPassing.Exists);
 			Assert.That(root.Exists);
@@ -118,8 +137,8 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void OverwritingAFileInAMissingFolderCreatesThatFolder()
 		{
-			var parentFolder = _runRootFolder;
-			var file = parentFolder.File("CreatedByTest.txt");
+			FsDirectory parentFolder = _runRootFolder;
+			FsFile file = parentFolder.File("CreatedByTest.txt");
 			file.Overwrite(NewContents);
 			Assert.That(parentFolder.Exists);
 		}
@@ -139,7 +158,7 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CanLocateTempFolder()
 		{
-			var tempPath = Path.GetTempPath();
+			string tempPath = Path.GetTempPath();
 			tempPath = tempPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 			Assert.That(_testSubject.TempDirectory.Path.Absolute, Is.EqualTo(tempPath));
 		}
@@ -147,7 +166,7 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CanCreateDirectoryAndRevertIt()
 		{
-			var newDir = _runRootFolder;
+			FsDirectory newDir = _runRootFolder;
 			_AssertIsMissing(newDir);
 			newDir.Create();
 			_AssertIsDir(newDir);
@@ -158,7 +177,7 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CanCreateFileAndRevertIt()
 		{
-			var newFile = _runRootFolder.File("CreatedByTest.txt");
+			FsFile newFile = _runRootFolder.File("CreatedByTest.txt");
 			_AssertIsMissing(newFile);
 			newFile.Overwrite(OriginalContents);
 			_AssertIsFile(newFile, OriginalContents);
@@ -169,9 +188,9 @@ namespace SimulatableApi.StreamStore.Tests
 		[Test]
 		public void CanOverwriteFileAndRevertIt()
 		{
-			var newFile = _runRootFolder.File("CreatedByTest.txt");
+			FsFile newFile = _runRootFolder.File("CreatedByTest.txt");
 			newFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
+			using (FileSystem secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
 				_AssertIsFile(newFile, OriginalContents);
@@ -186,7 +205,7 @@ namespace SimulatableApi.StreamStore.Tests
 		{
 			const string fileName = "ArbitraryFile.txt";
 			const string extension = ".txt";
-			var f = _runRootFolder.File(fileName);
+			FsFile f = _runRootFolder.File(fileName);
 			Assert.That(f.ContainingFolder, Is.EqualTo(_runRootFolder));
 			Assert.That(f.FileName, Is.EqualTo(fileName));
 			Assert.That(f.Extension, Is.EqualTo(extension));

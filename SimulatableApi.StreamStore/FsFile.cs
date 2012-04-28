@@ -4,12 +4,16 @@ using JetBrains.Annotations;
 
 namespace SimulatableApi.StreamStore
 {
+	/// <summary>
+	/// 	Represents a file in the underlying data store. This file may or may not exist. This class exposes methods to read, write, and delete the file. It also exposes methods to ask for information about the file. Multiple file instances can have the same path and <see
+	///  	cref="FileSystem" /> . If so, they will share storage. Any change made in one will be immediately visible in the all others.
+	/// </summary>
 	public class FsFile : IEquatable<FsFile>
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly FSPath _path;
 
-		public FsFile([NotNull] FileSystem allFiles, [NotNull] FSPath path)
+		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FSPath path)
 		{
 			if (allFiles == null)
 				throw new ArgumentNullException("allFiles");
@@ -19,6 +23,11 @@ namespace SimulatableApi.StreamStore
 			_path = path;
 		}
 
+		/// <summary>
+		/// 	Indicates whether two files represent the same path. They may come from different file systems and still be termed equal.
+		/// </summary>
+		/// <param name="other"> A file instance to compare with this object. </param>
+		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
 		public bool Equals(FsFile other)
 		{
 			if (ReferenceEquals(null, other))
@@ -28,29 +37,46 @@ namespace SimulatableApi.StreamStore
 			return Equals(other._path, _path);
 		}
 
+		/// <summary>
+		/// 	Gets the folder that contains this file.
+		/// </summary>
 		[NotNull]
 		public FsDirectory ContainingFolder
 		{
 			get { return new FsDirectory(_allFiles, _path.Parent); }
 		}
 
+		/// <summary>
+		/// 	Gets a value indicating whether this <see cref="FsFile" /> exists.
+		/// </summary>
+		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
 		public bool Exists
 		{
 			get { return _allFiles._Disk.FileExists(_path); }
 		}
 
+		/// <summary>
+		/// 	Gets the name of the file. For E:\example\foo.txt, this would return "foo.txt".
+		/// </summary>
+		/// <value> The name of the file. </value>
 		[NotNull]
 		public string FileName
 		{
 			get { return Path.GetFileName(_path.Absolute); }
 		}
 
+		/// <summary>
+		/// 	Gets the file's extension.
+		/// </summary>
 		[NotNull]
 		public string Extension
 		{
 			get { return Path.GetExtension(_path.Absolute); }
 		}
 
+		/// <summary>
+		/// 	Gets the full path to this file.
+		/// </summary>
 		[NotNull]
 		public FSPath FullPath
 		{
@@ -58,12 +84,12 @@ namespace SimulatableApi.StreamStore
 		}
 
 		/// <summary>
-		/// Regardless of the previous state of the file system, results in a file existing at this file's path with the contents given. This operation is revertable.
+		/// 	Regardless of the previous state of the file system, results in a file existing at this file's path with the contents given. This operation is revertable.
 		/// </summary>
-		/// <param name="newContents">The new contents for the file</param>
+		/// <param name="newContents"> The new contents for the file </param>
 		public void Overwrite([NotNull] string newContents)
 		{
-			var parent = ContainingFolder;
+			FsDirectory parent = ContainingFolder;
 			if (!parent.Exists)
 				parent.Create();
 			_allFiles._Changes.Overwrote(_path);
@@ -71,9 +97,22 @@ namespace SimulatableApi.StreamStore
 		}
 
 		/// <summary>
-		/// If the file exists, return its contents as a string.
+		/// 	Regardless of the previous state of the file system, results in a file existing at this file's path with the contents given. This operation is revertable.
 		/// </summary>
-		/// <returns>The entire contents of the file</returns>
+		/// <param name="newContents"> The new contents for the file </param>
+		public void OverwriteBinary([NotNull] byte[] newContents)
+		{
+			FsDirectory parent = ContainingFolder;
+			if (!parent.Exists)
+				parent.Create();
+			_allFiles._Changes.Overwrote(_path);
+			_allFiles._Disk.Overwrite(_path, newContents);
+		}
+
+		/// <summary>
+		/// 	If the file exists, return its contents as a string.
+		/// </summary>
+		/// <returns> The entire contents of the file </returns>
 		/// <exception cref="System.IO.FileNotFoundException">Thrown if the file does not exist.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">Thrown if this object's FullPath actually refers to a directory in the file system.</exception>
 		public string ReadAllText()
@@ -81,31 +120,62 @@ namespace SimulatableApi.StreamStore
 			return _allFiles._Disk.TextContents(_path);
 		}
 
-        public byte[] ReadAllBytes()
-        {
-            return _allFiles._Disk.RawContents(_path);
-        }
+		/// <summary>
+		/// 	If the file exists, return its contents as a byte array.
+		/// </summary>
+		/// <returns> The entire contents of the file </returns>
+		/// <exception cref="System.IO.FileNotFoundException">Thrown if the file does not exist.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">Thrown if this object's FullPath actually refers to a directory in the file system.</exception>
+		public byte[] ReadAllBytes()
+		{
+			return _allFiles._Disk.RawContents(_path);
+		}
 
+		/// <summary>
+		/// 	Returns a <see cref="System.String" /> that represents this instance.
+		/// </summary>
+		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
 		public override string ToString()
 		{
 			return string.Format("File({0})", _path);
 		}
 
+		/// <summary>
+		/// 	Indicates whether two files represent the same path. They may come from different file systems and still be termed equal.
+		/// </summary>
+		/// <param name="other"> A file instance to compare with this object. </param>
+		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
 		public override bool Equals(object obj)
 		{
 			return Equals(obj as FsFile);
 		}
 
+		/// <summary>
+		/// 	Returns a hash code for this instance.
+		/// </summary>
+		/// <returns> A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. </returns>
 		public override int GetHashCode()
 		{
 			return _path.GetHashCode();
 		}
 
+		/// <summary>
+		/// 	Implements the operator ==. It is the same as <see cref="Equals" /> .
+		/// </summary>
+		/// <param name="left"> The left. </param>
+		/// <param name="right"> The right. </param>
+		/// <returns> The result of the operator. </returns>
 		public static bool operator ==(FsFile left, FsFile right)
 		{
 			return Equals(left, right);
 		}
 
+		/// <summary>
+		/// 	Implements the operator !=. It is the same as !(left == right)
+		/// </summary>
+		/// <param name="left"> The left. </param>
+		/// <param name="right"> The right. </param>
+		/// <returns> The result of the operator. </returns>
 		public static bool operator !=(FsFile left, FsFile right)
 		{
 			return !Equals(left, right);

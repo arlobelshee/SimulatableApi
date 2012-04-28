@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace SimulatableApi.StreamStore
@@ -8,6 +9,7 @@ namespace SimulatableApi.StreamStore
 	internal class _FsDiskSimulated : IFsDisk
 	{
 		private readonly Dictionary<FSPath, _Node> _data = new Dictionary<FSPath, _Node>();
+		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
 		public bool DirExists(FSPath path)
 		{
@@ -21,19 +23,19 @@ namespace SimulatableApi.StreamStore
 
 		public string TextContents(FSPath path)
 		{
-			var storage = _GetStorage(path);
+			_Node storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-		    return storage.TextContents;
+			return DefaultEncoding.GetString(storage.RawContents);
 		}
 
-	    public byte[] RawContents(FSPath path)
-	    {
-            var storage = _GetStorage(path);
-	        _ValidateStorage(path, storage);
-            return storage.RawContents;
-	    }
+		public byte[] RawContents(FSPath path)
+		{
+			_Node storage = _GetStorage(path);
+			_ValidateStorage(path, storage);
+			return storage.RawContents;
+		}
 
-	    public void CreateDir(FSPath path)
+		public void CreateDir(FSPath path)
 		{
 			while (true)
 			{
@@ -47,7 +49,14 @@ namespace SimulatableApi.StreamStore
 		public void Overwrite(FSPath path, string newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File) {
-				TextContents = newContents
+				RawContents= DefaultEncoding.GetBytes(newContents)
+			};
+		}
+
+		public void Overwrite(FSPath path, byte[] newContents)
+		{
+			_data[path] = new _Node(_StorageKind.File) {
+				RawContents = newContents
 			};
 		}
 
@@ -75,13 +84,13 @@ namespace SimulatableApi.StreamStore
 			_data.Remove(src);
 		}
 
-        private void _ValidateStorage(FSPath path, _Node storage)
-        {
-            if (storage.Kind == _StorageKind.Missing)
-                throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
-            if (storage.Kind == _StorageKind.Directory)
-                throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
-        }
+		private void _ValidateStorage(FSPath path, _Node storage)
+		{
+			if (storage.Kind == _StorageKind.Missing)
+				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
+			if (storage.Kind == _StorageKind.Directory)
+				throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
+		}
 
 		[NotNull]
 		private _Node _GetStorage([NotNull] FSPath path)
@@ -97,13 +106,11 @@ namespace SimulatableApi.StreamStore
 			public _Node(_StorageKind storageKind)
 			{
 				Kind = storageKind;
-				TextContents = string.Empty;
-			    RawContents = new byte[0];
+				RawContents = new byte[0];
 			}
 
 			public _StorageKind Kind { get; private set; }
-			public string TextContents { get; set; }
-		    public byte[] RawContents { get; set; }
+			public byte[] RawContents { get; set; }
 		}
 
 		private enum _StorageKind

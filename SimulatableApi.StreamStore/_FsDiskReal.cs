@@ -34,6 +34,11 @@ namespace SimulatableApi.StreamStore
 			File.WriteAllText(path.Absolute, newContents);
 		}
 
+		public void Overwrite(FSPath path, byte[] newContents)
+		{
+			File.WriteAllBytes(path.Absolute, newContents);
+		}
+
 		public void DeleteDir(FSPath path)
 		{
 			Directory.Delete(path.Absolute);
