@@ -10,11 +10,9 @@
 	<projectUrl>http://arlobelshee.github.com/SimulatableApi/</projectUrl>
 	<requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<summary>$description$</summary>
-	<description>This package provides a transactional view on an abstract stream-oriented storage medium.
+	<description>This package provides a transactional view of a file system and an in-memory simulator for that view. This makes it easy to test code that interacts with the file system.
 
-There are two adaptors: backed by disk and backed by memory. the two share a single API and semantics: the FileSystem class. Thus the memory-backed FileSystem can be used as a simulator for the disk-backed one.
-
-This is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system, and all the instances related to a single file system share consistent state.
+This is not your typical files and directories API. There is a single instance that represents the entire file system. File and directory objects are bound to a file system instance and all the instances related to a single file system share consistent state.
 	</description>
 	<releaseNotes>Initial release. Approximately the right API. First pass at adaptors. Neither is firm yet.</releaseNotes>
 	<copyright>Copyright 2011</copyright>
