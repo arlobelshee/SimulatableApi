@@ -10,12 +10,6 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 	public class RealFileSystemCanLocateFilesAndDirs
 	{
 		[Test]
-		public void CanCheckForExistence()
-		{
-			Assert.That(_testSubject.Directory(ArbitraryMissingFolder), Has.Property("Exists").False);
-		}
-
-		[Test]
 		public void CannotGetContentsOfMissingFile()
 		{
 			FsFile testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");

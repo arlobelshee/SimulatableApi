@@ -18,6 +18,22 @@ namespace SimulatableApi.StreamStore.Tests.QueryBasicProperties
 			f.Extension.Should().Be(extension);
 		}
 
+		[Test]
+		public void DirectoriesKnowWhetherTheyExist()
+		{
+			_runRootFolder.Exists.Should().BeFalse();
+			_runRootFolder.Parent.Exists.Should().BeTrue();
+		}
+
+		[Test]
+		public void FilesKnowWhetherTheyExist()
+		{
+			var testSubject = _runRootFolder.File("something.txt");
+			testSubject.Exists.Should().BeFalse();
+			testSubject.Overwrite("anything");
+			testSubject.Exists.Should().BeTrue();
+		}
+
 		[NotNull]
 		protected abstract FileSystem MakeTestSubject();
 
