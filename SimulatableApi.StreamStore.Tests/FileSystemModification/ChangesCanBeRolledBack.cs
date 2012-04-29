@@ -4,10 +4,11 @@ using System.Text;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using FluentAssertions;
+using SimulatableApi.StreamStore.Tests.zzTestHelpers;
 
 namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 {
-	public class RealFileSystemCanLocateFilesAndDirs
+	public abstract class ChangesCanBeRolledBack
 	{
 		[Test]
 		public void CannotGetContentsOfMissingFile()
@@ -43,42 +44,59 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void CreatingADirectoryThatAlreadyExistsDoesNothingAndRollbackDoesNothing()
+		public void ShouldBeAbleToRollBackDirectoryCreation()
+		{
+			_runRootFolder.ShouldNotExist();
+			_runRootFolder.Create();
+			_runRootFolder.ShouldExist();
+			_testSubject.RevertAllChanges();
+			_runRootFolder.ShouldNotExist();
+		}
+
+		[Test]
+		public void CreatingADirectoryThatAlreadyExistsAndRollingItBackShouldDoNothing()
 		{
 			_runRootFolder.Create();
-			Assert.That(_runRootFolder.Exists);
+			_runRootFolder.ShouldExist();
 			using (FileSystem secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
 				secondView.Directory(_runRootFolder.Path).Create();
-				Assert.That(_runRootFolder.Exists);
+				_runRootFolder.ShouldExist();
 			}
-			Assert.That(_runRootFolder.Exists);
+			_runRootFolder.ShouldExist();
 		}
 
 		[Test]
-		public void CreatingAPathWithMultipleDirsThenRollingBackRemovesAllCreatedDirs()
+		public void CreatingADirectoryShouldCreateAnyMissingIntermediateDirectories()
 		{
 			FsDirectory theFolder = _runRootFolder.Dir("A");
-			FsDirectory parentFolderCreatedInPassing = theFolder.Parent;
-			FsDirectory root = parentFolderCreatedInPassing.Parent;
 
-			Assert.That(!parentFolderCreatedInPassing.Exists);
-			Assert.That(root.Exists);
+			theFolder.Parent.ShouldNotExist();
+			theFolder.ShouldNotExist();
 
 			theFolder.Create();
-			Assert.That(theFolder.Exists);
-			Assert.That(parentFolderCreatedInPassing.Exists);
-			Assert.That(root.Exists);
 
-			_testSubject.RevertAllChanges();
-			Assert.That(!theFolder.Exists);
-			Assert.That(!parentFolderCreatedInPassing.Exists);
-			Assert.That(root.Exists);
+			theFolder.ShouldExist();
+			theFolder.Parent.ShouldExist();
 		}
 
 		[Test]
-		public void OverwritingAFileInAMissingFolderCreatesThatFolder()
+		public void DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
+		{
+			FsDirectory theFolder = _runRootFolder.Dir("A");
+
+			theFolder.Parent.ShouldNotExist();
+
+			theFolder.Create();
+			theFolder.Parent.ShouldExist();
+
+			_testSubject.RevertAllChanges();
+			theFolder.Parent.ShouldNotExist();
+		}
+
+		[Test]
+		public void OverwritingAFileInAMissingFolderShouldCreateThatFolder()
 		{
 			FsDirectory parentFolder = _runRootFolder;
 			FsFile file = parentFolder.File("CreatedByTest.txt");
@@ -90,22 +108,22 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 		public void CanCreateDirectoryAndRevertIt()
 		{
 			FsDirectory newDir = _runRootFolder;
-			_AssertIsMissing(newDir);
+			newDir.ShouldNotExist();
 			newDir.Create();
-			_AssertIsDir(newDir);
+			newDir.ShouldExist();
 			_testSubject.RevertAllChanges();
-			_AssertIsMissing(newDir);
+			newDir.ShouldNotExist();
 		}
 
 		[Test]
 		public void CanCreateFileAndRevertIt()
 		{
 			FsFile newFile = _runRootFolder.File("CreatedByTest.txt");
-			_AssertIsMissing(newFile);
+			newFile.ShouldNotExist();
 			newFile.Overwrite(OriginalContents);
-			_AssertIsFile(newFile, OriginalContents);
+			newFile.ShouldContain(OriginalContents);
 			_testSubject.RevertAllChanges();
-			_AssertIsMissing(newFile);
+			newFile.ShouldNotExist();
 		}
 
 		[Test]
@@ -116,27 +134,11 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 			using (FileSystem secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				_AssertIsFile(newFile, OriginalContents);
+				newFile.ShouldContain(OriginalContents);
 				secondView.Directory(_runRootFolder.Path).File("CreatedByTest.txt").Overwrite(NewContents);
-				_AssertIsFile(newFile, NewContents);
+				newFile.ShouldContain(NewContents);
 			}
-			_AssertIsFile(newFile, OriginalContents);
-		}
-
-		private static void _AssertIsMissing(object node)
-		{
-			Assert.That(node, Has.Property("Exists").False);
-		}
-
-		private static void _AssertIsDir(FsDirectory dir)
-		{
-			Assert.That(dir, Has.Property("Exists").True);
-		}
-
-		private static void _AssertIsFile([NotNull] FsFile file, string contents)
-		{
-			Assert.That(file, Has.Property("Exists").True);
-			Assert.That(file.ReadAllText(), Is.EqualTo(contents));
+			newFile.ShouldContain(OriginalContents);
 		}
 
 		private static void _Throws<TException>(TestDelegate code, string message) where TException : Exception
@@ -144,7 +146,6 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 			Assert.That(Assert.Throws<TException>(code), Has.Property("Message").EqualTo(message));
 		}
 
-		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
 		private const string OriginalContents = "Original contents";
 		private const string NewContents = "helȽo ﺷ";
 		[NotNull]
@@ -167,14 +168,20 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 		}
 
 		[NotNull]
-		protected virtual FileSystem MakeTestSubject()
+		protected abstract FileSystem MakeTestSubject();
+	}
+
+	[TestFixture]
+	public class ChangesCanBeRolledBackInRealFs : ChangesCanBeRolledBack
+	{
+		protected override FileSystem MakeTestSubject()
 		{
 			return FileSystem.Real();
 		}
 	}
 
 	[TestFixture]
-	public class SimulatedFileSystemCanLocateFilesAndDirs : RealFileSystemCanLocateFilesAndDirs
+	public class ChangesCanBeRolledBackInMemoryFs : ChangesCanBeRolledBack
 	{
 		protected override FileSystem MakeTestSubject()
 		{
