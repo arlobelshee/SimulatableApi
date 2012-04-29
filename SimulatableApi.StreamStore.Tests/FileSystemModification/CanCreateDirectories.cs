@@ -8,7 +8,7 @@ using SimulatableApi.StreamStore.Tests.zzTestHelpers;
 
 namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 {
-	public abstract class ChangesCanBeRolledBack
+	public abstract class CanCreateDirectories
 	{
 		[Test]
 		public void CannotGetContentsOfMissingFile()
@@ -172,7 +172,7 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 	}
 
 	[TestFixture]
-	public class ChangesCanBeRolledBackInRealFs : ChangesCanBeRolledBack
+	public class CanCreateDirectoriesInRealFs : CanCreateDirectories
 	{
 		protected override FileSystem MakeTestSubject()
 		{
@@ -181,7 +181,7 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 	}
 
 	[TestFixture]
-	public class ChangesCanBeRolledBackInMemoryFs : ChangesCanBeRolledBack
+	public class CanCreateDirectoriesInMemoryFs : CanCreateDirectories
 	{
 		protected override FileSystem MakeTestSubject()
 		{
