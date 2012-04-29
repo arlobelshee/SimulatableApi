@@ -42,12 +42,6 @@ namespace SimulatableApi.StreamStore.Tests
 		}
 
 		[Test]
-		public void CannotAskForTheParentOfRoot()
-		{
-			_Throws<InvalidOperationException>(() => { FsDirectory foo = _testSubject.Directory(@"C:\").Parent; }, "The root directory does not have a parent.");
-		}
-
-		[Test]
 		public void CannotGetContentsOfMissingFile()
 		{
 			FsFile testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");

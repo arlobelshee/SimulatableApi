@@ -8,34 +8,34 @@ namespace SimulatableApi.StreamStore
 {
 	internal class _FsDiskSimulated : IFsDisk
 	{
-		private readonly Dictionary<FSPath, _Node> _data = new Dictionary<FSPath, _Node>();
+		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		public bool DirExists(FSPath path)
+		public bool DirExists(FsPath path)
 		{
 			return _GetStorage(path).Kind == _StorageKind.Directory;
 		}
 
-		public bool FileExists(FSPath path)
+		public bool FileExists(FsPath path)
 		{
 			return _GetStorage(path).Kind == _StorageKind.File;
 		}
 
-		public string TextContents(FSPath path)
+		public string TextContents(FsPath path)
 		{
 			_Node storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
 			return DefaultEncoding.GetString(storage.RawContents);
 		}
 
-		public byte[] RawContents(FSPath path)
+		public byte[] RawContents(FsPath path)
 		{
 			_Node storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
 			return storage.RawContents;
 		}
 
-		public void CreateDir(FSPath path)
+		public void CreateDir(FsPath path)
 		{
 			while (true)
 			{
@@ -46,35 +46,35 @@ namespace SimulatableApi.StreamStore
 			}
 		}
 
-		public void Overwrite(FSPath path, string newContents)
+		public void Overwrite(FsPath path, string newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File) {
 				RawContents= DefaultEncoding.GetBytes(newContents)
 			};
 		}
 
-		public void Overwrite(FSPath path, byte[] newContents)
+		public void Overwrite(FsPath path, byte[] newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File) {
 				RawContents = newContents
 			};
 		}
 
-		public void DeleteDir(FSPath path)
+		public void DeleteDir(FsPath path)
 		{
 			if (_GetStorage(path).Kind == _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Path {0} was a file, and you attempted to delete a directory.", path.Absolute));
 			_data.Remove(path);
 		}
 
-		public void DeleteFile(FSPath path)
+		public void DeleteFile(FsPath path)
 		{
 			if (_GetStorage(path).Kind == _StorageKind.Directory)
 				throw new ArgumentException("path", string.Format("Path {0} was a directory, and you attempted to delete a file.", path.Absolute));
 			_data.Remove(path);
 		}
 
-		public void MoveFile(FSPath src, FSPath dest)
+		public void MoveFile(FsPath src, FsPath dest)
 		{
 			if (_GetStorage(src).Kind != _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Attempted to move file {0}, which is not a file.", src.Absolute));
@@ -84,7 +84,7 @@ namespace SimulatableApi.StreamStore
 			_data.Remove(src);
 		}
 
-		private void _ValidateStorage(FSPath path, _Node storage)
+		private void _ValidateStorage(FsPath path, _Node storage)
 		{
 			if (storage.Kind == _StorageKind.Missing)
 				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
@@ -93,7 +93,7 @@ namespace SimulatableApi.StreamStore
 		}
 
 		[NotNull]
-		private _Node _GetStorage([NotNull] FSPath path)
+		private _Node _GetStorage([NotNull] FsPath path)
 		{
 			if (path.IsRoot)
 				return new _Node(_StorageKind.Directory);

@@ -11,10 +11,7 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
 		[Test]
 		public void TempFolderShouldHaveTheCorrectPath()
 		{
-			string tempPath = Path.GetTempPath();
-			tempPath = tempPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-
-			_testSubject.TempDirectory.Path.Absolute.Should().Be(tempPath);
+			_testSubject.TempDirectory.Path.Should().Be(FsPath.TempFolder);
 		}
 
 		[Test]
@@ -27,40 +24,6 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
 		public void ShouldBeAbleToMakeReferenceToAbsolutePath()
 		{
 			Assert.That(_testSubject.Directory(ArbitraryMissingFolder).Path.Absolute, Is.EqualTo(ArbitraryMissingFolder));
-		}
-
-		[Test]
-		public void ShouldRejectEmptyPathToDirectory()
-		{
-			_Throws<ArgumentNullException>(() => _testSubject.Directory(string.Empty),
-				"A path cannot be null or empty.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
-		public void ShouldRejectTryingToLocateDirectoryAPrioriWithNonAbsolutePath()
-		{
-			_Throws<ArgumentException>(() => _testSubject.Directory(@"something\relative"),
-				"The path must be absolute. 'something\\relative' is not an absolute path.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
-		public void ShouldRejectEmptyPathToFile()
-		{
-			_Throws<ArgumentNullException>(() => _testSubject.File(string.Empty),
-				"A path cannot be null or empty.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
-		public void ShouldRejectTryingToLocateFileAPrioriWithNonAbsolutePath()
-		{
-			_Throws<ArgumentException>(() => _testSubject.File(@"something\relative.txt"),
-				"The path must be absolute. 'something\\relative.txt' is not an absolute path.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
-		public void DirectoriesAreTheSameWhetherCreatedWithTrailingSlashOrNot()
-		{
-			Assert.That(_testSubject.Directory(@"C:\Path\").Path.Absolute, Is.EqualTo(@"C:\Path"));
 		}
 
 		[NotNull] private FileSystem _testSubject;

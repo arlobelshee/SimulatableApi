@@ -12,9 +12,9 @@ namespace SimulatableApi.StreamStore
 	public class FsDirectory : IEquatable<FsDirectory>
 	{
 		[NotNull] private readonly FileSystem _allFiles;
-		[NotNull] private readonly FSPath _path;
+		[NotNull] private readonly FsPath _path;
 
-		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FSPath path)
+		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path)
 		{
 			if (path == null)
 				throw new ArgumentNullException("path");
@@ -51,7 +51,7 @@ namespace SimulatableApi.StreamStore
 		/// 	Gets the path to this directory.
 		/// </summary>
 		[NotNull]
-		public FSPath Path
+		public FsPath Path
 		{
 			get { return _path; }
 		}
@@ -83,7 +83,7 @@ namespace SimulatableApi.StreamStore
 		{
 			if (Exists)
 				return;
-			_AllMissingDirectoriesInPathFromBottomUp().Reverse().Each(dir => _allFiles._Changes.CreatedDirectory(new FSPath(dir)));
+			_AllMissingDirectoriesInPathFromBottomUp().Reverse().Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
 			_allFiles._Disk.CreateDir(_path);
 		}
 

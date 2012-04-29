@@ -10,7 +10,7 @@ namespace SimulatableApi.StreamStore
 		}
 
 		public virtual void RevertAll() {}
-		public virtual void CreatedDirectory([NotNull] FSPath path) {}
-		public virtual void Overwrote([NotNull] FSPath path) {}
+		public virtual void CreatedDirectory([NotNull] FsPath path) {}
+		public virtual void Overwrote([NotNull] FsPath path) {}
 	}
 }

@@ -27,19 +27,19 @@ namespace SimulatableApi.StreamStore
 			_undoActions.Clear();
 		}
 
-		public override void CreatedDirectory(FSPath path)
+		public override void CreatedDirectory(FsPath path)
 		{
 			_undoActions.Add(() => _fileSystem._Disk.DeleteDir(path));
 		}
 
-		public override void Overwrote(FSPath path)
+		public override void Overwrote(FsPath path)
 		{
 			if (!_fileSystem._Disk.FileExists(path))
 			{
 				_undoActions.Add(() => _fileSystem._Disk.DeleteFile(path));
 				return;
 			}
-			var randomFileName = FSPath.TempFolder/Guid.NewGuid().ToString("N");
+			var randomFileName = FsPath.TempFolder/Guid.NewGuid().ToString("N");
 			_fileSystem._Disk.MoveFile(path, randomFileName);
 			_undoActions.Add(() =>
 			{

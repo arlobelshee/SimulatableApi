@@ -4,20 +4,22 @@ using JetBrains.Annotations;
 
 namespace SimulatableApi.StreamStore
 {
-	public class FSPath : IEquatable<FSPath>
+	public class FsPath : IEquatable<FsPath>
 	{
 		[NotNull] private readonly string _absolutePath;
 
-		public FSPath([NotNull] string absolutePath)
+		public FsPath([NotNull] string absolutePath)
 		{
 			if (string.IsNullOrEmpty(absolutePath))
 				throw new ArgumentNullException("absolutePath", "A path cannot be null or empty.");
 			if(!absolutePath.Substring(1,2).Equals(":\\"))
 				throw new ArgumentException(string.Format("The path must be absolute. '{0}' is not an absolute path.", absolutePath), "absolutePath");
-			_absolutePath = absolutePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+			_absolutePath = absolutePath;
+			if(absolutePath.Length>3)
+				_absolutePath = absolutePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 		}
 
-		public bool Equals(FSPath other)
+		public bool Equals(FsPath other)
 		{
 			if (ReferenceEquals(null, other))
 				return false;
@@ -27,9 +29,9 @@ namespace SimulatableApi.StreamStore
 		}
 
 		[NotNull]
-		public static FSPath TempFolder
+		public static FsPath TempFolder
 		{
-			get { return new FSPath(Path.GetTempPath()); }
+			get { return new FsPath(Path.GetTempPath()); }
 		}
 
 		[NotNull]
@@ -39,14 +41,14 @@ namespace SimulatableApi.StreamStore
 		}
 
 		[NotNull]
-		public FSPath Parent
+		public FsPath Parent
 		{
 			get
 			{
 				var parent = Path.GetDirectoryName(_absolutePath);
 				if (string.IsNullOrEmpty(parent))
-					throw new InvalidOperationException("The root directory does not have a parent.");
-				return new FSPath(parent);
+					throw new InvalidOperationException(string.Format("'{0}' is a drive root. It does not have a parent.", _absolutePath));
+				return new FsPath(parent);
 			}
 		}
 
@@ -56,14 +58,14 @@ namespace SimulatableApi.StreamStore
 		}
 
 		[NotNull]
-		public static FSPath operator /([NotNull] FSPath self, [NotNull] string nextStep)
+		public static FsPath operator /([NotNull] FsPath self, [NotNull] string nextStep)
 		{
-			return new FSPath(Path.Combine(self._absolutePath, nextStep));
+			return new FsPath(Path.Combine(self._absolutePath, nextStep));
 		}
 
 		public override bool Equals(object obj)
 		{
-			return Equals(obj as FSPath);
+			return Equals(obj as FsPath);
 		}
 
 		public override int GetHashCode()
@@ -71,12 +73,12 @@ namespace SimulatableApi.StreamStore
 			return _absolutePath.GetHashCode();
 		}
 
-		public static bool operator ==(FSPath left, FSPath right)
+		public static bool operator ==(FsPath left, FsPath right)
 		{
 			return Equals(left, right);
 		}
 
-		public static bool operator !=(FSPath left, FSPath right)
+		public static bool operator !=(FsPath left, FsPath right)
 		{
 			return !Equals(left, right);
 		}

@@ -87,7 +87,7 @@ namespace SimulatableApi.StreamStore
 		[NotNull]
 		public FsDirectory Directory([NotNull] string absolutePath)
 		{
-			return Directory(new FSPath(absolutePath));
+			return Directory(new FsPath(absolutePath));
 		}
 
 		/// <summary>
@@ -100,7 +100,7 @@ namespace SimulatableApi.StreamStore
 		/// <exception cref="ArgumentNullException">if the path is null</exception>
 		/// <returns>a non-null directory instance</returns>
 		[NotNull]
-		public FsDirectory Directory([NotNull] FSPath path)
+		public FsDirectory Directory([NotNull] FsPath path)
 		{
 			return new FsDirectory(this, path);
 		}
@@ -119,7 +119,7 @@ namespace SimulatableApi.StreamStore
 		[NotNull]
 		public FsFile File([NotNull] string absoluteFilePath)
 		{
-			return File(new FSPath(absoluteFilePath));
+			return File(new FsPath(absoluteFilePath));
 		}
 
 		/// <summary>
@@ -132,7 +132,7 @@ namespace SimulatableApi.StreamStore
 		/// <exception cref="ArgumentNullException">if the path is null</exception>
 		/// <returns>a non-null file instance</returns>
 		[NotNull]
-		public FsFile File([NotNull] FSPath fileName)
+		public FsFile File([NotNull] FsPath fileName)
 		{
 			return new FsFile(this, fileName);
 		}

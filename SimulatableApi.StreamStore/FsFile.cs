@@ -11,9 +11,9 @@ namespace SimulatableApi.StreamStore
 	public class FsFile : IEquatable<FsFile>
 	{
 		[NotNull] private readonly FileSystem _allFiles;
-		[NotNull] private readonly FSPath _path;
+		[NotNull] private readonly FsPath _path;
 
-		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FSPath path)
+		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FsPath path)
 		{
 			if (allFiles == null)
 				throw new ArgumentNullException("allFiles");
@@ -78,7 +78,7 @@ namespace SimulatableApi.StreamStore
 		/// 	Gets the full path to this file.
 		/// </summary>
 		[NotNull]
-		public FSPath FullPath
+		public FsPath FullPath
 		{
 			get { return _path; }
 		}
