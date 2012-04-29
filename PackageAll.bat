@@ -3,8 +3,8 @@
 mkdir build
 del /q build\*.*
 
-echo Packing SimulatableApi.StreamStore...
-pushd SimulatableApi.StreamStore
+echo Packing Simulated.FileSystem...
+pushd Simulated.FileSystem
 call Package.bat
 if ERRORLEVEL 1 goto failed
 popd
