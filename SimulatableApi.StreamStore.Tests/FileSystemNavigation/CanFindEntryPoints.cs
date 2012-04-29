@@ -6,8 +6,7 @@ using NUnit.Framework;
 
 namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
 {
-	[TestFixture]
-	public class CanNavigateDirectories_RealFs
+	public abstract class CanFindEntryPoints
 	{
 		[Test]
 		public void TempFolderShouldHaveTheCorrectPath()
@@ -59,10 +58,7 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
 		}
 
 		[NotNull]
-		protected virtual FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
+		protected abstract FileSystem MakeTestSubject();
 
 		private static void _Throws<TException>(Action code, string message) where TException : Exception
 		{
@@ -73,11 +69,20 @@ namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
 	}
 
 	[TestFixture]
-	public class CanNavigateDirectories_MemoryFs : CanNavigateDirectories_RealFs
+	public class CanFindEntryPointsMemoryFs : CanFindEntryPoints
 	{
 		protected override FileSystem MakeTestSubject()
 		{
 			return FileSystem.Simulated();
+		}
+	}
+
+	[TestFixture]
+	public class CanFindEntryPointsRealFs : CanFindEntryPoints
+	{
+		protected override FileSystem MakeTestSubject()
+		{
+			return FileSystem.Real();
 		}
 	}
 }
