@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace System.Linq
 // ReSharper restore CheckNamespace
 {
-	public static class LinqExtensions
+	internal static class _LinqExtensions
 	{
 		public static void Each<T>([NotNull] this IEnumerable<T> items, [NotNull] Action<T> op)
 		{

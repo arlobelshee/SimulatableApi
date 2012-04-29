@@ -46,7 +46,7 @@
     <Compile Include="FsFile.cs" />
     <Compile Include="FSPath.cs" />
     <Compile Include="IFsDisk.cs" />
-    <Compile Include="LinqExtensions.cs" />
+    <Compile Include="_LinqExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="_FsDiskReal.cs" />
     <Compile Include="_FsDiskSimulated.cs" />
