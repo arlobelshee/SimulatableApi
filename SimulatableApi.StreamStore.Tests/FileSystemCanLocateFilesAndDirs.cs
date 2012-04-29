@@ -9,32 +9,6 @@ namespace SimulatableApi.StreamStore.Tests
 {
 	public class RealFileSystemCanLocateFilesAndDirs
 	{
-		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
-		private const string OriginalContents = "Original contents";
-		private const string NewContents = "helȽo ﺷ";
-		[NotNull] private FileSystem _testSubject;
-		[NotNull] private FsDirectory _runRootFolder;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
-		}
-
-		[NotNull]
-		protected virtual FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-
 		[Test]
 		public void CanCheckForExistence()
 		{
@@ -119,12 +93,6 @@ namespace SimulatableApi.StreamStore.Tests
 		}
 
 		[Test]
-		public void CanGetTheParentOfADirectory()
-		{
-			Assert.That(_testSubject.Directory(@"C:\Base\Second").Parent, Is.EqualTo(_testSubject.Directory(@"C:\Base")));
-		}
-
-		[Test]
 		public void CanCreateDirectoryAndRevertIt()
 		{
 			FsDirectory newDir = _runRootFolder;
@@ -161,24 +129,6 @@ namespace SimulatableApi.StreamStore.Tests
 			_AssertIsFile(newFile, OriginalContents);
 		}
 
-		[Test]
-		public void AFileKnowsWhereItIs()
-		{
-			const string fileName = "ArbitraryFile.txt";
-			const string extension = ".txt";
-			FsFile f = _runRootFolder.File(fileName);
-			Assert.That(f.ContainingFolder, Is.EqualTo(_runRootFolder));
-			Assert.That(f.FileName, Is.EqualTo(fileName));
-			Assert.That(f.Extension, Is.EqualTo(extension));
-		}
-
-		[Test]
-		public void FileSystemCanMakeAFileFromAString()
-		{
-			const string fileName = "SomeFileName.html";
-			Assert.That(_testSubject.File((_runRootFolder.Path/fileName).Absolute), Is.EqualTo(_runRootFolder.File(fileName)));
-		}
-
 		private static void _AssertIsMissing(object node)
 		{
 			Assert.That(node, Has.Property("Exists").False);
@@ -198,6 +148,34 @@ namespace SimulatableApi.StreamStore.Tests
 		private static void _Throws<TException>(TestDelegate code, string message) where TException : Exception
 		{
 			Assert.That(Assert.Throws<TException>(code), Has.Property("Message").EqualTo(message));
+		}
+
+		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
+		private const string OriginalContents = "Original contents";
+		private const string NewContents = "helȽo ﺷ";
+		[NotNull]
+		private FileSystem _testSubject;
+		[NotNull]
+		private FsDirectory _runRootFolder;
+
+		[SetUp]
+		public void Setup()
+		{
+			_testSubject = MakeTestSubject();
+			_testSubject.EnableRevertToHere();
+			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			_testSubject.RevertAllChanges();
+		}
+
+		[NotNull]
+		protected virtual FileSystem MakeTestSubject()
+		{
+			return FileSystem.Real();
 		}
 	}
 
