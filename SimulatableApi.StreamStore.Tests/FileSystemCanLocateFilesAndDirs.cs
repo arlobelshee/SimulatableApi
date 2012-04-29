@@ -42,12 +42,6 @@ namespace SimulatableApi.StreamStore.Tests
 		}
 
 		[Test]
-		public void RejectsInvalidFiles()
-		{
-			_Throws<ArgumentNullException>(() => _testSubject.File(string.Empty), "A path cannot be null or empty.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
 		public void CannotAskForTheParentOfRoot()
 		{
 			_Throws<InvalidOperationException>(() => { FsDirectory foo = _testSubject.Directory(@"C:\").Parent; }, "The root directory does not have a parent.");
@@ -131,15 +125,9 @@ namespace SimulatableApi.StreamStore.Tests
 		}
 
 		[Test]
-		public void DirectoriesAreTheSameWhetherCreatedWithTrailingSlashOrNot()
-		{
-			Assert.That(_testSubject.Directory(@"C:\Path\").Path.Absolute, Is.EqualTo(@"C:\Path"));
-		}
-
-		[Test]
 		public void CanGetTheParentOfADirectory()
 		{
-			Assert.That(_testSubject.Directory(@"C:\Base\Second").Parent, Is.EqualTo(_testSubject.Directory(@"C:\Base\")));
+			Assert.That(_testSubject.Directory(@"C:\Base\Second").Parent, Is.EqualTo(_testSubject.Directory(@"C:\Base")));
 		}
 
 		[Test]
