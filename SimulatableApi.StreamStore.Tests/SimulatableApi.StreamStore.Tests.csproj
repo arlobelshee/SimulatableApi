@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileSystemCanLocateFilesAndDirs.cs" />
+    <Compile Include="FileSystemModification\ChangesCanBeRolledBack.cs" />
     <Compile Include="FileSystemNavigation\CanComputePathsUsingFsPath.cs" />
     <Compile Include="FileSystemNavigation\CanFindEntryPoints.cs" />
     <Compile Include="FileSystemNavigation\CanNavigateRelativeToAFileOrDirectory.cs" />
