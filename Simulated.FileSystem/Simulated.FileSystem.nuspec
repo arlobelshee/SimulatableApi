@@ -4,7 +4,7 @@
 	<id>$id$</id>
 	<version>$version$</version>
 	<title>$title$</title>
-	<authors>Arlo Belshee</authors>
+	<authors>Arlo Belshee, Anthony Mastrean</authors>
 	<owners>$author$</owners>
 	<licenseUrl>http://www.opensource.org/licenses/mit-license</licenseUrl>
 	<projectUrl>http://arlobelshee.github.com/SimulatableApi/</projectUrl>
@@ -16,7 +16,7 @@ This is not your typical files and directories API. There is a single instance t
 
 Whole-system savepoints are built in and you can revert to the last savepoint at any time.
 	</description>
-	<releaseNotes>Changing the names. Closer to what I want.</releaseNotes>
+	<releaseNotes>Changing the names. These are probably final. At this point the API seems pretty stable. But I'm still going to wait to do 1.0 until I've played with it some more.</releaseNotes>
 	<copyright>Copyright 2011</copyright>
 	<tags>filesystem simulator</tags>
   </metadata>
