@@ -65,7 +65,7 @@
     <Compile Include="zzTestHelpers\_TestHelperExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimulatableApi.StreamStore\SimulatableApi.StreamStore.csproj">
+    <ProjectReference Include="..\Simulated.FileSystem\SimulatableApi.StreamStore.csproj">
       <Project>{134CF601-FCE5-40E6-BDDB-1B850E7A8BB8}</Project>
       <Name>SimulatableApi.StreamStore</Name>
     </ProjectReference>
