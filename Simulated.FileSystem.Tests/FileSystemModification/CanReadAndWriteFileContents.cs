@@ -5,6 +5,7 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
+using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemModification
 {

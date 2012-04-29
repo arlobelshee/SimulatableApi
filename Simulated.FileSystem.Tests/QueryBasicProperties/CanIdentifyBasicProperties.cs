@@ -2,6 +2,7 @@
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using Simulated._Fs;
 
 namespace Simulated.Tests.QueryBasicProperties
 {

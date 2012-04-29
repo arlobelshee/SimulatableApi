@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
 	/// <summary>
 	/// 	Represents a file in the underlying data store. This file may or may not exist. This class exposes methods to read, write, and delete the file. It also exposes methods to ask for information about the file. Multiple file instances can have the same path and <see

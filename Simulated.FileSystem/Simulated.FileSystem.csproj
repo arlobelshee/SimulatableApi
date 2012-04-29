@@ -42,11 +42,11 @@
   <ItemGroup>
     <Compile Include="Annotations.cs" />
     <Compile Include="FileSystem.cs" />
-    <Compile Include="FsDirectory.cs" />
-    <Compile Include="FsFile.cs" />
     <Compile Include="FsPath.cs" />
     <Compile Include="_Fs\DiskReal.cs" />
     <Compile Include="_Fs\DiskSimulated.cs" />
+    <Compile Include="_Fs\FsDirectory.cs" />
+    <Compile Include="_Fs\FsFile.cs" />
     <Compile Include="_Fs\Undo.cs" />
     <Compile Include="_Fs\UndoWithChangeTracking.cs" />
     <Compile Include="_Fs\_IDisk.cs" />

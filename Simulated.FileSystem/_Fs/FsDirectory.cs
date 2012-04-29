@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
 	/// <summary>
 	/// 	Represents a folder in the underlying data store. This folder may or may not exist. This class exposes methods to create and delete folders, to manipulate their contents, and to ask for more information about the folder.
