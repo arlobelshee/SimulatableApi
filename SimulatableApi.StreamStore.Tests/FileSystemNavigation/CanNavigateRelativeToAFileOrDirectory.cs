@@ -3,7 +3,7 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
-namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
+namespace Simulated.Tests.FileSystemNavigation
 {
 	public abstract class CanNavigateRelativeToAFileOrDirectory
 	{

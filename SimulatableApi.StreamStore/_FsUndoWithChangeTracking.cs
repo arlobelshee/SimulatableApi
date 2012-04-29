@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace SimulatableApi.StreamStore
+namespace Simulated
 {
 	internal class _FsUndoWithChangeTracking : _FsUndo
 	{

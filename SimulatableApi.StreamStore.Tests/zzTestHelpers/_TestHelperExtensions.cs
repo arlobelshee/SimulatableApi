@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using NUnit.Framework;
 
-namespace SimulatableApi.StreamStore.Tests.zzTestHelpers
+namespace Simulated.Tests.zzTestHelpers
 {
 	internal static class _TestHelperExtensions
 	{

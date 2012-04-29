@@ -3,7 +3,7 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
 
-namespace SimulatableApi.StreamStore.Tests.QueryBasicProperties
+namespace Simulated.Tests.QueryBasicProperties
 {
 	public abstract class CanIdentifyBasicProperties
 	{

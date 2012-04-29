@@ -3,7 +3,7 @@ using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace SimulatableApi.StreamStore.Tests.FileSystemNavigation
+namespace Simulated.Tests.FileSystemNavigation
 {
 	[TestFixture]
 	public class CanComputePathsUsingFsPath

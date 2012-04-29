@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace SimulatableApi.StreamStore
+namespace Simulated
 {
 	internal class _FsDiskReal : IFsDisk
 	{

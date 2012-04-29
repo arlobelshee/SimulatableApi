@@ -8,8 +8,8 @@
     <ProjectGuid>{DF78229E-26D5-42C9-B910-AF0433970079}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimulatableApi.StreamStore.Tests</RootNamespace>
-    <AssemblyName>SimulatableApi.StreamStore.Tests</AssemblyName>
+    <RootNamespace>Simulated.Tests</RootNamespace>
+    <AssemblyName>Simulated.FileSystem.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

@@ -8,8 +8,8 @@
     <ProjectGuid>{134CF601-FCE5-40E6-BDDB-1B850E7A8BB8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimulatableApi.StreamStore</RootNamespace>
-    <AssemblyName>SimulatableApi.StreamStore</AssemblyName>
+    <RootNamespace>Simulated</RootNamespace>
+    <AssemblyName>Simulated.FileSystem</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

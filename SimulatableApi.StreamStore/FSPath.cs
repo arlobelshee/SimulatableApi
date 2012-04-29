@@ -2,7 +2,7 @@
 using System.IO;
 using JetBrains.Annotations;
 
-namespace SimulatableApi.StreamStore
+namespace Simulated
 {
 	/// <summary>
 	/// <see cref="FsPath"/> represents an absolute path.

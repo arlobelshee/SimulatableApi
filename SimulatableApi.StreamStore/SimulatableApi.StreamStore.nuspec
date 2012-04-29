@@ -13,8 +13,10 @@
 	<description>This package provides a transactional view of a file system and an in-memory simulator for that view. This makes it easy to test code that interacts with the file system.
 
 This is not your typical files and directories API. There is a single instance that represents the entire file system. File and directory objects are bound to a file system instance and all the instances related to a single file system share consistent state.
+
+Whole-system savepoints are built in and you can revert to the last savepoint at any time.
 	</description>
-	<releaseNotes>Initial release. Approximately the right API. First pass at adaptors. Neither is firm yet.</releaseNotes>
+	<releaseNotes>Changing the names. Closer to what I want.</releaseNotes>
 	<copyright>Copyright 2011</copyright>
 	<tags>filesystem simulator</tags>
   </metadata>

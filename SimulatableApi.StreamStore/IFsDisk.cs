@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace SimulatableApi.StreamStore
+namespace Simulated
 {
 	internal interface IFsDisk
 	{

@@ -1,9 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
 using NUnit.Framework;
-using SimulatableApi.StreamStore.Tests.zzTestHelpers;
+using Simulated.Tests.zzTestHelpers;
 
-namespace SimulatableApi.StreamStore.Tests.FileSystemModification
+namespace Simulated.Tests.FileSystemModification
 {
 	public abstract class CanCreateDirectories
 	{

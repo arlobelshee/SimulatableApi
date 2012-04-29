@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimulatableApi.StreamStore")]
-[assembly: AssemblyDescription("A port that represents a transactional view over a set of streams. Adaptors implement this backed by disk or by memory.")]
+[assembly: AssemblyTitle("Simulated.FileSystem")]
+[assembly: AssemblyDescription("This package provides a transactional view of a file system and an in-memory simulator for that view. This makes it easy to test code that interacts with the file system.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Arlo Belshee")]
-[assembly: AssemblyProduct("SimulatableApi.StreamStore")]
+[assembly: AssemblyProduct("Simulated.FileSystem")]
 [assembly: AssemblyCopyright("Copyright © Arlo Belshee 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.1.0")]
-[assembly: AssemblyFileVersion("0.1.1.0")]
+[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyFileVersion("0.2.0.0")]
