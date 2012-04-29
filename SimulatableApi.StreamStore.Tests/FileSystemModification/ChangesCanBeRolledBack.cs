@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using FluentAssertions;
 
-namespace SimulatableApi.StreamStore.Tests
+namespace SimulatableApi.StreamStore.Tests.FileSystemModification
 {
 	public class RealFileSystemCanLocateFilesAndDirs
 	{
