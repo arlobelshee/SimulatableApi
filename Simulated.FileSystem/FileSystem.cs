@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using JetBrains.Annotations;
+using Simulated._Fs;
 
 namespace Simulated
 {
@@ -21,7 +22,7 @@ namespace Simulated
 	{
 		private FileSystem([NotNull] _IFsDisk disk, bool shouldCreateTempFolder)
 		{
-			_Changes = new _FsUndo();
+			_Changes = new _Undo();
 			_Disk = disk;
 			TempDirectory.Create();
 		}
@@ -42,7 +43,7 @@ namespace Simulated
 		internal _IFsDisk _Disk { get; private set; }
 
 		[NotNull]
-		internal _FsUndo _Changes { get; private set; }
+		internal _Undo _Changes { get; private set; }
 
 		/// <summary>
 		/// Gets the temp directory.
@@ -60,7 +61,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Real()
 		{
-			return new FileSystem(new _FsDiskReal(), false);
+			return new FileSystem(new _DiskReal(), false);
 		}
 
 		/// <summary>
@@ -70,7 +71,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Simulated()
 		{
-			return new FileSystem(new _FsDiskSimulated(), true);
+			return new FileSystem(new _DiskSimulated(), true);
 		}
 
 		/// <summary>
@@ -147,7 +148,7 @@ namespace Simulated
 		{
 			if (!_Changes.IsTrackingChanges)
 			{
-				_Changes = new _FsUndoWithChangeTracking(this);
+				_Changes = new _UndoWithChangeTracking(this);
 			}
 		}
 
@@ -166,7 +167,7 @@ namespace Simulated
 		{
 			if (_Changes.IsTrackingChanges)
 			{
-				_Changes = new _FsUndo();
+				_Changes = new _Undo();
 			}
 		}
 

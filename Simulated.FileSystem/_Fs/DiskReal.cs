@@ -1,8 +1,8 @@
 ﻿using System.IO;
 
-namespace Simulated
+namespace Simulated._Fs
 {
-	internal class _FsDiskReal : _IFsDisk
+	internal class _DiskReal : _IFsDisk
 	{
 		public bool DirExists(FsPath path)
 		{

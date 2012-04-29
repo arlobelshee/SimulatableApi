@@ -44,7 +44,7 @@
     <Compile Include="FileSystem.cs" />
     <Compile Include="FsDirectory.cs" />
     <Compile Include="FsFile.cs" />
-    <Compile Include="FSPath.cs" />
+    <Compile Include="FsPath.cs" />
     <Compile Include="_Fs\DiskReal.cs" />
     <Compile Include="_Fs\DiskSimulated.cs" />
     <Compile Include="_Fs\Undo.cs" />

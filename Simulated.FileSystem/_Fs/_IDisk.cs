@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
 	internal interface _IFsDisk
 	{

@@ -4,9 +4,9 @@ using System.IO;
 using System.Text;
 using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
-	internal class _FsDiskSimulated : _IFsDisk
+	internal class _DiskSimulated : _IFsDisk
 	{
 		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;

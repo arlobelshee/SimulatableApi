@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
-	internal class _FsUndo
+	internal class _Undo
 	{
 		public virtual bool IsTrackingChanges
 		{

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace Simulated
+namespace Simulated._Fs
 {
-	internal class _FsUndoWithChangeTracking : _FsUndo
+	internal class _UndoWithChangeTracking : _Undo
 	{
 		[NotNull] private readonly FileSystem _fileSystem;
 		[NotNull] private readonly List<Action> _undoActions = new List<Action>();
 
-		public _FsUndoWithChangeTracking(FileSystem fileSystem)
+		public _UndoWithChangeTracking(FileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
 		}
