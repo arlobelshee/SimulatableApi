@@ -10,12 +10,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4837BA90-252C-40C2-819C-567BB0CA85AD}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
+		PackageAll.bat = PackageAll.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatableApi.StreamStore", "Simulated.FileSystem\SimulatableApi.StreamStore.csproj", "{134CF601-FCE5-40E6-BDDB-1B850E7A8BB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulated.FileSystem", "Simulated.FileSystem\Simulated.FileSystem.csproj", "{134CF601-FCE5-40E6-BDDB-1B850E7A8BB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatableApi.StreamStore.Tests", "Simulated.FileSystem.Tests\SimulatableApi.StreamStore.Tests.csproj", "{DF78229E-26D5-42C9-B910-AF0433970079}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulated.FileSystem.Tests", "Simulated.FileSystem.Tests\Simulated.FileSystem.Tests.csproj", "{DF78229E-26D5-42C9-B910-AF0433970079}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
