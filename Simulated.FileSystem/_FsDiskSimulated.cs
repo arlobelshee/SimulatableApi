@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Simulated
 {
-	internal class _FsDiskSimulated : IFsDisk
+	internal class _FsDiskSimulated : _IFsDisk
 	{
 		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;

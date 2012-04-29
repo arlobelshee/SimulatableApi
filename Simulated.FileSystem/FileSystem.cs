@@ -19,7 +19,7 @@ namespace Simulated
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
-		private FileSystem([NotNull] IFsDisk disk, bool shouldCreateTempFolder)
+		private FileSystem([NotNull] _IFsDisk disk, bool shouldCreateTempFolder)
 		{
 			_Changes = new _FsUndo();
 			_Disk = disk;
@@ -39,7 +39,7 @@ namespace Simulated
 		}
 
 		[NotNull]
-		internal IFsDisk _Disk { get; private set; }
+		internal _IFsDisk _Disk { get; private set; }
 
 		[NotNull]
 		internal _FsUndo _Changes { get; private set; }

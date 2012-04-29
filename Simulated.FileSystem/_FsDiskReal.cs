@@ -2,7 +2,7 @@
 
 namespace Simulated
 {
-	internal class _FsDiskReal : IFsDisk
+	internal class _FsDiskReal : _IFsDisk
 	{
 		public bool DirExists(FsPath path)
 		{
