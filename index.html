@@ -1,59 +1,61 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Simulatable Api</title>
-    
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+	 <meta charset="utf-8">
+	 <meta http-equiv="X-UA-Compatible" content="chrome=1">
+	 <title>Simulatable Api</title>
+	 
+	 <link rel="stylesheet" href="stylesheets/styles.css">
+	 <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+	 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	 <!--[if lt IE 9]>
+	 <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	 <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Simulatable Api</h1>
-        <p>Implements several simulators for common dependencies. These abstractions make it easier to write highly-testable code.</p>
-        <p class="view"><a href="https://github.com/arlobelshee/SimulatableApi">View the Project on GitHub <small>arlobelshee/SimulatableApi</small></a></p>
-        <ul>
-          <li><a href="https://github.com/arlobelshee/SimulatableApi/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/arlobelshee/SimulatableApi/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/arlobelshee/SimulatableApi">Fork On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h2>Why Simulate?</h2>
+	 <div class="wrapper">
+		<header>
+			<h1>Simulatable Api</h1>
+			<p>Implements several simulators for common dependencies. These abstractions make it easier to write highly-testable code.</p>
+			<p class="view"><a href="https://github.com/arlobelshee/SimulatableApi">View the Project on GitHub <small>arlobelshee/SimulatableApi</small></a></p>
+			<ul>
+				<li><a href="https://github.com/arlobelshee/SimulatableApi/zipball/master">Download <strong>ZIP File</strong></a></li>
+				<li><a href="https://github.com/arlobelshee/SimulatableApi/tarball/master">Download <strong>TAR Ball</strong></a></li>
+				<li><a href="https://github.com/arlobelshee/SimulatableApi">Fork On <strong>GitHub</strong></a></li>
+			</ul>
+			<p class="view"><a href="https://nuget.org/packages/Simulated.FileSystem">Download binaries on NuGet</a></p>
+			<p><strong>License:</strong> MIT.</p>
+		</header>
+		<section>
+<h2>Why Simulate?</h2>
 
 <p>Your program needs to run on several platforms or it depends on slow components (databases, files, networks, or users).</p>
 
 <ul>
-<li>How do you keep your tests fast?</li>
-<li>How do you test it without running all of your tests on every platform?</li>
-<li>How can you keep the majority of the code platform agnostic?</li>
+	<li>How do you keep your tests fast?</li>
+	<li>How do you test it without running all of your tests on every platform?</li>
+	<li>How can you keep the majority of the code platform agnostic?</li>
 </ul>
 
 <p>The first part of the solution is to use a <a href="http://alistair.cockburn.us/Hexagonal+architecture">Hexagonal Architecture</a>. In this architecture, your program has 4 parts:</p>
 
 <dl>
-<dt>Model</dt>
-<dd>
-Your business model is the core of everything. This should contain all the domain logic for your domain. Use Domain Driven Design techniques.
-</dd>
-<dt>Manipulation</dt>
-<dd>
-Your application manipulates the business model. The manipulation code wraps your model and connects to various ports. It responds to port events by manipulating the model. It notifies ports when the model changes is ways they care about.
-</dd>
-<dt>Ports</dt>
-<dd>
-Ports are abstractions for external actors that your application interacts with. Examples include file systems, users, the internet, and queryable persistant storage. Some ports trigger events to which your application reacts. Some just do whatever your application tells them to do. Some do both.
-</dd>
-<dt>Adaptors</dt>
-<dd>
-Adaptors adapt a particular port to a particular external system. For example, an adaptor may adapt the user port to a GUI, while another adapts it to a batch processing system and a third adapts it to a test double.
-</dd>
+	<dt>Model</dt>
+	<dd>
+	Your business model is the core of everything. This should contain all the domain logic for your domain. Use Domain Driven Design techniques.
+	</dd>
+	<dt>Manipulation</dt>
+	<dd>
+	Your application manipulates the business model. The manipulation code wraps your model and connects to various ports. It responds to port events by manipulating the model. It notifies ports when the model changes is ways they care about.
+	</dd>
+	<dt>Ports</dt>
+	<dd>
+	Ports are abstractions for external actors that your application interacts with. Examples include file systems, users, the internet, and queryable persistant storage. Some ports trigger events to which your application reacts. Some just do whatever your application tells them to do. Some do both.
+	</dd>
+	<dt>Adaptors</dt>
+	<dd>
+	Adaptors adapt a particular port to a particular external system. For example, an adaptor may adapt the user port to a GUI, while another adapts it to a batch processing system and a third adapts it to a test double.
+	</dd>
 </dl>
 
 <p>The next step is to define a set of test cases that operate on the ports. These ensure that each adaptor for a given port behaves exactly the same&mdash;to whatever degree your application wants uniformity.</p>
@@ -77,38 +79,38 @@ Adaptors adapt a particular port to a particular external system. For example, a
 <p>My first release contains only one port, and only two adaptors. I will add more ports and adpators over time. Here is the list of planned ports, with a description of each. I'll add full documentation for each as I add it to the library.</p>
 
 <dl>
-<dt>File System</dt>
-<dd>
-This port is a transactional view on an arbitrary storage medium. There are two adaptors. One is backed by a file system. The other is backed by memory. I may eventually add an adaptor for an async read- & write-through cache.</dd>
-<dt>Structured Data Store (not implemented yet)</dt>
-<dd>
-This port is a view of a structured data store. It supports both Queryable Repository and Loader/Saver patterns for interaction with the store. There will be adaptors for an in-memory non-persitent caching store and for Sql Server. I may add adaptors for other data stores over time.
-</dd>
-<dt>Time (not implemented yet)</dt>
-<dd>
-This port manages time. Adaptors will include wall-clock time, simuation frame time, and event sequence time. There are numerous other definitions of time; I may add adaptors for them eventually.
-</dd>
-<dt>User Interaction (not implemented yet)</dt>
-<dd>
-This port represents interaction with the user. The first three adaptors will be for WPF, a DSL for batch files or other automation, and a test adaptor. The test adaptor makes it easy to force the system to an initial state and provides low-level control. The automation adaptor allows the aplication to present abstractions that make it easier to write automation scripts.
-</dd>
-<dt>Internet (not implemented yet)</dt>
-<dd>
-This is a generic port that represents the internet as a whole. Initial adaptors will be for async HTTP and for an in-memory internet cache.
-</dd>
-<dt></dt>
-<dt>Remote Service (not implemented yet)</dt>
-<dd>
-This port represents a single remote service. Usage examples include a credit-card processing service or a read-write REST API. Initial adaptors will include an adaptor that connects to the live service, one that connects to a testing or pre-production service, and one that provides canned responses to canned operations. This port differs from the others in that it is designed to be tested in an approval style and be incorporated into your site monitoring. It protects you against unexpected changes in a third-party service that will affect your product.
-</dd>
-<dt>Parallel Computation (not implemented yet)</dt>
-<dd>
-This port represents parallelism. its purpose is to allow you to code with high-level APIs (Task, PLinq, etc), but still break that abstraction in test code so that you can force a particular execution order. This helps when trying to pin down race conditions or deadlocks. This port depends heavily on the Time port.
-</dd>
-<dt>.Net Platform (not implemented yet)</dt>
-<dd>
-This port abstracts over the .Net runtime in use. Adaptors will exist for Azure, Windows Client, Windows Server, Phone, Silverlight, and WindowsRT. This port will eventually get very large. This is not at attempt to create a full common subset for these platforms. You will still need to compile your code differently for each one. However, it should abstract away platform differences such as Reflection semmantics.
-</dd>
+	<dt>File System</dt>
+	<dd>
+	This port is a transactional view on an arbitrary storage medium. There are two adaptors. One is backed by a file system. The other is backed by memory. I may eventually add an adaptor for an async read- & write-through cache.</dd>
+	<dt>Structured Data Store (not implemented yet)</dt>
+	<dd>
+	This port is a view of a structured data store. It supports both Queryable Repository and Loader/Saver patterns for interaction with the store. There will be adaptors for an in-memory non-persitent caching store and for Sql Server. I may add adaptors for other data stores over time.
+	</dd>
+	<dt>Time (not implemented yet)</dt>
+	<dd>
+	This port manages time. Adaptors will include wall-clock time, simuation frame time, and event sequence time. There are numerous other definitions of time; I may add adaptors for them eventually.
+	</dd>
+	<dt>User Interaction (not implemented yet)</dt>
+	<dd>
+	This port represents interaction with the user. The first three adaptors will be for WPF, a DSL for batch files or other automation, and a test adaptor. The test adaptor makes it easy to force the system to an initial state and provides low-level control. The automation adaptor allows the aplication to present abstractions that make it easier to write automation scripts.
+	</dd>
+	<dt>Internet (not implemented yet)</dt>
+	<dd>
+	This is a generic port that represents the internet as a whole. Initial adaptors will be for async HTTP and for an in-memory internet cache.
+	</dd>
+	<dt></dt>
+	<dt>Remote Service (not implemented yet)</dt>
+	<dd>
+	This port represents a single remote service. Usage examples include a credit-card processing service or a read-write REST API. Initial adaptors will include an adaptor that connects to the live service, one that connects to a testing or pre-production service, and one that provides canned responses to canned operations. This port differs from the others in that it is designed to be tested in an approval style and be incorporated into your site monitoring. It protects you against unexpected changes in a third-party service that will affect your product.
+	</dd>
+	<dt>Parallel Computation (not implemented yet)</dt>
+	<dd>
+	This port represents parallelism. its purpose is to allow you to code with high-level APIs (Task, PLinq, etc), but still break that abstraction in test code so that you can force a particular execution order. This helps when trying to pin down race conditions or deadlocks. This port depends heavily on the Time port.
+	</dd>
+	<dt>.Net Platform (not implemented yet)</dt>
+	<dd>
+	This port abstracts over the .Net runtime in use. Adaptors will exist for Azure, Windows Client, Windows Server, Phone, Silverlight, and WindowsRT. This port will eventually get very large. This is not at attempt to create a full common subset for these platforms. You will still need to compile your code differently for each one. However, it should abstract away platform differences such as Reflection semmantics.
+	</dd>
 </dl>
 
 <h2>File System</h2>
@@ -133,13 +135,13 @@ This port abstracts over the .Net runtime in use. Adaptors will exist for Azure,
 
 <p>For this reason, I recommend that you only create one adaptor instance. If you need multiple views then clone your instance. Do not create a new, unrelated instance.</p>
 
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/arlobelshee">arlobelshee</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+		</section>
+		<footer>
+		  <p>This project is maintained by <a href="https://github.com/arlobelshee">arlobelshee</a></p>
+		  <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+		</footer>
+	 </div>
+	 <script src="javascripts/scale.fix.js"></script>
+	 
   </body>
 </html>
