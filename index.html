@@ -70,14 +70,14 @@ Adaptors adapt a particular port to a particular external system. For example, a
 
 <p>Note: different applications require different types of uniformity in their ports. So some of these implementations may not work for your project. I think they're a good starting point. These ports have proven to be good abstractions in numerous projects. However, I do expect that you'll modify them some to fit each particular project.</p>
 
-<p>I've released this library as binaries for those who can use the port abstractions as-is. I've released it as source for those who need to modify the abstractions to fit their domains.</p>
+<p><a href="https://nuget.org/packages/Simulated.FileSystem">Simulatable API binaries</a> are available on NuGet for those who can use the port abstractions as-is. I've released the <a href="https://github.com/arlobelshee/SimulatableApi">source</a> for those who need to modify the abstractions to fit their domains.</p>
 
 <h2>What ports can I expect in this library?</h2>
 
 <p>My first release contains only one port, and only two adaptors. I will add more ports and adpators over time. Here is the list of planned ports, with a description of each. I'll add full documentation for each as I add it to the library.</p>
 
 <dl>
-<dt>Stream Storage</dt>
+<dt>File System</dt>
 <dd>
 This port is a transactional view on an arbitrary storage medium. There are two adaptors. One is backed by a file system. The other is backed by memory. I may eventually add an adaptor for an async read- & write-through cache.</dd>
 <dt>Structured Data Store (not implemented yet)</dt>
@@ -111,7 +111,7 @@ This port abstracts over the .Net runtime in use. Adaptors will exist for Azure,
 </dd>
 </dl>
 
-<h2>Stream Storage</h2>
+<h2>File System</h2>
 
 <p>This port represents a transactional view on an arbitrary storage medium.</p>
 
@@ -121,11 +121,17 @@ This port abstracts over the .Net runtime in use. Adaptors will exist for Azure,
 
 <p>The last, <code>FileSystem.Clone()</code>, creates a view from another view. The two views share the same underlying storage but each has its own change tracking and undo facilities.</p>
 
-<p>The first thing to notice is that this is not your typical files and directories API. There is a single instance that represents the entire file system; file and directory objects are bound to a file system.</p>
+<p>This is not your typical files and directories API.</p>
+
+<p>There is a single instance that represents the entire file system; file and directory objects are bound to a file system.</p>
 
 <p>All the instances related to a single file system share consistent state. If you create two file objects pointing to the same path in a particular file system and then write to one, you will immediately see the changes in the second.</p>
 
-<p>No promise is made about consistency between multiple <code>FileSystem</code>s unless they are clones of each other. For example, the in-memory adaptor has disjoint state between <code>FileSystem</code> instances. The on disk adaptor shares state between separate <code>FileSystem</code> instances, if those instances refer to the same directories. For this reason, I recommend that you only create one adaptor instance. If you need multiple views then clone your instance. Do not create a new, unrelated instance.</p>
+<p>Clones are guaranteed to share consistent state. They only difference is where their last savepoint is.</p>
+
+<p>No promise is made about consistency between multiple <code>FileSystem</code>s unless they are clones of each other. For example, the in-memory adaptor has disjoint state between <code>FileSystem</code> instances. The on disk adaptor shares state between separate <code>FileSystem</code> instances.</p>
+
+<p>For this reason, I recommend that you only create one adaptor instance. If you need multiple views then clone your instance. Do not create a new, unrelated instance.</p>
 
       </section>
       <footer>
