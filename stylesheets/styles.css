@@ -14,6 +14,10 @@ p, ul, ol, table, pre, dl {
 	margin:0 0 20px;
 }
 
+p, ul, ol, dl {
+	text-align: justify;
+}
+
 h1, h2, h3 {
 	line-height:1.1;
 }
@@ -30,7 +34,7 @@ a {
 
 a small {
 	font-size:11px;
-	color:#777;
+	color:#000;
 	margin-top:-0.6em;
 	display:block;
 }
@@ -38,6 +42,8 @@ a small {
 .wrapper {
 	width:860px;
 	margin:0 auto;
+	position: relative;
+	left: -7%;
 }
 
 blockquote {
@@ -172,12 +178,22 @@ footer {
 	bottom:50px;
 }
 
-@media print, screen and (max-width: 960px) {
+@media print, screen and (max-width: 1135px) {
 	
 	div.wrapper {
 	 width:auto;
 	 margin:0;
+	position: static;
+	left: 0;
 	}
+
+	section {
+		width: auto;
+		padding-left: 360px;
+	}
+}
+
+@media print, screen and (max-width: 960px) {
 	
 	header, section, footer {
 	 float:none;
