@@ -41,7 +41,24 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void RevertingChangedFileContentsShouldReverToOriginalContents()
+		public void CommittingChangedFileContentsShouldCompletelyEliminateOriginalContents()
+		{
+			_testFile.Overwrite(OriginalContents);
+			using (FileSystem secondView = _testSubject.Clone())
+			{
+				secondView.EnableRevertToHere();
+				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				var originalDataCache = secondView._UndoDataCache;
+
+				originalDataCache.Files("*.*").Should().NotBeEmpty();
+				secondView.CommitChanges();
+				originalDataCache.Files("*.*").Should().BeEquivalentTo();
+				originalDataCache.ShouldNotExist();
+			}
+		}
+
+		[Test]
+		public void RevertingChangedFileContentsShouldRevertToOriginalContents()
 		{
 			_testFile.Overwrite(OriginalContents);
 			using (FileSystem secondView = _testSubject.Clone())
@@ -64,7 +81,7 @@ namespace Simulated.Tests.FileSystemModification
 		public void CannotReadContentsOfFolder()
 		{
 			FsFile testFile = _testFile;
-			_testSubject.Directory(testFile.FullPath).Create();
+			_testSubject.Directory(testFile.FullPath).EnsureExists();
 			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
 		}
 

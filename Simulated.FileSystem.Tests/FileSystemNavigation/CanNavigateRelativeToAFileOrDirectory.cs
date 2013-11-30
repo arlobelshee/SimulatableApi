@@ -32,6 +32,18 @@ namespace Simulated.Tests.FileSystemNavigation
 			_runRootFolder.File(ArbitraryFileName).ContainingFolder.Should().Be(_runRootFolder);
 		}
 
+		[Test]
+		public void CanGetAllFilesWithinADirectory()
+		{
+			var firstFile = _runRootFolder.File(ArbitraryFileName);
+			var extension = firstFile.Extension;
+			var secondFile = _runRootFolder.File("secondFile" + extension);
+			firstFile.Overwrite(ArbitraryContents);
+			secondFile.Overwrite(ArbitraryContents);
+			_runRootFolder.Files("*" + extension).Should().BeEquivalentTo(firstFile, secondFile);
+			_runRootFolder.Files(firstFile.FileBaseName + ".*").Should().BeEquivalentTo(firstFile);
+		}
+
 		[NotNull]
 		protected abstract FileSystem MakeTestSubject();
 
@@ -53,6 +65,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		}
 
 		private const string ArbitraryFileName = "something.txt";
+		private const string ArbitraryContents = "Arbitrary contents.";
 	}
 
 	[TestFixture]

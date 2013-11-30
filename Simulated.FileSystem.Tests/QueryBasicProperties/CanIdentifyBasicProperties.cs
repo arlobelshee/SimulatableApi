@@ -12,11 +12,13 @@ namespace Simulated.Tests.QueryBasicProperties
 		public void AFileKnowsItsFileNameParts()
 		{
 			const string fileName = "ArbitraryFile.txt";
+			const string baseName = "ArbitraryFile";
 			const string extension = ".txt";
 
 			FsFile f = _runRootFolder.File(fileName);
 			f.FileName.Should().Be(fileName);
 			f.Extension.Should().Be(extension);
+			f.FileBaseName.Should().Be(baseName);
 		}
 
 		[Test]

@@ -7,7 +7,8 @@ using JetBrains.Annotations;
 namespace Simulated._Fs
 {
 	/// <summary>
-	/// 	Represents a folder in the underlying data store. This folder may or may not exist. This class exposes methods to create and delete folders, to manipulate their contents, and to ask for more information about the folder.
+	///    Represents a folder in the underlying data store. This folder may or may not exist. This class exposes methods to
+	///    create and delete folders, to manipulate their contents, and to ask for more information about the folder.
 	/// </summary>
 	public class FsDirectory : IEquatable<FsDirectory>
 	{
@@ -25,7 +26,8 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Indicates whether two folders represent the same path. They may come from different file systems and still be termed equal.
+		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
+		///    equal.
 		/// </summary>
 		/// <param name="other"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
@@ -39,7 +41,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets a value indicating whether this <see cref="FsDirectory" /> exists.
+		///    Gets a value indicating whether this <see cref="FsDirectory" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
 		public bool Exists
@@ -48,7 +50,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the path to this directory.
+		///    Gets the path to this directory.
 		/// </summary>
 		[NotNull]
 		public FsPath Path
@@ -57,7 +59,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the directory that contains this directory.
+		///    Gets the directory that contains this directory.
 		/// </summary>
 		[NotNull]
 		public FsDirectory Parent
@@ -66,7 +68,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets a drectory instance that represents a sub-directory of this directory.
+		///    Gets a drectory instance that represents a sub-directory of this directory.
 		/// </summary>
 		/// <param name="subdirName"> Name of the subdir. </param>
 		/// <returns> the subdir as a directory object </returns>
@@ -77,9 +79,10 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Regardless of the previous state of the file system, results in a directory existing at this object's Path. This operation is revertable.
+		///    Regardless of the previous state of the file system, results in a directory existing at this object's Path. This
+		///    operation is revertable.
 		/// </summary>
-		public void Create()
+		public void EnsureExists()
 		{
 			if (Exists)
 				return;
@@ -88,7 +91,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// Gets a file object for a file in this directory.
+		///    Gets a file object for a file in this directory.
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
 		/// <returns>a file in this directory</returns>
@@ -98,7 +101,22 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Returns a <see cref="System.String" /> that represents this instance.
+		///    Gets an enumeration of known files in this directory.
+		///    Note: an in-memory FileSystem is always presumed to start empty, while an on-disk
+		///    FileSystem starts with an existing structure of directories and files.
+		///    This method always returns results from the underlying data store. As such, it will find files that you created
+		///    with prior to this FileSystem's existence (e.g., those created in a root from which this was
+		///    cloned or those that were on the disk before attaching this FileSystem).
+		/// </summary>
+		/// <param name="searchPattern">A filter to apply. Uses file system shell pattern matching (e.g., *.txt).</param>
+		/// <returns>An enumeration of all known files that match the pattern.</returns>
+		public IEnumerable<FsFile> Files(string searchPattern)
+		{
+			return _allFiles._Disk.FindFiles(_path, searchPattern).Select(p => new FsFile(_allFiles, p));
+		}
+
+		/// <summary>
+		///    Returns a <see cref="System.String" /> that represents this instance.
 		/// </summary>
 		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
 		public override string ToString()
@@ -107,7 +125,8 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Indicates whether two folders represent the same path. They may come from different file systems and still be termed equal.
+		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
+		///    equal.
 		/// </summary>
 		/// <param name="other"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
@@ -117,7 +136,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Returns a hash code for this instance.
+		///    Returns a hash code for this instance.
 		/// </summary>
 		/// <returns> A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. </returns>
 		public override int GetHashCode()
@@ -126,7 +145,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
@@ -137,7 +156,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Implements the operator !=. It is the same as !(left == right)
+		///    Implements the operator !=. It is the same as !(left == right)
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
@@ -151,7 +170,7 @@ namespace Simulated._Fs
 		private IEnumerable<string> _AllMissingDirectoriesInPathFromBottomUp()
 		{
 			var dir = new DirectoryInfo(_path.Absolute);
-			DirectoryInfo root = dir.Root;
+			var root = dir.Root;
 			while (!dir.Exists && dir != root)
 			{
 				yield return dir.FullName;

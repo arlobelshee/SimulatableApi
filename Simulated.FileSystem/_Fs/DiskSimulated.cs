@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 
@@ -23,14 +24,14 @@ namespace Simulated._Fs
 
 		public string TextContents(FsPath path)
 		{
-			_Node storage = _GetStorage(path);
+			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
 			return DefaultEncoding.GetString(storage.RawContents);
 		}
 
 		public byte[] RawContents(FsPath path)
 		{
-			_Node storage = _GetStorage(path);
+			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
 			return storage.RawContents;
 		}
@@ -48,14 +49,16 @@ namespace Simulated._Fs
 
 		public void Overwrite(FsPath path, string newContents)
 		{
-			_data[path] = new _Node(_StorageKind.File) {
-				RawContents= DefaultEncoding.GetBytes(newContents)
+			_data[path] = new _Node(_StorageKind.File)
+			{
+				RawContents = DefaultEncoding.GetBytes(newContents)
 			};
 		}
 
 		public void Overwrite(FsPath path, byte[] newContents)
 		{
-			_data[path] = new _Node(_StorageKind.File) {
+			_data[path] = new _Node(_StorageKind.File)
+			{
 				RawContents = newContents
 			};
 		}
@@ -82,6 +85,28 @@ namespace Simulated._Fs
 				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
 			_data[dest] = _data[src];
 			_data.Remove(src);
+		}
+
+		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		{
+			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
+			if (patternExtensionDelimiter < 0)
+				return Enumerable.Empty<FsPath>();
+			var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
+			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
+			return
+				_data.Where(
+					item =>
+						item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
+					.Select(item => item.Key);
+		}
+
+		private bool _PatternMatches(string patternBaseName, string patternExtension, string fileName)
+		{
+			var extension = Path.GetExtension(fileName);
+			extension = string.IsNullOrEmpty(extension) ? string.Empty : extension.Substring(1);
+			var baseName = Path.GetFileNameWithoutExtension(fileName);
+			return (patternBaseName == "*" || baseName == patternBaseName) && (patternExtension == "*" || extension == patternExtension);
 		}
 
 		private void _ValidateStorage(FsPath path, _Node storage)

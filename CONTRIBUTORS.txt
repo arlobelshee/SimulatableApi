@@ -1,0 +1,4 @@
+The following people have contributed to this project. All such contributions are released as part of the main work and under its license.
+
+ * Anthony Mastrean (github:AnthonyMastrean)
+ 

@@ -16,7 +16,9 @@ This is not your typical files and directories API. There is a single instance t
 
 Whole-system savepoints are built in and you can revert to the last savepoint at any time.
 	</description>
-	<releaseNotes>Changing the names. These are probably final. At this point the API seems pretty stable. But I'm still going to wait to do 1.0 until I've played with it some more.</releaseNotes>
+	<releaseNotes>API is now locked. I will maintain backwards compatibility from here on. Future experimentation will happen in the Simulated.Experimental namespace. Everything outside of that namespace will be compatible.
+	
+	This release also adds the ability to delete files and directories, still with full transactional gurantees.</releaseNotes>
 	<copyright>Copyright 2011</copyright>
 	<tags>filesystem simulator</tags>
   </metadata>

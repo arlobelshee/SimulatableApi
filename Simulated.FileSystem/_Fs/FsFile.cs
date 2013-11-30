@@ -66,7 +66,15 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the file's extension.
+		/// Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
+		/// </summary>
+		public string FileBaseName
+		{
+			get { return Path.GetFileNameWithoutExtension(_path.Absolute); }
+		}
+
+		/// <summary>
+		/// 	Gets the file's extension. For E:\example\foo.txt, this would return ".txt".
 		/// </summary>
 		[NotNull]
 		public string Extension
@@ -91,7 +99,7 @@ namespace Simulated._Fs
 		{
 			FsDirectory parent = ContainingFolder;
 			if (!parent.Exists)
-				parent.Create();
+				parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
@@ -104,7 +112,7 @@ namespace Simulated._Fs
 		{
 			FsDirectory parent = ContainingFolder;
 			if (!parent.Exists)
-				parent.Create();
+				parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}

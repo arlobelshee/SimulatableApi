@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Simulated._Fs
 {
@@ -19,12 +21,12 @@ namespace Simulated._Fs
 			return File.ReadAllText(path.Absolute);
 		}
 
-	    public byte[] RawContents(FsPath path)
-	    {
-	        return File.ReadAllBytes(path.Absolute);
-	    }
+		public byte[] RawContents(FsPath path)
+		{
+			return File.ReadAllBytes(path.Absolute);
+		}
 
-	    public void CreateDir(FsPath path)
+		public void CreateDir(FsPath path)
 		{
 			Directory.CreateDirectory(path.Absolute);
 		}
@@ -52,6 +54,13 @@ namespace Simulated._Fs
 		public void MoveFile(FsPath src, FsPath dest)
 		{
 			File.Move(src.Absolute, dest.Absolute);
+		}
+
+		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		{
+			if (!DirExists(path))
+				return Enumerable.Empty<FsPath>();
+			return Directory.EnumerateFiles(path.Absolute, searchPattern).Select(p => new FsPath(p));
 		}
 	}
 }
