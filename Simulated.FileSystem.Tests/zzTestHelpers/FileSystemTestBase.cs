@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: FileSystemTestBase.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated._Fs;

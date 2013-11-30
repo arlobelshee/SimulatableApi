@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: FsDirectory.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,7 +76,9 @@ namespace Simulated._Fs
 		{
 			if (Exists)
 				return;
-			_AllMissingDirectoriesInPathFromBottomUp().Reverse().Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
+			_AllMissingDirectoriesInPathFromBottomUp()
+				.Reverse()
+				.Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
 			_allFiles._Disk.CreateDir(_path);
 		}
 
@@ -110,7 +117,8 @@ namespace Simulated._Fs
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
 		public IEnumerable<FsFile> Files(string searchPattern)
 		{
-			return _allFiles._Disk.FindFiles(_path, searchPattern).Select(p => new FsFile(_allFiles, p));
+			return _allFiles._Disk.FindFiles(_path, searchPattern)
+				.Select(p => new FsFile(_allFiles, p));
 		}
 
 		/// <summary>

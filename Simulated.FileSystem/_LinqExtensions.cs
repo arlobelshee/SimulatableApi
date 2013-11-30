@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿// SimulatableAPI
+// File: _LinqExtensions.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 // ReSharper disable CheckNamespace
-namespace System.Linq
-// ReSharper restore CheckNamespace
+
+namespace System.Linq // ReSharper restore CheckNamespace
 {
 	internal static class _LinqExtensions
 	{

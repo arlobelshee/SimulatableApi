@@ -1,3 +1,8 @@
+// SimulatableAPI
+// File: FsFile.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
 using System;
 using System.IO;
 using JetBrains.Annotations;
@@ -5,8 +10,12 @@ using JetBrains.Annotations;
 namespace Simulated._Fs
 {
 	/// <summary>
-	/// 	Represents a file in the underlying data store. This file may or may not exist. This class exposes methods to read, write, and delete the file. It also exposes methods to ask for information about the file. Multiple file instances can have the same path and <see
-	///  	cref="FileSystem" /> . If so, they will share storage. Any change made in one will be immediately visible in the all others.
+	///    Represents a file in the underlying data store. This file may or may not exist. This class exposes methods to read,
+	///    write, and delete the file. It also exposes methods to ask for information about the file. Multiple file instances
+	///    can have the same path and
+	///    <see
+	///       cref="FileSystem" />
+	///    . If so, they will share storage. Any change made in one will be immediately visible in the all others.
 	/// </summary>
 	public class FsFile : IEquatable<FsFile>
 	{
@@ -24,7 +33,8 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Indicates whether two files represent the same path. They may come from different file systems and still be termed equal.
+		///    Indicates whether two files represent the same path. They may come from different file systems and still be termed
+		///    equal.
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
@@ -38,7 +48,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the folder that contains this file.
+		///    Gets the folder that contains this file.
 		/// </summary>
 		[NotNull]
 		public FsDirectory ContainingFolder
@@ -47,7 +57,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets a value indicating whether this <see cref="FsFile" /> exists.
+		///    Gets a value indicating whether this <see cref="FsFile" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
 		public bool Exists
@@ -56,7 +66,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the name of the file. For E:\example\foo.txt, this would return "foo.txt".
+		///    Gets the name of the file. For E:\example\foo.txt, this would return "foo.txt".
 		/// </summary>
 		/// <value> The name of the file. </value>
 		[NotNull]
@@ -66,7 +76,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
+		///    Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
 		/// </summary>
 		public string FileBaseName
 		{
@@ -74,7 +84,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the file's extension. For E:\example\foo.txt, this would return ".txt".
+		///    Gets the file's extension. For E:\example\foo.txt, this would return ".txt".
 		/// </summary>
 		[NotNull]
 		public string Extension
@@ -83,7 +93,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Gets the full path to this file.
+		///    Gets the full path to this file.
 		/// </summary>
 		[NotNull]
 		public FsPath FullPath
@@ -92,12 +102,13 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Regardless of the previous state of the file system, results in a file existing at this file's path with the contents given. This operation is revertable.
+		///    Regardless of the previous state of the file system, results in a file existing at this file's path with the
+		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
 		public void Overwrite([NotNull] string newContents)
 		{
-			FsDirectory parent = ContainingFolder;
+			var parent = ContainingFolder;
 			if (!parent.Exists)
 				parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
@@ -105,12 +116,13 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Regardless of the previous state of the file system, results in a file existing at this file's path with the contents given. This operation is revertable.
+		///    Regardless of the previous state of the file system, results in a file existing at this file's path with the
+		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
 		public void OverwriteBinary([NotNull] byte[] newContents)
 		{
-			FsDirectory parent = ContainingFolder;
+			var parent = ContainingFolder;
 			if (!parent.Exists)
 				parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
@@ -118,29 +130,35 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	If the file exists, return its contents as a string.
+		///    If the file exists, return its contents as a string.
 		/// </summary>
 		/// <returns> The entire contents of the file </returns>
 		/// <exception cref="System.IO.FileNotFoundException">Thrown if the file does not exist.</exception>
-		/// <exception cref="System.UnauthorizedAccessException">Thrown if this object's FullPath actually refers to a directory in the file system.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">
+		///    Thrown if this object's FullPath actually refers to a directory in
+		///    the file system.
+		/// </exception>
 		public string ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
 		}
 
 		/// <summary>
-		/// 	If the file exists, return its contents as a byte array.
+		///    If the file exists, return its contents as a byte array.
 		/// </summary>
 		/// <returns> The entire contents of the file </returns>
 		/// <exception cref="System.IO.FileNotFoundException">Thrown if the file does not exist.</exception>
-		/// <exception cref="System.UnauthorizedAccessException">Thrown if this object's FullPath actually refers to a directory in the file system.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">
+		///    Thrown if this object's FullPath actually refers to a directory in
+		///    the file system.
+		/// </exception>
 		public byte[] ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
 		}
 
 		/// <summary>
-		/// 	Returns a <see cref="System.String" /> that represents this instance.
+		///    Returns a <see cref="System.String" /> that represents this instance.
 		/// </summary>
 		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
 		public override string ToString()
@@ -149,7 +167,8 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Indicates whether two files represent the same path. They may come from different file systems and still be termed equal.
+		///    Indicates whether two files represent the same path. They may come from different file systems and still be termed
+		///    equal.
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
@@ -159,7 +178,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Returns a hash code for this instance.
+		///    Returns a hash code for this instance.
 		/// </summary>
 		/// <returns> A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. </returns>
 		public override int GetHashCode()
@@ -168,7 +187,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
@@ -179,7 +198,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// 	Implements the operator !=. It is the same as !(left == right)
+		///    Implements the operator !=. It is the same as !(left == right)
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>

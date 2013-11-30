@@ -1,6 +1,10 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: CanFindEntryPoints.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using FluentAssertions;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 
@@ -11,25 +15,29 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void TempFolderShouldHaveTheCorrectPath()
 		{
-			_testSubject.TempDirectory.Path.Should().Be(FsPath.TempFolder);
+			_testSubject.TempDirectory.Path.Should()
+				.Be(FsPath.TempFolder);
 		}
 
 		[Test]
 		public void TempFolderShouldInitiallyExist()
 		{
-			_testSubject.TempDirectory.Exists.Should().BeTrue();
+			_testSubject.TempDirectory.Exists.Should()
+				.BeTrue();
 		}
 
 		[Test]
 		public void ShouldBeAbleToMakeReferenceToAbsolutePath()
 		{
-			_testSubject.Directory(ArbitraryMissingFolder).Path.Absolute.Should().Be(ArbitraryMissingFolder);
+			_testSubject.Directory(ArbitraryMissingFolder)
+				.Path.Absolute.Should()
+				.Be(ArbitraryMissingFolder);
 		}
-
 
 		private static void _Throws<TException>(Action code, string message) where TException : Exception
 		{
-			code.ShouldThrow<TException>().WithMessage(message);
+			code.ShouldThrow<TException>()
+				.WithMessage(message);
 		}
 
 		private const string ArbitraryMissingFolder = @"C:\theroot\folder";

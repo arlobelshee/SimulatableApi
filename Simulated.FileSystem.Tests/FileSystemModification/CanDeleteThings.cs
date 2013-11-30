@@ -1,4 +1,9 @@
-﻿using NUnit.Framework;
+﻿// SimulatableAPI
+// File: CanDeleteThings.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.FileSystemModification
@@ -29,19 +34,26 @@ namespace Simulated.Tests.FileSystemModification
 		{
 			var dir = _runRootFolder.Dir(ArbitraryDirName);
 			dir.EnsureExists();
-			dir.Dir(ArbitraryDirName).EnsureExists();
-			dir.File(ArbitraryFileName).Overwrite(ArbitraryContents);
+			dir.Dir(ArbitraryDirName)
+				.EnsureExists();
+			dir.File(ArbitraryFileName)
+				.Overwrite(ArbitraryContents);
 			using (var fs = _testSubject.Clone())
 			{
 				fs.EnableRevertToHere();
-				fs.Directory(dir.Path).EnsureDoesNotExist();
+				fs.Directory(dir.Path)
+					.EnsureDoesNotExist();
 				dir.ShouldNotExist();
-				dir.Dir(ArbitraryDirName).ShouldNotExist();
-				dir.File(ArbitraryFileName).ShouldNotExist();
+				dir.Dir(ArbitraryDirName)
+					.ShouldNotExist();
+				dir.File(ArbitraryFileName)
+					.ShouldNotExist();
 			}
 			dir.ShouldExist();
-			dir.Dir(ArbitraryDirName).ShouldExist();
-			dir.File(ArbitraryFileName).ShouldContain(ArbitraryContents);
+			dir.Dir(ArbitraryDirName)
+				.ShouldExist();
+			dir.File(ArbitraryFileName)
+				.ShouldContain(ArbitraryContents);
 		}
 	}
 

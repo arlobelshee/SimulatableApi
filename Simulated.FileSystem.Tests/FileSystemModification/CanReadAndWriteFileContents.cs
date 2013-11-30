@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: CanReadAndWriteFileContents.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.IO;
 using System.Text;
 using FluentAssertions;
@@ -33,9 +38,10 @@ namespace Simulated.Tests.FileSystemModification
 		public void ChangingContentsOfFileShouldChangeContentsSeenByAllViews()
 		{
 			_testFile.Overwrite(OriginalContents);
-			using (FileSystem secondView = _testSubject.Clone())
+			using (var secondView = _testSubject.Clone())
 			{
-				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				secondView.File(_testFile.FullPath)
+					.Overwrite(NewContents);
 			}
 			_testFile.ShouldContain(NewContents);
 		}
@@ -44,15 +50,20 @@ namespace Simulated.Tests.FileSystemModification
 		public void CommittingChangesShouldCompletelyEliminateAllUndoData()
 		{
 			_testFile.Overwrite(OriginalContents);
-			using (FileSystem secondView = _testSubject.Clone())
+			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				secondView.File(_testFile.FullPath)
+					.Overwrite(NewContents);
 				var originalDataCache = secondView._UndoDataCache;
 
-				originalDataCache.Files("*.*").Should().NotBeEmpty();
+				originalDataCache.Files("*.*")
+					.Should()
+					.NotBeEmpty();
 				secondView.CommitChanges();
-				originalDataCache.Files("*.*").Should().BeEquivalentTo();
+				originalDataCache.Files("*.*")
+					.Should()
+					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
 		}
@@ -61,15 +72,20 @@ namespace Simulated.Tests.FileSystemModification
 		public void RollingBackChangesShouldCompletelyEliminateAllUndoData()
 		{
 			_testFile.Overwrite(OriginalContents);
-			using (FileSystem secondView = _testSubject.Clone())
+			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				secondView.File(_testFile.FullPath)
+					.Overwrite(NewContents);
 				var originalDataCache = secondView._UndoDataCache;
 
-				originalDataCache.Files("*.*").Should().NotBeEmpty();
+				originalDataCache.Files("*.*")
+					.Should()
+					.NotBeEmpty();
 				secondView.RevertAllChanges();
-				originalDataCache.Files("*.*").Should().BeEquivalentTo();
+				originalDataCache.Files("*.*")
+					.Should()
+					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
 		}
@@ -78,10 +94,11 @@ namespace Simulated.Tests.FileSystemModification
 		public void RevertingChangedFileContentsShouldRevertToOriginalContents()
 		{
 			_testFile.Overwrite(OriginalContents);
-			using (FileSystem secondView = _testSubject.Clone())
+			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				secondView.File(_testFile.FullPath)
+					.Overwrite(NewContents);
 				_testFile.ShouldContain(NewContents);
 			}
 			_testFile.ShouldContain(OriginalContents);
@@ -90,39 +107,43 @@ namespace Simulated.Tests.FileSystemModification
 		[Test]
 		public void CannotReadContentsOfMissingFile()
 		{
-			FsFile testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
+			var testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
 			_Throws<FileNotFoundException>(() => testFile.ReadAllText(), string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
 		public void CannotReadContentsOfFolder()
 		{
-			FsFile testFile = _testFile;
-			_testSubject.Directory(testFile.FullPath).EnsureExists();
+			var testFile = _testFile;
+			_testSubject.Directory(testFile.FullPath)
+				.EnsureExists();
 			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
 		public void StringsShouldBeEncodedInUtf8ByDefault()
 		{
-			FsFile testFile = _testFile;
+			var testFile = _testFile;
 			testFile.Overwrite(NewContents);
-			byte[] asString = testFile.ReadAllBytes();
-			asString.Should().Equal(Encoding.UTF8.GetBytes(NewContents));
+			var asString = testFile.ReadAllBytes();
+			asString.Should()
+				.Equal(Encoding.UTF8.GetBytes(NewContents));
 		}
 
 		[Test]
 		public void BinaryFilesWithValidStringDataShouldBeReadableAsText()
 		{
-			FsFile testFile = _testFile;
+			var testFile = _testFile;
 			testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
-			string asString = testFile.ReadAllText();
-			asString.Should().Be(NewContents);
+			var asString = testFile.ReadAllText();
+			asString.Should()
+				.Be(NewContents);
 		}
 
 		private static void _Throws<TException>(TestDelegate code, string message) where TException : Exception
 		{
-			Assert.That(Assert.Throws<TException>(code), Has.Property("Message").EqualTo(message));
+			Assert.That(Assert.Throws<TException>(code), Has.Property("Message")
+				.EqualTo(message));
 		}
 
 		private const string OriginalContents = "Original contents";

@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: UndoWithChangeTracking.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -28,7 +33,8 @@ namespace Simulated._Fs
 
 		public override void RevertAll()
 		{
-			Enumerable.Reverse(_stepsTaken).Each(step => step.Undo());
+			Enumerable.Reverse(_stepsTaken)
+				.Each(step => step.Undo());
 			_stepsTaken.Clear();
 			_EnsureUndoDataCacheIsGone();
 		}
@@ -41,7 +47,8 @@ namespace Simulated._Fs
 		public override void DeletedDirectory(FsPath path)
 		{
 			_EnsureUndoDataCacheExists();
-			var randomDirectoryName = UndoDataCache / Guid.NewGuid().ToString("N");
+			var randomDirectoryName = UndoDataCache/Guid.NewGuid()
+				.ToString("N");
 			_fileSystem._Disk.MoveDir(path, randomDirectoryName);
 			_AddUndoStep(() => _fileSystem._Disk.MoveDir(randomDirectoryName, path));
 		}
@@ -54,7 +61,8 @@ namespace Simulated._Fs
 				return;
 			}
 			_EnsureUndoDataCacheExists();
-			var randomFileName = UndoDataCache/Guid.NewGuid().ToString("N");
+			var randomFileName = UndoDataCache/Guid.NewGuid()
+				.ToString("N");
 			_fileSystem._Disk.MoveFile(path, randomFileName);
 			_AddUndoStep(() =>
 			{

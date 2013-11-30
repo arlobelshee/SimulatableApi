@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// SimulatableAPI
+// File: DiskReal.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -65,7 +70,8 @@ namespace Simulated._Fs
 		{
 			if (!DirExists(path))
 				return Enumerable.Empty<FsPath>();
-			return Directory.EnumerateFiles(path.Absolute, searchPattern).Select(p => new FsPath(p));
+			return Directory.EnumerateFiles(path.Absolute, searchPattern)
+				.Select(p => new FsPath(p));
 		}
 	}
 }

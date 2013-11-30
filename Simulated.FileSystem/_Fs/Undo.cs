@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: Undo.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -7,7 +12,8 @@ namespace Simulated._Fs
 	{
 		public _Undo()
 		{
-			UndoDataCache = FsPath.TempFolder/("UndoData." + Guid.NewGuid().ToString("N"));
+			UndoDataCache = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
+				.ToString("N"));
 		}
 
 		public virtual bool IsTrackingChanges

@@ -131,7 +131,8 @@ namespace Simulated
 		public FsPath ReplaceAncestor(FsPath currentAncestor, FsPath newAncestor, bool descendentIsDirectory)
 		{
 			var myPath = _AllDirectoryNamesInOrder(descendentIsDirectory);
-			var rootElementsToTrim = currentAncestor._AllDirectoryNamesInOrder(true).Length;
+			var rootElementsToTrim = currentAncestor._AllDirectoryNamesInOrder(true)
+				.Length;
 			var myUniquePathElements = myPath.Skip(rootElementsToTrim);
 			if (!descendentIsDirectory)
 			{

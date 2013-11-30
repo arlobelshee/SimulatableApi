@@ -1,8 +1,10 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿// SimulatableAPI
+// File: CanCreateDirectories.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
-using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemModification
 {
@@ -31,10 +33,11 @@ namespace Simulated.Tests.FileSystemModification
 		{
 			_runRootFolder.EnsureExists();
 			_runRootFolder.ShouldExist();
-			using (FileSystem secondView = _testSubject.Clone())
+			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.Directory(_runRootFolder.Path).EnsureExists();
+				secondView.Directory(_runRootFolder.Path)
+					.EnsureExists();
 				_runRootFolder.ShouldExist();
 			}
 			_runRootFolder.ShouldExist();
@@ -43,7 +46,7 @@ namespace Simulated.Tests.FileSystemModification
 		[Test]
 		public void CreatingADirectoryShouldCreateAnyMissingIntermediateDirectories()
 		{
-			FsDirectory subDir = _runRootFolder.Dir("A");
+			var subDir = _runRootFolder.Dir("A");
 
 			subDir.Parent.ShouldNotExist();
 			subDir.EnsureExists();
@@ -53,7 +56,7 @@ namespace Simulated.Tests.FileSystemModification
 		[Test]
 		public void DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
 		{
-			FsDirectory subDir = _runRootFolder.Dir("A");
+			var subDir = _runRootFolder.Dir("A");
 			subDir.EnsureExists();
 
 			subDir.Parent.ShouldExist();
@@ -65,7 +68,8 @@ namespace Simulated.Tests.FileSystemModification
 		public void OverwritingAFileInAMissingFolderShouldCreateThatFolder()
 		{
 			_runRootFolder.ShouldNotExist();
-			_runRootFolder.File("CreatedByTest.txt").Overwrite("anything");
+			_runRootFolder.File("CreatedByTest.txt")
+				.Overwrite("anything");
 			_runRootFolder.ShouldExist();
 		}
 	}

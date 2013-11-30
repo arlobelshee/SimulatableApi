@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿// SimulatableAPI
+// File: _IDisk.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs

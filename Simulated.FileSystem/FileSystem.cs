@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: FileSystem.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.IO;
 using JetBrains.Annotations;
 using Simulated._Fs;
