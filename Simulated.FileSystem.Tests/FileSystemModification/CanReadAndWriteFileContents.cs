@@ -41,7 +41,7 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void CommittingChangedFileContentsShouldCompletelyEliminateOriginalContents()
+		public void CommittingChangesShouldCompletelyEliminateAllUndoData()
 		{
 			_testFile.Overwrite(OriginalContents);
 			using (FileSystem secondView = _testSubject.Clone())
@@ -52,6 +52,23 @@ namespace Simulated.Tests.FileSystemModification
 
 				originalDataCache.Files("*.*").Should().NotBeEmpty();
 				secondView.CommitChanges();
+				originalDataCache.Files("*.*").Should().BeEquivalentTo();
+				originalDataCache.ShouldNotExist();
+			}
+		}
+
+		[Test]
+		public void RollingBackChangesShouldCompletelyEliminateAllUndoData()
+		{
+			_testFile.Overwrite(OriginalContents);
+			using (FileSystem secondView = _testSubject.Clone())
+			{
+				secondView.EnableRevertToHere();
+				secondView.File(_testFile.FullPath).Overwrite(NewContents);
+				var originalDataCache = secondView._UndoDataCache;
+
+				originalDataCache.Files("*.*").Should().NotBeEmpty();
+				secondView.RevertAllChanges();
 				originalDataCache.Files("*.*").Should().BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}

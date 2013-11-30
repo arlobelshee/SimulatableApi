@@ -1,9 +1,11 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: CanNavigateRelativeToAFileOrDirectory.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
 using FluentAssertions;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
-using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemNavigation
 {
@@ -12,25 +14,33 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void CanGetTheParentOfADirectory()
 		{
-			_testSubject.Directory(@"C:\Base\Second").Parent.Path.Should().Be(new FsPath(@"C:\Base"));
+			_testSubject.Directory(@"C:\Base\Second")
+				.Parent.Path.Should()
+				.Be(new FsPath(@"C:\Base"));
 		}
 
 		[Test]
 		public void CanGetAFileWithinADirectory()
 		{
-			_runRootFolder.File(ArbitraryFileName).FullPath.Should().Be(_runRootFolder.Path/ArbitraryFileName);
+			_runRootFolder.File(ArbitraryFileName)
+				.FullPath.Should()
+				.Be(_runRootFolder.Path/ArbitraryFileName);
 		}
 
 		[Test]
 		public void CanGetASubDirectory()
 		{
-			_runRootFolder.Dir(ArbitraryFileName).Path.Should().Be(_runRootFolder.Path/ArbitraryFileName);
+			_runRootFolder.Dir(ArbitraryFileName)
+				.Path.Should()
+				.Be(_runRootFolder.Path/ArbitraryFileName);
 		}
 
 		[Test]
 		public void AFileKnowsWhereItIs()
 		{
-			_runRootFolder.File(ArbitraryFileName).ContainingFolder.Should().Be(_runRootFolder);
+			_runRootFolder.File(ArbitraryFileName)
+				.ContainingFolder.Should()
+				.Be(_runRootFolder);
 		}
 
 		[Test]
@@ -41,8 +51,12 @@ namespace Simulated.Tests.FileSystemNavigation
 			var secondFile = _runRootFolder.File("secondFile" + extension);
 			firstFile.Overwrite(ArbitraryContents);
 			secondFile.Overwrite(ArbitraryContents);
-			_runRootFolder.Files("*" + extension).Should().BeEquivalentTo(firstFile, secondFile);
-			_runRootFolder.Files(firstFile.FileBaseName + ".*").Should().BeEquivalentTo(firstFile);
+			_runRootFolder.Files("*" + extension)
+				.Should()
+				.BeEquivalentTo(firstFile, secondFile);
+			_runRootFolder.Files(firstFile.FileBaseName + ".*")
+				.Should()
+				.BeEquivalentTo(firstFile);
 		}
 	}
 

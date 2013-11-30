@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: CanComputePathsUsingFsPath.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.IO;
 using FluentAssertions;
 using NUnit.Framework;
@@ -85,6 +90,7 @@ namespace Simulated.Tests.FileSystemNavigation
 
 		[Test]
 		[TestCase(@"C:\foo", @"C:\foo\bar", true)]
+		[TestCase(@"C:\foo", @"C:\foo\bar", false)]
 		[TestCase(@"C:\foo", @"C:\foo\bar.txt", false)]
 		[TestCase(@"C:\foo", @"C:\foo", true)]
 		[TestCase(@"C:\foo", @"C:\foo\bar\baz", true)]
@@ -105,6 +111,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		[TestCase(@"D:\", @"C:\foo\bar\baz.txt", false)]
 		[TestCase(@"C:\foo\foo", @"C:\foo\bar", true)]
 		[TestCase(@"C:\bar\foo", @"C:\bar", true)]
+		[TestCase(@"C:\foo", @"C:\foo", false)]
 		public void ShouldNotBeAncestors(string ancestor, string nonDescendent, bool descendentIsDirectory)
 		{
 			new FsPath(ancestor).IsAncestorOf(new FsPath(nonDescendent), descendentIsDirectory)

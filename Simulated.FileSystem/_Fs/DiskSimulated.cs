@@ -1,4 +1,9 @@
-﻿using System;
+﻿// SimulatableAPI
+// File: DiskSimulated.cs
+// 
+// Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -67,16 +72,23 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
-			if (_GetStorage(path)
-				.Kind == _StorageKind.File)
+			var storageKind = _GetStorage(path)
+				.Kind;
+			if (storageKind == _StorageKind.Missing)
+				return;
+			if (storageKind == _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Path {0} was a file, and you attempted to delete a directory.", path.Absolute));
-			_data.Remove(path);
+			var toDelete = _ItemsInScopeOfDirectory(path);
+			toDelete.Each(p => _data.Remove(p.Key));
 		}
 
 		public void DeleteFile(FsPath path)
 		{
-			if (_GetStorage(path)
-				.Kind == _StorageKind.Directory)
+			var storageKind = _GetStorage(path)
+				.Kind;
+			if (storageKind == _StorageKind.Missing)
+				return;
+			if (storageKind == _StorageKind.Directory)
 				throw new ArgumentException("path", string.Format("Path {0} was a directory, and you attempted to delete a file.", path.Absolute));
 			_data.Remove(path);
 		}
@@ -100,9 +112,14 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));
-			var itemsToMove = _data.Where(item => src.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
-				.ToList();
+			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
+		}
+
+		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory(FsPath path)
+		{
+			return _data.Where(item => path.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
+				.ToList();
 		}
 
 		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
