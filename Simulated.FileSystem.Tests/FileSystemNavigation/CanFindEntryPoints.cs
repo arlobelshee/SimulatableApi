@@ -2,10 +2,11 @@
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.FileSystemNavigation
 {
-	public abstract class CanFindEntryPoints
+	public abstract class CanFindEntryPoints : FileSystemTestBase
 	{
 		[Test]
 		public void TempFolderShouldHaveTheCorrectPath()
@@ -22,26 +23,9 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void ShouldBeAbleToMakeReferenceToAbsolutePath()
 		{
-			Assert.That(_testSubject.Directory(ArbitraryMissingFolder).Path.Absolute, Is.EqualTo(ArbitraryMissingFolder));
+			_testSubject.Directory(ArbitraryMissingFolder).Path.Absolute.Should().Be(ArbitraryMissingFolder);
 		}
 
-		[NotNull] private FileSystem _testSubject;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
-		}
-
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
 
 		private static void _Throws<TException>(Action code, string message) where TException : Exception
 		{

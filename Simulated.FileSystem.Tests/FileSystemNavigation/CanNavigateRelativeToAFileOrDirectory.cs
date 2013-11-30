@@ -2,11 +2,12 @@
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using Simulated.Tests.zzTestHelpers;
 using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemNavigation
 {
-	public abstract class CanNavigateRelativeToAFileOrDirectory
+	public abstract class CanNavigateRelativeToAFileOrDirectory : FileSystemTestBase
 	{
 		[Test]
 		public void CanGetTheParentOfADirectory()
@@ -42,26 +43,6 @@ namespace Simulated.Tests.FileSystemNavigation
 			secondFile.Overwrite(ArbitraryContents);
 			_runRootFolder.Files("*" + extension).Should().BeEquivalentTo(firstFile, secondFile);
 			_runRootFolder.Files(firstFile.FileBaseName + ".*").Should().BeEquivalentTo(firstFile);
-		}
-
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
-
-		[NotNull] private FileSystem _testSubject;
-		[NotNull] private FsDirectory _runRootFolder;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
 		}
 
 		private const string ArbitraryFileName = "something.txt";

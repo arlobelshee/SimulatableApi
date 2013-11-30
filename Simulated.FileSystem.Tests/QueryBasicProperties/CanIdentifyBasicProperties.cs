@@ -1,12 +1,10 @@
-﻿using System;
-using FluentAssertions;
-using JetBrains.Annotations;
+﻿using FluentAssertions;
 using NUnit.Framework;
-using Simulated._Fs;
+using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.QueryBasicProperties
 {
-	public abstract class CanIdentifyBasicProperties
+	public abstract class CanIdentifyBasicProperties : FileSystemTestBase
 	{
 		[Test]
 		public void AFileKnowsItsFileNameParts()
@@ -15,7 +13,7 @@ namespace Simulated.Tests.QueryBasicProperties
 			const string baseName = "ArbitraryFile";
 			const string extension = ".txt";
 
-			FsFile f = _runRootFolder.File(fileName);
+			var f = _runRootFolder.File(fileName);
 			f.FileName.Should().Be(fileName);
 			f.Extension.Should().Be(extension);
 			f.FileBaseName.Should().Be(baseName);
@@ -35,28 +33,6 @@ namespace Simulated.Tests.QueryBasicProperties
 			testSubject.Exists.Should().BeFalse();
 			testSubject.Overwrite("anything");
 			testSubject.Exists.Should().BeTrue();
-		}
-
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
-
-		[NotNull]
-		private FileSystem _testSubject;
-		[NotNull]
-		private FsDirectory _runRootFolder;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
 		}
 	}
 

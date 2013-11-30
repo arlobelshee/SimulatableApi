@@ -9,7 +9,7 @@ using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemModification
 {
-	public abstract class CanReadAndWriteFileContents
+	public abstract class CanReadAndWriteFileContents : FileSystemTestBase
 	{
 		[Test]
 		public void CanCreateFileAndReadItsContents()
@@ -110,26 +110,12 @@ namespace Simulated.Tests.FileSystemModification
 
 		private const string OriginalContents = "Original contents";
 		private const string NewContents = "helȽo ﺷ";
-		[NotNull] private FileSystem _testSubject;
 		[NotNull] private FsFile _testFile;
 
-		[SetUp]
-		public void Setup()
+		protected override void FinishSetup()
 		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-			var runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-			_testFile = runRootFolder.File("CreatedByTest.txt");
+			_testFile = _runRootFolder.File("CreatedByTest.txt");
 		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
-		}
-
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
 	}
 
 	[TestFixture]

@@ -6,7 +6,7 @@ using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemModification
 {
-	public abstract class CanCreateDirectories
+	public abstract class CanCreateDirectories : FileSystemTestBase
 	{
 		[Test]
 		public void ShouldBeAbleToCreateADirectory()
@@ -68,26 +68,6 @@ namespace Simulated.Tests.FileSystemModification
 			_runRootFolder.File("CreatedByTest.txt").Overwrite("anything");
 			_runRootFolder.ShouldExist();
 		}
-
-		[NotNull] private FileSystem _testSubject;
-		[NotNull] private FsDirectory _runRootFolder;
-
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.RevertAllChanges();
-		}
-
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
 	}
 
 	[TestFixture]
