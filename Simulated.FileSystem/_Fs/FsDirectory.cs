@@ -26,21 +26,6 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
-		///    equal.
-		/// </summary>
-		/// <param name="other"> A directory instance to compare with this object. </param>
-		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals(FsDirectory other)
-		{
-			if (ReferenceEquals(null, other))
-				return false;
-			if (ReferenceEquals(this, other))
-				return true;
-			return Equals(other._path, _path);
-		}
-
-		/// <summary>
 		///    Gets a value indicating whether this <see cref="FsDirectory" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
@@ -91,6 +76,19 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
+		///    Regardless of the previous state of the file system, results in a directory no longer existing at this object's
+		///    Path. This operation is revertable.
+		/// </summary>
+		public void EnsureDoesNotExist()
+		{
+			if (!Exists)
+				return;
+			_allFiles._Changes.DeletedDirectory(_path);
+			if (Exists)
+				_allFiles._Disk.DeleteDir(_path);
+		}
+
+		/// <summary>
 		///    Gets a file object for a file in this directory.
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
@@ -113,6 +111,21 @@ namespace Simulated._Fs
 		public IEnumerable<FsFile> Files(string searchPattern)
 		{
 			return _allFiles._Disk.FindFiles(_path, searchPattern).Select(p => new FsFile(_allFiles, p));
+		}
+
+		/// <summary>
+		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
+		///    equal.
+		/// </summary>
+		/// <param name="other"> A directory instance to compare with this object. </param>
+		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
+		public bool Equals(FsDirectory other)
+		{
+			if (ReferenceEquals(null, other))
+				return false;
+			if (ReferenceEquals(this, other))
+				return true;
+			return Equals(other._path, _path);
 		}
 
 		/// <summary>

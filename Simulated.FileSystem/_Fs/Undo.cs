@@ -7,7 +7,7 @@ namespace Simulated._Fs
 	{
 		public _Undo()
 		{
-			UndoDataCache = FsPath.TempFolder/("UndoData."+Guid.NewGuid().ToString("N"));
+			UndoDataCache = FsPath.TempFolder/("UndoData." + Guid.NewGuid().ToString("N"));
 		}
 
 		public virtual bool IsTrackingChanges
@@ -21,5 +21,6 @@ namespace Simulated._Fs
 		public virtual void RevertAll() {}
 		public virtual void CreatedDirectory([NotNull] FsPath path) {}
 		public virtual void Overwrote([NotNull] FsPath path) {}
+		public virtual void DeletedDirectory(FsPath path) {}
 	}
 }

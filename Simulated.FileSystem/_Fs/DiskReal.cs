@@ -43,7 +43,7 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
-			Directory.Delete(path.Absolute);
+			Directory.Delete(path.Absolute, true);
 		}
 
 		public void DeleteFile(FsPath path)
@@ -54,6 +54,11 @@ namespace Simulated._Fs
 		public void MoveFile(FsPath src, FsPath dest)
 		{
 			File.Move(src.Absolute, dest.Absolute);
+		}
+
+		public void MoveDir(FsPath src, FsPath dest)
+		{
+			Directory.Move(src.Absolute, dest.Absolute);
 		}
 
 		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)

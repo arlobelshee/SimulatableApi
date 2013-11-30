@@ -7,6 +7,9 @@ namespace Simulated.Tests.zzTestHelpers
 {
 	public abstract class FileSystemTestBase
 	{
+		protected const string ArbitraryFileName = "something.txt";
+		protected const string ArbitraryContents = "Arbitrary contents.";
+		protected const string ArbitraryDirName = "ArbitraryDirectory";
 		[NotNull] protected FileSystem _testSubject;
 		[NotNull] protected FsDirectory _runRootFolder;
 

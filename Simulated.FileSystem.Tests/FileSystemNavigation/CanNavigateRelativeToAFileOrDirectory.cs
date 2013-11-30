@@ -44,9 +44,6 @@ namespace Simulated.Tests.FileSystemNavigation
 			_runRootFolder.Files("*" + extension).Should().BeEquivalentTo(firstFile, secondFile);
 			_runRootFolder.Files(firstFile.FileBaseName + ".*").Should().BeEquivalentTo(firstFile);
 		}
-
-		private const string ArbitraryFileName = "something.txt";
-		private const string ArbitraryContents = "Arbitrary contents.";
 	}
 
 	[TestFixture]

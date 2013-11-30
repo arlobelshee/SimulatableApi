@@ -14,12 +14,14 @@ namespace Simulated._Fs
 
 		public bool DirExists(FsPath path)
 		{
-			return _GetStorage(path).Kind == _StorageKind.Directory;
+			return _GetStorage(path)
+				.Kind == _StorageKind.Directory;
 		}
 
 		public bool FileExists(FsPath path)
 		{
-			return _GetStorage(path).Kind == _StorageKind.File;
+			return _GetStorage(path)
+				.Kind == _StorageKind.File;
 		}
 
 		public string TextContents(FsPath path)
@@ -65,26 +67,42 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
-			if (_GetStorage(path).Kind == _StorageKind.File)
+			if (_GetStorage(path)
+				.Kind == _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Path {0} was a file, and you attempted to delete a directory.", path.Absolute));
 			_data.Remove(path);
 		}
 
 		public void DeleteFile(FsPath path)
 		{
-			if (_GetStorage(path).Kind == _StorageKind.Directory)
+			if (_GetStorage(path)
+				.Kind == _StorageKind.Directory)
 				throw new ArgumentException("path", string.Format("Path {0} was a directory, and you attempted to delete a file.", path.Absolute));
 			_data.Remove(path);
 		}
 
 		public void MoveFile(FsPath src, FsPath dest)
 		{
-			if (_GetStorage(src).Kind != _StorageKind.File)
+			if (_GetStorage(src)
+				.Kind != _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Attempted to move file {0}, which is not a file.", src.Absolute));
-			if (_GetStorage(dest).Kind != _StorageKind.Missing)
+			if (_GetStorage(dest)
+				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
-			_data[dest] = _data[src];
-			_data.Remove(src);
+			_MoveItemImpl(src, dest);
+		}
+
+		public void MoveDir(FsPath src, FsPath dest)
+		{
+			if (_GetStorage(src)
+				.Kind != _StorageKind.Directory)
+				throw new ArgumentException("path", string.Format("Attempted to move directory {0}, which is not a directory.", src.Absolute));
+			if (_GetStorage(dest)
+				.Kind != _StorageKind.Missing)
+				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));
+			var itemsToMove = _data.Where(item => src.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
+				.ToList();
+			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
 		}
 
 		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
@@ -94,11 +112,16 @@ namespace Simulated._Fs
 				return Enumerable.Empty<FsPath>();
 			var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
 			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
-			return
-				_data.Where(
-					item =>
-						item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
-					.Select(item => item.Key);
+			return _data.Where(
+				item =>
+					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
+				.Select(item => item.Key);
+		}
+
+		private void _MoveItemImpl(FsPath src, FsPath dest)
+		{
+			_data[dest] = _data[src];
+			_data.Remove(src);
 		}
 
 		private bool _PatternMatches(string patternBaseName, string patternExtension, string fileName)

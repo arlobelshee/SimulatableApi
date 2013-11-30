@@ -32,11 +32,20 @@ namespace Simulated._Fs
 		{
 			Enumerable.Reverse(_stepsTaken).Each(step => step.Undo());
 			_stepsTaken.Clear();
+			_EnsureUndoDataCacheIsGone();
 		}
 
 		public override void CreatedDirectory(FsPath path)
 		{
 			_AddUndoStep(() => _fileSystem._Disk.DeleteDir(path), NoOp);
+		}
+
+		public override void DeletedDirectory(FsPath path)
+		{
+			_EnsureUndoDataCacheExists();
+			var randomDirectoryName = UndoDataCache / Guid.NewGuid().ToString("N");
+			_fileSystem._Disk.MoveDir(path, randomDirectoryName);
+			_AddUndoStep(() => _fileSystem._Disk.MoveDir(randomDirectoryName, path), () => _fileSystem._Disk.DeleteDir(randomDirectoryName));
 		}
 
 		public override void Overwrote(FsPath path)

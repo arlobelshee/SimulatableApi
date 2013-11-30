@@ -15,6 +15,7 @@ namespace Simulated._Fs
 		void DeleteDir([NotNull] FsPath path);
 		void DeleteFile([NotNull] FsPath path);
 		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
+		void MoveDir(FsPath src, FsPath dest);
 		IEnumerable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }
