@@ -99,7 +99,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public Task MoveFile(FsPath src, FsPath dest)
 		{
 			if (_GetStorage(src)
 				.Kind != _StorageKind.File)
@@ -108,6 +108,7 @@ namespace Simulated._Fs
 				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
 			_MoveItemImpl(src, dest);
+			return _Undo.CompletedTask;
 		}
 
 		public void MoveDir(FsPath src, FsPath dest)

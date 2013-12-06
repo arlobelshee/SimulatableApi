@@ -78,14 +78,14 @@ namespace Simulated._Fs
 			}
 			var randomFileName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
-			_fileSystem._Disk.MoveFile(path, randomFileName);
+			await _fileSystem._Disk.MoveFile(path, randomFileName);
 			_AddUndoStep(() => _RestoreFileFromCache(path, randomFileName));
 		}
 
 		private async Task _RestoreFileFromCache(FsPath path, FsPath randomFileName)
 		{
 			await _fileSystem._Disk.DeleteFile(path);
-			_fileSystem._Disk.MoveFile(randomFileName, path);
+			await _fileSystem._Disk.MoveFile(randomFileName, path);
 		}
 
 		private void _AddUndoStep(Func<Task> undo)

@@ -67,9 +67,9 @@ namespace Simulated._Fs
 			return Task.Run(()=>File.Delete(path.Absolute));
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public Task MoveFile(FsPath src, FsPath dest)
 		{
-			File.Move(src.Absolute, dest.Absolute);
+			return Task.Run(()=>File.Move(src.Absolute, dest.Absolute));
 		}
 
 		public void MoveDir(FsPath src, FsPath dest)

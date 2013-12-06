@@ -21,7 +21,7 @@ namespace Simulated._Fs
 		Task Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
 		Task DeleteDir([NotNull] FsPath path);
 		Task DeleteFile([NotNull] FsPath path);
-		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
+		Task MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
 		void MoveDir(FsPath src, FsPath dest);
 		Task<IEnumerable<FsPath>> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
