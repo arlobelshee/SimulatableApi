@@ -111,7 +111,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+		public Task MoveDir(FsPath src, FsPath dest)
 		{
 			if (_GetStorage(src)
 				.Kind != _StorageKind.Directory)
@@ -121,6 +121,7 @@ namespace Simulated._Fs
 				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
+			return _Undo.CompletedTask;
 		}
 
 		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory(FsPath path)

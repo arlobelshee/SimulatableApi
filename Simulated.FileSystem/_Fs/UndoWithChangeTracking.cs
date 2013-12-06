@@ -61,10 +61,8 @@ namespace Simulated._Fs
 		{
 			var randomDirectoryName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
-			_fileSystem._Disk.MoveDir(path, randomDirectoryName);
-			_AddUndoStep(() => { _fileSystem._Disk.MoveDir(randomDirectoryName, path);
-				                   return CompletedTask;
-			});
+			await _fileSystem._Disk.MoveDir(path, randomDirectoryName);
+			_AddUndoStep(() => _fileSystem._Disk.MoveDir(randomDirectoryName, path));
 		}
 
 		public override async Task Overwrote(FsPath path)

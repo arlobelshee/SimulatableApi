@@ -22,7 +22,7 @@ namespace Simulated._Fs
 		Task DeleteDir([NotNull] FsPath path);
 		Task DeleteFile([NotNull] FsPath path);
 		Task MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
-		void MoveDir(FsPath src, FsPath dest);
+		Task MoveDir(FsPath src, FsPath dest);
 		Task<IEnumerable<FsPath>> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }
