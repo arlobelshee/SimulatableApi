@@ -26,11 +26,11 @@ namespace Simulated.Tests.zzTestHelpers
 		protected abstract FileSystem MakeTestSubject();
 
 		[SetUp]
-		public async Task Setup()
+		public void Setup()
 		{
 			_testSubject = MakeTestSubject();
 			_testSubject.EnableRevertToHere();
-			_runRootFolder = (await _testSubject.TempDirectory).Dir("CreatedByTestRun-" + Guid.NewGuid());
+			_runRootFolder = _testSubject.TempDirectory.Result.Dir("CreatedByTestRun-" + Guid.NewGuid());
 			FinishSetup();
 		}
 

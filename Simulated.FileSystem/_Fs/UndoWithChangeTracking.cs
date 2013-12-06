@@ -15,22 +15,20 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _fileSystem;
 		[NotNull] private readonly List<UndoStep> _stepsTaken = new List<UndoStep>();
-		private readonly FsPath _cachePathUseThePropertyInstead;
 
 		public _UndoWithChangeTracking([NotNull] FileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
-			_cachePathUseThePropertyInstead = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
+			var cacheLocation = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
 				.ToString("N"));
-			UndoDataCache = new AsyncLazy<FsPath>(_fileSystem._Disk.DirExists(_cachePathUseThePropertyInstead)
-				.ContinueWith(exists =>
-				{
-					if (!exists.Result)
-					{
-						_fileSystem._Disk.CreateDir(_cachePathUseThePropertyInstead);
-					}
-					return _cachePathUseThePropertyInstead;
-				}));
+			UndoDataCache = new AsyncLazy<FsPath>(_EnsureDirExists(cacheLocation));
+		}
+
+		private async Task<FsPath> _EnsureDirExists(FsPath cacheLocation)
+		{
+			if (!await _fileSystem._Disk.DirExists(cacheLocation))
+				_fileSystem._Disk.CreateDir(cacheLocation);
+			return cacheLocation;
 		}
 
 		public AsyncLazy<FsPath> UndoDataCache { get; private set; }
@@ -91,10 +89,10 @@ namespace Simulated._Fs
 
 		private async Task _EnsureUndoDataCacheIsGone()
 		{
-			// Use direct access to the path from here because this is the teardown for the lazy value.
-			if (await _fileSystem._Disk.DirExists(_cachePathUseThePropertyInstead))
+			var cachePath = await UndoDataCache;
+			if (await _fileSystem._Disk.DirExists(cachePath))
 			{
-				_fileSystem._Disk.DeleteDir(_cachePathUseThePropertyInstead);
+				_fileSystem._Disk.DeleteDir(cachePath);
 			}
 		}
 

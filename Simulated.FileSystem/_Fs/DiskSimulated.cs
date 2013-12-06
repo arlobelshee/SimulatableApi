@@ -30,11 +30,11 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.File).AsImmediateTask();
 		}
 
-		public string TextContents(FsPath path)
+		public Task<string> TextContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-			return DefaultEncoding.GetString(storage.RawContents);
+			return DefaultEncoding.GetString(storage.RawContents).AsImmediateTask();
 		}
 
 		public byte[] RawContents(FsPath path)

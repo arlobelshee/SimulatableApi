@@ -17,6 +17,11 @@ namespace Simulated._Fs
 		public AsyncLazy(Func<Task<T>> taskFactory) : base(() => Task.Factory.StartNew(taskFactory)
 			.Unwrap()) {}
 
+		public T Result
+		{
+			get { return Value.Result; }
+		}
+
 		public TaskAwaiter<T> GetAwaiter()
 		{
 			return Value.GetAwaiter();

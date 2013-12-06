@@ -31,7 +31,7 @@ namespace Simulated.Tests.FileSystemModification
 			await _testFile.Overwrite(OriginalContents);
 
 			_testFile.ShouldContain(OriginalContents);
-			_testSubject.RevertAllChanges();
+			await _testSubject.RevertAllChanges();
 			_testFile.ShouldNotExist();
 		}
 
@@ -58,12 +58,10 @@ namespace Simulated.Tests.FileSystemModification
 					.Overwrite(NewContents);
 				var originalDataCache = await secondView._UndoDataCache();
 
-				(await originalDataCache.Files("*.*"))
-					.Should()
+				(await originalDataCache.Files("*.*")).Should()
 					.NotBeEmpty();
-				secondView.CommitChanges();
-				(await originalDataCache.Files("*.*"))
-					.Should()
+				await secondView.CommitChanges();
+				(await originalDataCache.Files("*.*")).Should()
 					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
@@ -80,12 +78,10 @@ namespace Simulated.Tests.FileSystemModification
 					.Overwrite(NewContents);
 				var originalDataCache = await secondView._UndoDataCache();
 
-				(await originalDataCache.Files("*.*"))
-					.Should()
+				(await originalDataCache.Files("*.*")).Should()
 					.NotBeEmpty();
-				secondView.RevertAllChanges();
-				(await originalDataCache.Files("*.*"))
-					.Should()
+				await secondView.RevertAllChanges();
+				(await originalDataCache.Files("*.*")).Should()
 					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
@@ -109,16 +105,22 @@ namespace Simulated.Tests.FileSystemModification
 		public async Task CannotReadContentsOfMissingFile()
 		{
 			var testFile = (await _testSubject.TempDirectory).File("CreatedByTest.txt");
-			_Throws<FileNotFoundException>(() => testFile.ReadAllText(), string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
+			Action readFromMissingFile = () => testFile.ReadAllText()
+				.Wait();
+			readFromMissingFile.ShouldThrow<FileNotFoundException>()
+				.WithMessage(string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
-		public async Task CannotReadContentsOfFolder()
+		public async Task CannotReadFileContentsFromADirectory()
 		{
 			var testFile = _testFile;
 			await _testSubject.Directory(testFile.FullPath)
 				.EnsureExists();
-			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
+			Action treatDirectoryAsIfItWereAFile = () => testFile.ReadAllText()
+				.Wait();
+			treatDirectoryAsIfItWereAFile.ShouldThrow<UnauthorizedAccessException>()
+				.WithMessage(string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
@@ -136,15 +138,9 @@ namespace Simulated.Tests.FileSystemModification
 		{
 			var testFile = _testFile;
 			await testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
-			var asString = testFile.ReadAllText();
+			var asString = await testFile.ReadAllText();
 			asString.Should()
 				.Be(NewContents);
-		}
-
-		private static void _Throws<TException>(TestDelegate code, string message) where TException : Exception
-		{
-			Assert.That(Assert.Throws<TException>(code), Has.Property("Message")
-				.EqualTo(message));
 		}
 
 		private const string OriginalContents = "Original contents";

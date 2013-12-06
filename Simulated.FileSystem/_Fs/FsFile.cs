@@ -139,7 +139,7 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
-		public string ReadAllText()
+		public Task<string> ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
 		}

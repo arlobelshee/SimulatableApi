@@ -47,7 +47,8 @@ namespace Simulated
 		/// </summary>
 		public void Dispose()
 		{
-			RevertAllChanges();
+			RevertAllChanges()
+				.Wait();
 		}
 
 		[NotNull]
@@ -168,20 +169,26 @@ namespace Simulated
 		/// <summary>
 		///    Reverts all changes since the save point.
 		/// </summary>
-		public void RevertAllChanges()
+		public async Task RevertAllChanges()
 		{
-			_Changes.RevertAll();
+			if (_Changes.IsTrackingChanges)
+			{
+				var oldChanges = _Changes;
+				_Changes = new _Undo();
+				await oldChanges.RevertAll();
+			}
 		}
 
 		/// <summary>
 		///    Commits any pending changes and removes the save point.
 		/// </summary>
-		public void CommitChanges()
+		public async Task CommitChanges()
 		{
 			if (_Changes.IsTrackingChanges)
 			{
-				_Changes.CommitAll();
+				var oldChanges = _Changes;
 				_Changes = new _Undo();
+				await oldChanges.CommitAll();
 			}
 		}
 

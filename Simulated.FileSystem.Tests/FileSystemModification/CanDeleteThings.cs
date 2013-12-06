@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 
@@ -11,37 +12,37 @@ namespace Simulated.Tests.FileSystemModification
 	public abstract class CanDeleteThings : FileSystemTestBase
 	{
 		[Test]
-		public void DeletingADirectoryThatDoesNotExistShouldDoNothing()
+		public async Task DeletingADirectoryThatDoesNotExistShouldDoNothing()
 		{
 			var dir = _runRootFolder.Dir(ArbitraryDirName);
 			dir.ShouldNotExist();
-			dir.EnsureDoesNotExist();
+			await dir.EnsureDoesNotExist();
 			dir.ShouldNotExist();
 		}
 
 		[Test]
-		public void DeletingANewlyCreatedDirectoryShouldEliminateItAsIfItWereNeverThere()
+		public async Task DeletingANewlyCreatedDirectoryShouldEliminateItAsIfItWereNeverThere()
 		{
 			var dir = _runRootFolder.Dir(ArbitraryDirName);
-			dir.EnsureExists();
+			await dir.EnsureExists();
 			dir.ShouldExist();
-			dir.EnsureDoesNotExist();
+			await dir.EnsureDoesNotExist();
 			dir.ShouldNotExist();
 		}
 
 		[Test]
-		public void RevertingADirectoryDeleteShouldRestoreSubdirsAndFiles()
+		public async Task RevertingADirectoryDeleteShouldRestoreSubdirsAndFiles()
 		{
 			var dir = _runRootFolder.Dir(ArbitraryDirName);
-			dir.EnsureExists();
-			dir.Dir(ArbitraryDirName)
+			await dir.EnsureExists();
+			await dir.Dir(ArbitraryDirName)
 				.EnsureExists();
-			dir.File(ArbitraryFileName)
+			await dir.File(ArbitraryFileName)
 				.Overwrite(ArbitraryContents);
 			using (var fs = _testSubject.Clone())
 			{
 				fs.EnableRevertToHere();
-				fs.Directory(dir.Path)
+				await fs.Directory(dir.Path)
 					.EnsureDoesNotExist();
 				dir.ShouldNotExist();
 				dir.Dir(ArbitraryDirName)

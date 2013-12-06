@@ -20,12 +20,13 @@ namespace Simulated._Fs
 
 		public Task<bool> FileExists(FsPath path)
 		{
-			return File.Exists(path.Absolute).AsImmediateTask();
+			return File.Exists(path.Absolute)
+				.AsImmediateTask();
 		}
 
-		public string TextContents(FsPath path)
+		public Task<string> TextContents(FsPath path)
 		{
-			return File.ReadAllText(path.Absolute);
+			return Task.Run(() => File.ReadAllText(path.Absolute));
 		}
 
 		public byte[] RawContents(FsPath path)
@@ -68,15 +69,9 @@ namespace Simulated._Fs
 			Directory.Move(src.Absolute, dest.Absolute);
 		}
 
-		public Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
+		public async Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
 		{
-			return DirExists(path)
-				.ContinueWith(r => _FindFilesImpl(path, searchPattern, r.Result));
-		}
-
-		private IEnumerable<FsPath> _FindFilesImpl(FsPath path, string searchPattern, bool dirExists)
-		{
-			if (!dirExists)
+			if (!await DirExists(path))
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path.Absolute, searchPattern)
 				.Select(p => new FsPath(p));

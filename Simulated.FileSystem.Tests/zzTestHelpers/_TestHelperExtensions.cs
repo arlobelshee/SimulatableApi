@@ -26,7 +26,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public static void ShouldContain([NotNull] this FsFile file, string contents)
 		{
 			file.ShouldExist();
-			file.ReadAllText()
+			file.ReadAllText().Result
 				.Should()
 				.Be(contents);
 		}
