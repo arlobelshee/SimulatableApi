@@ -81,8 +81,8 @@ namespace Simulated._Fs
 		{
 			if (!await DirExists(path))
 				return Enumerable.Empty<FsPath>();
-			return Directory.EnumerateFiles(path.Absolute, searchPattern)
-				.Select(p => new FsPath(p));
+			return await Task.Run(()=>Directory.EnumerateFiles(path.Absolute, searchPattern)
+				.Select(p => new FsPath(p)));
 		}
 	}
 }

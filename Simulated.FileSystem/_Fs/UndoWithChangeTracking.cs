@@ -69,9 +69,7 @@ namespace Simulated._Fs
 		{
 			if (!await _fileSystem._Disk.FileExists(path))
 			{
-				_AddUndoStep(() => { _fileSystem._Disk.DeleteFile(path);
-					                   return CompletedTask;
-				});
+				_AddUndoStep(() => _fileSystem._Disk.DeleteFile(path));
 				return;
 			}
 			var randomFileName = (await UndoDataCache)/Guid.NewGuid()
