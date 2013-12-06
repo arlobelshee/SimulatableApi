@@ -87,15 +87,16 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public void DeleteFile(FsPath path)
+		public Task DeleteFile(FsPath path)
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
 			if (storageKind == _StorageKind.Missing)
-				return;
+				return _Undo.CompletedTask;
 			if (storageKind == _StorageKind.Directory)
 				throw new ArgumentException("path", string.Format("Path {0} was a directory, and you attempted to delete a file.", path.Absolute));
 			_data.Remove(path);
+			return _Undo.CompletedTask;
 		}
 
 		public void MoveFile(FsPath src, FsPath dest)
