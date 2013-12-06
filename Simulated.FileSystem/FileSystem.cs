@@ -169,27 +169,29 @@ namespace Simulated
 		/// <summary>
 		///    Reverts all changes since the save point.
 		/// </summary>
-		public async Task RevertAllChanges()
+		public Task RevertAllChanges()
 		{
 			if (_Changes.IsTrackingChanges)
 			{
 				var oldChanges = _Changes;
 				_Changes = new _Undo();
-				await oldChanges.RevertAll();
+				return oldChanges.RevertAll();
 			}
+			return _Undo.CompletedTask;
 		}
 
 		/// <summary>
 		///    Commits any pending changes and removes the save point.
 		/// </summary>
-		public async Task CommitChanges()
+		public Task CommitChanges()
 		{
 			if (_Changes.IsTrackingChanges)
 			{
 				var oldChanges = _Changes;
 				_Changes = new _Undo();
-				await oldChanges.CommitAll();
+				return oldChanges.CommitAll();
 			}
+			return _Undo.CompletedTask;
 		}
 
 		/// <summary>

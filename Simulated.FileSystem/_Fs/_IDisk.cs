@@ -19,7 +19,7 @@ namespace Simulated._Fs
 		Task CreateDir([NotNull] FsPath path);
 		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 		Task Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
-		void DeleteDir([NotNull] FsPath path);
+		Task DeleteDir([NotNull] FsPath path);
 		void DeleteFile([NotNull] FsPath path);
 		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
 		void MoveDir(FsPath src, FsPath dest);

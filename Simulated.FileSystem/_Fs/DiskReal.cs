@@ -57,9 +57,9 @@ namespace Simulated._Fs
 			}
 		}
 
-		public void DeleteDir(FsPath path)
+		public Task DeleteDir(FsPath path)
 		{
-			Directory.Delete(path.Absolute, true);
+			return Task.Run(()=>Directory.Delete(path.Absolute, true));
 		}
 
 		public void DeleteFile(FsPath path)

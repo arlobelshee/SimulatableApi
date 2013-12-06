@@ -58,6 +58,7 @@ namespace Simulated.Tests.FileSystemModification
 		public async Task DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
 		{
 			var subDir = _runRootFolder.Dir("A");
+			subDir.Parent.ShouldNotExist();
 			await subDir.EnsureExists();
 
 			subDir.Parent.ShouldExist();

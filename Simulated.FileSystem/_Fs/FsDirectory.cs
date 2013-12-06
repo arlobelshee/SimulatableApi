@@ -93,7 +93,7 @@ namespace Simulated._Fs
 				return;
 			await _allFiles._Changes.DeletedDirectory(_path);
 			if (await Exists)
-				_allFiles._Disk.DeleteDir(_path);
+				await _allFiles._Disk.DeleteDir(_path);
 		}
 
 		/// <summary>
