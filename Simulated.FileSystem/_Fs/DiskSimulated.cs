@@ -65,12 +65,13 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public void Overwrite(FsPath path, byte[] newContents)
+		public Task Overwrite(FsPath path, byte[] newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = newContents
 			};
+			return _Undo.CompletedTask;
 		}
 
 		public void DeleteDir(FsPath path)

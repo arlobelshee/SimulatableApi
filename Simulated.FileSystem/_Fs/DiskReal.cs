@@ -48,9 +48,13 @@ namespace Simulated._Fs
 			}
 		}
 
-		public void Overwrite(FsPath path, byte[] newContents)
+		public async Task Overwrite(FsPath path, byte[] newContents)
 		{
-			File.WriteAllBytes(path.Absolute, newContents);
+			using (var writer = File.OpenWrite(path.Absolute))
+			{
+				await writer.WriteAsync(newContents, 0, newContents.Length);
+				await writer.FlushAsync();
+			}
 		}
 
 		public void DeleteDir(FsPath path)

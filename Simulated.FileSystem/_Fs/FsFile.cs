@@ -127,7 +127,7 @@ namespace Simulated._Fs
 			if (!await parent.Exists)
 				await parent.EnsureExists();
 			await _allFiles._Changes.Overwrote(_path);
-			_allFiles._Disk.Overwrite(_path, newContents);
+			await _allFiles._Disk.Overwrite(_path, newContents);
 		}
 
 		/// <summary>
