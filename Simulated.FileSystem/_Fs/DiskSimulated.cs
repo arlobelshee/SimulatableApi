@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -17,10 +18,10 @@ namespace Simulated._Fs
 		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		public bool DirExists(FsPath path)
+		public Task<bool> DirExists(FsPath path)
 		{
-			return _GetStorage(path)
-				.Kind == _StorageKind.Directory;
+			return (_GetStorage(path)
+				.Kind == _StorageKind.Directory).AsImmediateTask();
 		}
 
 		public bool FileExists(FsPath path)
@@ -122,17 +123,17 @@ namespace Simulated._Fs
 				.ToList();
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
 		{
 			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
 			if (patternExtensionDelimiter < 0)
-				return Enumerable.Empty<FsPath>();
+				return Enumerable.Empty<FsPath>().AsImmediateTask();
 			var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
 			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
 			return _data.Where(
 				item =>
 					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
-				.Select(item => item.Key);
+				.Select(item => item.Key).AsImmediateTask();
 		}
 
 		private void _MoveItemImpl(FsPath src, FsPath dest)

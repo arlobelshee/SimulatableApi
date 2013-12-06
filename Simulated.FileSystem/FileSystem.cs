@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Simulated._Fs;
 
@@ -27,11 +28,15 @@ namespace Simulated
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
-		private FileSystem([NotNull] _IFsDisk disk, bool shouldCreateTempFolder)
+		private readonly AsyncLazy<FsDirectory> _tempDirectory;
+
+		private FileSystem([NotNull] _IFsDisk disk)
 		{
 			_Changes = new _Undo();
 			_Disk = disk;
-			TempDirectory.EnsureExists();
+			var temp = Directory(Path.GetTempPath());
+			_tempDirectory = new AsyncLazy<FsDirectory>(temp.EnsureExists()
+				.ContinueWith(result => temp));
 		}
 
 		/// <summary>
@@ -55,14 +60,18 @@ namespace Simulated
 		///    Gets the temp directory.
 		/// </summary>
 		[NotNull]
-		public FsDirectory TempDirectory
+		public AsyncLazy<FsDirectory> TempDirectory
 		{
-			get { return Directory(Path.GetTempPath()); }
+			get { return _tempDirectory; }
 		}
 
-		internal FsDirectory _UndoDataCache
+		[NotNull]
+		internal async Task<FsDirectory> _UndoDataCache()
 		{
-			get { return Directory(_Changes.UndoDataCache); }
+			var undoWithChangeTracking = _Changes as _UndoWithChangeTracking;
+			if (undoWithChangeTracking == null)
+				return null;
+			return Directory(await undoWithChangeTracking.UndoDataCache);
 		}
 
 		/// <summary>
@@ -72,7 +81,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Real()
 		{
-			return new FileSystem(new _DiskReal(), false);
+			return new FileSystem(new _DiskReal());
 		}
 
 		/// <summary>
@@ -82,7 +91,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Simulated()
 		{
-			return new FileSystem(new _DiskSimulated(), true);
+			return new FileSystem(new _DiskSimulated());
 		}
 
 		/// <summary>
@@ -187,7 +196,7 @@ namespace Simulated
 		[NotNull]
 		public FileSystem Clone()
 		{
-			return new FileSystem(_Disk, false);
+			return new FileSystem(_Disk);
 		}
 	}
 }

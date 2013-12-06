@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -44,17 +45,17 @@ namespace Simulated.Tests.FileSystemNavigation
 		}
 
 		[Test]
-		public void CanGetAllFilesWithinADirectory()
+		public async Task CanGetAllFilesWithinADirectory()
 		{
 			var firstFile = _runRootFolder.File(ArbitraryFileName);
 			var extension = firstFile.Extension;
 			var secondFile = _runRootFolder.File("secondFile" + extension);
-			firstFile.Overwrite(ArbitraryContents);
-			secondFile.Overwrite(ArbitraryContents);
-			_runRootFolder.Files("*" + extension)
+			await firstFile.Overwrite(ArbitraryContents);
+			await secondFile.Overwrite(ArbitraryContents);
+			(await _runRootFolder.Files("*" + extension))
 				.Should()
 				.BeEquivalentTo(firstFile, secondFile);
-			_runRootFolder.Files(firstFile.FileBaseName + ".*")
+			(await _runRootFolder.Files(firstFile.FileBaseName + ".*"))
 				.Should()
 				.BeEquivalentTo(firstFile);
 		}

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -33,8 +34,8 @@ namespace Simulated._Fs
 		/// <summary>
 		///    Gets a value indicating whether this <see cref="FsDirectory" /> exists.
 		/// </summary>
-		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
-		public bool Exists
+		/// <value>&lt;c&gt;true&lt;/c&gt; if it exists; otherwise, &lt;c&gt;false&lt;/c&gt;.</value>
+		public Task<bool> Exists
 		{
 			get { return _allFiles._Disk.DirExists(_path); }
 		}
@@ -72,9 +73,9 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory existing at this object's Path. This
 		///    operation is revertable.
 		/// </summary>
-		public void EnsureExists()
+		public async Task EnsureExists()
 		{
-			if (Exists)
+			if (await Exists)
 				return;
 			_AllMissingDirectoriesInPathFromBottomUp()
 				.Reverse()
@@ -86,12 +87,12 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory no longer existing at this object's
 		///    Path. This operation is revertable.
 		/// </summary>
-		public void EnsureDoesNotExist()
+		public async Task EnsureDoesNotExist()
 		{
-			if (!Exists)
+			if (!await Exists)
 				return;
-			_allFiles._Changes.DeletedDirectory(_path);
-			if (Exists)
+			await _allFiles._Changes.DeletedDirectory(_path);
+			if (await Exists)
 				_allFiles._Disk.DeleteDir(_path);
 		}
 
@@ -115,9 +116,9 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="searchPattern">A filter to apply. Uses file system shell pattern matching (e.g., *.txt).</param>
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
-		public IEnumerable<FsFile> Files(string searchPattern)
+		public async Task<IEnumerable<FsFile>> Files(string searchPattern)
 		{
-			return _allFiles._Disk.FindFiles(_path, searchPattern)
+			return (await _allFiles._Disk.FindFiles(_path, searchPattern))
 				.Select(p => new FsFile(_allFiles, p));
 		}
 
@@ -149,7 +150,7 @@ namespace Simulated._Fs
 		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
 		///    equal.
 		/// </summary>
-		/// <param name="other"> A directory instance to compare with this object. </param>
+		/// <param name="obj"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
 		public override bool Equals(object obj)
 		{

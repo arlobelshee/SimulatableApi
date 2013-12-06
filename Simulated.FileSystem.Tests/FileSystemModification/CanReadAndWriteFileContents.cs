@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -17,17 +18,17 @@ namespace Simulated.Tests.FileSystemModification
 	public abstract class CanReadAndWriteFileContents : FileSystemTestBase
 	{
 		[Test]
-		public void CanCreateFileAndReadItsContents()
+		public async Task CanCreateFileAndReadItsContents()
 		{
 			_testFile.ShouldNotExist();
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 			_testFile.ShouldContain(OriginalContents);
 		}
 
 		[Test]
-		public void RollingBackShouldRemoveAnyCreatedFiles()
+		public async Task RollingBackShouldRemoveAnyCreatedFiles()
 		{
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 
 			_testFile.ShouldContain(OriginalContents);
 			_testSubject.RevertAllChanges();
@@ -35,33 +36,33 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void ChangingContentsOfFileShouldChangeContentsSeenByAllViews()
+		public async Task ChangingContentsOfFileShouldChangeContentsSeenByAllViews()
 		{
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 			using (var secondView = _testSubject.Clone())
 			{
-				secondView.File(_testFile.FullPath)
+				await secondView.File(_testFile.FullPath)
 					.Overwrite(NewContents);
 			}
 			_testFile.ShouldContain(NewContents);
 		}
 
 		[Test]
-		public void CommittingChangesShouldCompletelyEliminateAllUndoData()
+		public async Task CommittingChangesShouldCompletelyEliminateAllUndoData()
 		{
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
+				await secondView.File(_testFile.FullPath)
 					.Overwrite(NewContents);
-				var originalDataCache = secondView._UndoDataCache;
+				var originalDataCache = await secondView._UndoDataCache();
 
-				originalDataCache.Files("*.*")
+				(await originalDataCache.Files("*.*"))
 					.Should()
 					.NotBeEmpty();
 				secondView.CommitChanges();
-				originalDataCache.Files("*.*")
+				(await originalDataCache.Files("*.*"))
 					.Should()
 					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
@@ -69,21 +70,21 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void RollingBackChangesShouldCompletelyEliminateAllUndoData()
+		public async Task RollingBackChangesShouldCompletelyEliminateAllUndoData()
 		{
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
+				await secondView.File(_testFile.FullPath)
 					.Overwrite(NewContents);
-				var originalDataCache = secondView._UndoDataCache;
+				var originalDataCache = await secondView._UndoDataCache();
 
-				originalDataCache.Files("*.*")
+				(await originalDataCache.Files("*.*"))
 					.Should()
 					.NotBeEmpty();
 				secondView.RevertAllChanges();
-				originalDataCache.Files("*.*")
+				(await originalDataCache.Files("*.*"))
 					.Should()
 					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
@@ -91,13 +92,13 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void RevertingChangedFileContentsShouldRevertToOriginalContents()
+		public async Task RevertingChangedFileContentsShouldRevertToOriginalContents()
 		{
-			_testFile.Overwrite(OriginalContents);
+			await _testFile.Overwrite(OriginalContents);
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
+				await secondView.File(_testFile.FullPath)
 					.Overwrite(NewContents);
 				_testFile.ShouldContain(NewContents);
 			}
@@ -105,36 +106,36 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void CannotReadContentsOfMissingFile()
+		public async Task CannotReadContentsOfMissingFile()
 		{
-			var testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
+			var testFile = (await _testSubject.TempDirectory).File("CreatedByTest.txt");
 			_Throws<FileNotFoundException>(() => testFile.ReadAllText(), string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
-		public void CannotReadContentsOfFolder()
+		public async Task CannotReadContentsOfFolder()
 		{
 			var testFile = _testFile;
-			_testSubject.Directory(testFile.FullPath)
+			await _testSubject.Directory(testFile.FullPath)
 				.EnsureExists();
 			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
 		}
 
 		[Test]
-		public void StringsShouldBeEncodedInUtf8ByDefault()
+		public async Task StringsShouldBeEncodedInUtf8ByDefault()
 		{
 			var testFile = _testFile;
-			testFile.Overwrite(NewContents);
+			await testFile.Overwrite(NewContents);
 			var asString = testFile.ReadAllBytes();
 			asString.Should()
 				.Equal(Encoding.UTF8.GetBytes(NewContents));
 		}
 
 		[Test]
-		public void BinaryFilesWithValidStringDataShouldBeReadableAsText()
+		public async Task BinaryFilesWithValidStringDataShouldBeReadableAsText()
 		{
 			var testFile = _testFile;
-			testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
+			await testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
 			var asString = testFile.ReadAllText();
 			asString.Should()
 				.Be(NewContents);

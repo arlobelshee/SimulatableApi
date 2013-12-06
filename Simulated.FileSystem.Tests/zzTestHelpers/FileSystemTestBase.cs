@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated._Fs;
@@ -25,11 +26,11 @@ namespace Simulated.Tests.zzTestHelpers
 		protected abstract FileSystem MakeTestSubject();
 
 		[SetUp]
-		public void Setup()
+		public async Task Setup()
 		{
 			_testSubject = MakeTestSubject();
 			_testSubject.EnableRevertToHere();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
+			_runRootFolder = (await _testSubject.TempDirectory).Dir("CreatedByTestRun-" + Guid.NewGuid());
 			FinishSetup();
 		}
 

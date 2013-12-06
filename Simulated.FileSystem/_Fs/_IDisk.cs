@@ -4,13 +4,14 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
 	internal interface _IFsDisk
 	{
-		bool DirExists([NotNull] FsPath path);
+		Task<bool> DirExists([NotNull] FsPath path);
 		bool FileExists([NotNull] FsPath path);
 		string TextContents([NotNull] FsPath path);
 		byte[] RawContents([NotNull] FsPath path);
@@ -21,6 +22,6 @@ namespace Simulated._Fs
 		void DeleteFile([NotNull] FsPath path);
 		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
 		void MoveDir(FsPath src, FsPath dest);
-		IEnumerable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
+		Task<IEnumerable<FsPath>> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }

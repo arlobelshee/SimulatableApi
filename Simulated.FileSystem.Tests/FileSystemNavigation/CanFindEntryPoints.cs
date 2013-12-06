@@ -3,7 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -13,17 +13,16 @@ namespace Simulated.Tests.FileSystemNavigation
 	public abstract class CanFindEntryPoints : FileSystemTestBase
 	{
 		[Test]
-		public void TempFolderShouldHaveTheCorrectPath()
+		public async Task TempFolderShouldHaveTheCorrectPath()
 		{
-			_testSubject.TempDirectory.Path.Should()
+			(await _testSubject.TempDirectory).Path.Should()
 				.Be(FsPath.TempFolder);
 		}
 
 		[Test]
-		public void TempFolderShouldInitiallyExist()
+		public async Task TempFolderShouldInitiallyExist()
 		{
-			_testSubject.TempDirectory.Exists.Should()
-				.BeTrue();
+			(await _testSubject.TempDirectory).ShouldExist();
 		}
 
 		[Test]
@@ -32,12 +31,6 @@ namespace Simulated.Tests.FileSystemNavigation
 			_testSubject.Directory(ArbitraryMissingFolder)
 				.Path.Absolute.Should()
 				.Be(ArbitraryMissingFolder);
-		}
-
-		private static void _Throws<TException>(Action code, string message) where TException : Exception
-		{
-			code.ShouldThrow<TException>()
-				.WithMessage(message);
 		}
 
 		private const string ArbitraryMissingFolder = @"C:\theroot\folder";

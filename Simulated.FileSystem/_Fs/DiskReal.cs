@@ -6,14 +6,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Simulated._Fs
 {
 	internal class _DiskReal : _IFsDisk
 	{
-		public bool DirExists(FsPath path)
+		public Task<bool> DirExists(FsPath path)
 		{
-			return Directory.Exists(path.Absolute);
+			return Directory.Exists(path.Absolute)
+				.AsImmediateTask();
 		}
 
 		public bool FileExists(FsPath path)
@@ -66,9 +68,15 @@ namespace Simulated._Fs
 			Directory.Move(src.Absolute, dest.Absolute);
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
 		{
-			if (!DirExists(path))
+			return DirExists(path)
+				.ContinueWith(r => _FindFilesImpl(path, searchPattern, r.Result));
+		}
+
+		private IEnumerable<FsPath> _FindFilesImpl(FsPath path, string searchPattern, bool dirExists)
+		{
+			if (!dirExists)
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path.Absolute, searchPattern)
 				.Select(p => new FsPath(p));

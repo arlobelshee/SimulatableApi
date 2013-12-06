@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -28,21 +29,21 @@ namespace Simulated.Tests.QueryBasicProperties
 		}
 
 		[Test]
-		public void DirectoriesKnowWhetherTheyExist()
+		public async Task DirectoriesKnowWhetherTheyExist()
 		{
-			_runRootFolder.Exists.Should()
+			(await _runRootFolder.Exists).Should()
 				.BeFalse();
-			_runRootFolder.Parent.Exists.Should()
+			(await _runRootFolder.Parent.Exists).Should()
 				.BeTrue();
 		}
 
 		[Test]
-		public void FilesKnowWhetherTheyExist()
+		public async Task FilesKnowWhetherTheyExist()
 		{
 			var testSubject = _runRootFolder.File("something.txt");
 			testSubject.Exists.Should()
 				.BeFalse();
-			testSubject.Overwrite("anything");
+			await testSubject.Overwrite("anything");
 			testSubject.Exists.Should()
 				.BeTrue();
 		}

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -14,29 +15,43 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _fileSystem;
 		[NotNull] private readonly List<UndoStep> _stepsTaken = new List<UndoStep>();
+		private readonly FsPath _cachePathUseThePropertyInstead;
 
-		public _UndoWithChangeTracking(FileSystem fileSystem)
+		public _UndoWithChangeTracking([NotNull] FileSystem fileSystem)
 		{
 			_fileSystem = fileSystem;
+			_cachePathUseThePropertyInstead = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
+				.ToString("N"));
+			UndoDataCache = new AsyncLazy<FsPath>(_fileSystem._Disk.DirExists(_cachePathUseThePropertyInstead)
+				.ContinueWith(exists =>
+				{
+					if (!exists.Result)
+					{
+						_fileSystem._Disk.CreateDir(_cachePathUseThePropertyInstead);
+					}
+					return _cachePathUseThePropertyInstead;
+				}));
 		}
+
+		public AsyncLazy<FsPath> UndoDataCache { get; private set; }
 
 		public override bool IsTrackingChanges
 		{
 			get { return true; }
 		}
 
-		public override void CommitAll()
+		public override Task CommitAll()
 		{
 			_stepsTaken.Clear();
-			_EnsureUndoDataCacheIsGone();
+			return _EnsureUndoDataCacheIsGone();
 		}
 
-		public override void RevertAll()
+		public override Task RevertAll()
 		{
 			Enumerable.Reverse(_stepsTaken)
 				.Each(step => step.Undo());
 			_stepsTaken.Clear();
-			_EnsureUndoDataCacheIsGone();
+			return _EnsureUndoDataCacheIsGone();
 		}
 
 		public override void CreatedDirectory(FsPath path)
@@ -44,24 +59,22 @@ namespace Simulated._Fs
 			_AddUndoStep(() => _fileSystem._Disk.DeleteDir(path));
 		}
 
-		public override void DeletedDirectory(FsPath path)
+		public override async Task DeletedDirectory(FsPath path)
 		{
-			_EnsureUndoDataCacheExists();
-			var randomDirectoryName = UndoDataCache/Guid.NewGuid()
+			var randomDirectoryName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
 			_fileSystem._Disk.MoveDir(path, randomDirectoryName);
 			_AddUndoStep(() => _fileSystem._Disk.MoveDir(randomDirectoryName, path));
 		}
 
-		public override void Overwrote(FsPath path)
+		public override async Task Overwrote(FsPath path)
 		{
 			if (!_fileSystem._Disk.FileExists(path))
 			{
 				_AddUndoStep(() => _fileSystem._Disk.DeleteFile(path));
 				return;
 			}
-			_EnsureUndoDataCacheExists();
-			var randomFileName = UndoDataCache/Guid.NewGuid()
+			var randomFileName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
 			_fileSystem._Disk.MoveFile(path, randomFileName);
 			_AddUndoStep(() =>
@@ -76,19 +89,12 @@ namespace Simulated._Fs
 			_stepsTaken.Add(new UndoStep(undo));
 		}
 
-		private void _EnsureUndoDataCacheExists()
+		private async Task _EnsureUndoDataCacheIsGone()
 		{
-			if (!_fileSystem._Disk.DirExists(UndoDataCache))
+			// Use direct access to the path from here because this is the teardown for the lazy value.
+			if (await _fileSystem._Disk.DirExists(_cachePathUseThePropertyInstead))
 			{
-				_fileSystem._Disk.CreateDir(UndoDataCache);
-			}
-		}
-
-		private void _EnsureUndoDataCacheIsGone()
-		{
-			if (_fileSystem._Disk.DirExists(UndoDataCache))
-			{
-				_fileSystem._Disk.DeleteDir(UndoDataCache);
+				_fileSystem._Disk.DeleteDir(_cachePathUseThePropertyInstead);
 			}
 		}
 

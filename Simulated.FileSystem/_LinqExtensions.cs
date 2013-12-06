@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 // ReSharper disable CheckNamespace
@@ -18,6 +19,13 @@ namespace System.Linq // ReSharper restore CheckNamespace
 			{
 				op(item);
 			}
+		}
+
+		public static Task<T> AsImmediateTask<T>(this T result)
+		{
+			var source = new TaskCompletionSource<T>();
+			source.SetResult(result);
+			return source.Task;
 		}
 	}
 }

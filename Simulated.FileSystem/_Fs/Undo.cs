@@ -3,30 +3,41 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
+using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
 	internal class _Undo
 	{
-		public _Undo()
-		{
-			UndoDataCache = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
-				.ToString("N"));
-		}
+		private static readonly Task CompletedTask = true.AsImmediateTask();
 
 		public virtual bool IsTrackingChanges
 		{
 			get { return false; }
 		}
 
-		public FsPath UndoDataCache { get; private set; }
+		public virtual Task CommitAll()
+		{
+			return CompletedTask;
+		}
 
-		public virtual void CommitAll() {}
-		public virtual void RevertAll() {}
+		public virtual Task RevertAll()
+		{
+			return CompletedTask;
+		}
+
 		public virtual void CreatedDirectory([NotNull] FsPath path) {}
-		public virtual void Overwrote([NotNull] FsPath path) {}
-		public virtual void DeletedDirectory(FsPath path) {}
+
+		public virtual Task Overwrote([NotNull] FsPath path)
+		{
+			return CompletedTask;
+		}
+
+		public virtual Task DeletedDirectory(FsPath path)
+		{
+			return CompletedTask;
+		}
 	}
 }

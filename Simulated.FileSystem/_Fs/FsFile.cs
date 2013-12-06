@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -106,11 +107,11 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
-		public void Overwrite([NotNull] string newContents)
+		public async Task Overwrite([NotNull] string newContents)
 		{
 			var parent = ContainingFolder;
-			if (!parent.Exists)
-				parent.EnsureExists();
+			if (!await parent.Exists)
+				await parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
@@ -120,11 +121,11 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
-		public void OverwriteBinary([NotNull] byte[] newContents)
+		public async Task OverwriteBinary([NotNull] byte[] newContents)
 		{
 			var parent = ContainingFolder;
-			if (!parent.Exists)
-				parent.EnsureExists();
+			if (!await parent.Exists)
+				await parent.EnsureExists();
 			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
@@ -172,9 +173,9 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public override bool Equals(object obj)
+		public override bool Equals(object other)
 		{
-			return Equals(obj as FsFile);
+			return Equals(other as FsFile);
 		}
 
 		/// <summary>
@@ -187,7 +188,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as <see cref="Equals(FsFile, FsFile)" /> .
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
