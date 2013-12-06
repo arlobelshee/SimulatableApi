@@ -80,7 +80,7 @@ namespace Simulated._Fs
 			_AllMissingDirectoriesInPathFromBottomUp()
 				.Reverse()
 				.Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
-			_allFiles._Disk.CreateDir(_path);
+			await _allFiles._Disk.CreateDir(_path);
 		}
 
 		/// <summary>
@@ -118,8 +118,7 @@ namespace Simulated._Fs
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
 		public async Task<IEnumerable<FsFile>> Files(string searchPattern)
 		{
-			return (await _allFiles._Disk.FindFiles(_path, searchPattern))
-				.Select(p => new FsFile(_allFiles, p));
+			return (await _allFiles._Disk.FindFiles(_path, searchPattern)).Select(p => new FsFile(_allFiles, p));
 		}
 
 		/// <summary>
@@ -167,7 +166,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==.
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
@@ -193,7 +192,7 @@ namespace Simulated._Fs
 		{
 			var dir = new DirectoryInfo(_path.Absolute);
 			var root = dir.Root;
-			while (!dir.Exists && dir != root)
+			while (dir != null && (!dir.Exists && dir != root))
 			{
 				yield return dir.FullName;
 				dir = dir.Parent;

@@ -27,7 +27,7 @@ namespace Simulated._Fs
 		private async Task<FsPath> _EnsureDirExists(FsPath cacheLocation)
 		{
 			if (!await _fileSystem._Disk.DirExists(cacheLocation))
-				_fileSystem._Disk.CreateDir(cacheLocation);
+				await _fileSystem._Disk.CreateDir(cacheLocation);
 			return cacheLocation;
 		}
 

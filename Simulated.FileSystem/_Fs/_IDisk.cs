@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -15,7 +16,7 @@ namespace Simulated._Fs
 		Task<bool> FileExists([NotNull] FsPath path);
 		Task<string> TextContents([NotNull] FsPath path);
 		Task<byte[]> RawContents([NotNull] FsPath path);
-		void CreateDir([NotNull] FsPath path);
+		Task CreateDir([NotNull] FsPath path);
 		void Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 		void Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
 		void DeleteDir([NotNull] FsPath path);

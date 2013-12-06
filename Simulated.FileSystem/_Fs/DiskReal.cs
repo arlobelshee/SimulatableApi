@@ -34,9 +34,9 @@ namespace Simulated._Fs
 			return Task.Run(() => File.ReadAllBytes(path.Absolute));
 		}
 
-		public void CreateDir(FsPath path)
+		public Task CreateDir(FsPath path)
 		{
-			Directory.CreateDirectory(path.Absolute);
+			return Task.Run(()=>Directory.CreateDirectory(path.Absolute));
 		}
 
 		public void Overwrite(FsPath path, string newContents)

@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 
@@ -11,32 +12,32 @@ namespace Simulated.Tests.FileSystemModification
 	public abstract class CanCreateDirectories : FileSystemTestBase
 	{
 		[Test]
-		public void ShouldBeAbleToCreateADirectory()
+		public async Task ShouldBeAbleToCreateADirectory()
 		{
 			_runRootFolder.ShouldNotExist();
-			_runRootFolder.EnsureExists();
+			await _runRootFolder.EnsureExists();
 			_runRootFolder.ShouldExist();
 		}
 
 		[Test]
-		public void ShouldBeAbleToRollBackDirectoryCreation()
+		public async Task ShouldBeAbleToRollBackDirectoryCreation()
 		{
-			_runRootFolder.EnsureExists();
+			await _runRootFolder.EnsureExists();
 
 			_runRootFolder.ShouldExist();
-			_testSubject.RevertAllChanges();
+			await _testSubject.RevertAllChanges();
 			_runRootFolder.ShouldNotExist();
 		}
 
 		[Test]
-		public void CreatingADirectoryThatAlreadyExistsAndRollingItBackShouldDoNothing()
+		public async Task CreatingADirectoryThatAlreadyExistsAndRollingItBackShouldDoNothing()
 		{
-			_runRootFolder.EnsureExists();
+			await _runRootFolder.EnsureExists();
 			_runRootFolder.ShouldExist();
 			using (var secondView = _testSubject.Clone())
 			{
 				secondView.EnableRevertToHere();
-				secondView.Directory(_runRootFolder.Path)
+				await secondView.Directory(_runRootFolder.Path)
 					.EnsureExists();
 				_runRootFolder.ShouldExist();
 			}
@@ -44,31 +45,31 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void CreatingADirectoryShouldCreateAnyMissingIntermediateDirectories()
+		public async Task CreatingADirectoryShouldCreateAnyMissingIntermediateDirectories()
 		{
 			var subDir = _runRootFolder.Dir("A");
 
 			subDir.Parent.ShouldNotExist();
-			subDir.EnsureExists();
+			await subDir.EnsureExists();
 			subDir.Parent.ShouldExist();
 		}
 
 		[Test]
-		public void DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
+		public async Task DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
 		{
 			var subDir = _runRootFolder.Dir("A");
-			subDir.EnsureExists();
+			await subDir.EnsureExists();
 
 			subDir.Parent.ShouldExist();
-			_testSubject.RevertAllChanges();
+			await _testSubject.RevertAllChanges();
 			subDir.Parent.ShouldNotExist();
 		}
 
 		[Test]
-		public void OverwritingAFileInAMissingFolderShouldCreateThatFolder()
+		public async Task OverwritingAFileInAMissingFolderShouldCreateThatFolder()
 		{
 			_runRootFolder.ShouldNotExist();
-			_runRootFolder.File("CreatedByTest.txt")
+			await _runRootFolder.File("CreatedByTest.txt")
 				.Overwrite("anything");
 			_runRootFolder.ShouldExist();
 		}

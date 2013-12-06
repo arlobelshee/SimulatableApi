@@ -44,13 +44,13 @@ namespace Simulated._Fs
 			return storage.RawContents.AsImmediateTask();
 		}
 
-		public void CreateDir(FsPath path)
+		public Task CreateDir(FsPath path)
 		{
 			while (true)
 			{
 				_data[path] = new _Node(_StorageKind.Directory);
 				if (path.IsRoot)
-					return;
+					return _Undo.CompletedTask;
 				path = path.Parent;
 			}
 		}
