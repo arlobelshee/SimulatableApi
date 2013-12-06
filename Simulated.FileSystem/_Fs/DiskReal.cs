@@ -18,9 +18,9 @@ namespace Simulated._Fs
 				.AsImmediateTask();
 		}
 
-		public bool FileExists(FsPath path)
+		public Task<bool> FileExists(FsPath path)
 		{
-			return File.Exists(path.Absolute);
+			return File.Exists(path.Absolute).AsImmediateTask();
 		}
 
 		public string TextContents(FsPath path)

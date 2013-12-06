@@ -12,7 +12,7 @@ namespace Simulated._Fs
 	internal interface _IFsDisk
 	{
 		Task<bool> DirExists([NotNull] FsPath path);
-		bool FileExists([NotNull] FsPath path);
+		Task<bool> FileExists([NotNull] FsPath path);
 		string TextContents([NotNull] FsPath path);
 		byte[] RawContents([NotNull] FsPath path);
 		void CreateDir([NotNull] FsPath path);

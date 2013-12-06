@@ -17,10 +17,15 @@ namespace Simulated.Tests.zzTestHelpers
 				.BeTrue("directory should exist");
 		}
 
+		public static void ShouldExist(this FsFile file)
+		{
+			file.Exists.Result.Should()
+				.BeTrue("file should exist");
+		}
+
 		public static void ShouldContain([NotNull] this FsFile file, string contents)
 		{
-			file.Exists.Should()
-				.BeTrue("file should exist");
+			file.ShouldExist();
 			file.ReadAllText()
 				.Should()
 				.Be(contents);
@@ -34,8 +39,8 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldNotExist(this FsFile file)
 		{
-			file.Exists.Should()
-				.BeFalse();
+			file.Exists.Result.Should()
+				.BeFalse("file should be missing");
 		}
 	}
 }

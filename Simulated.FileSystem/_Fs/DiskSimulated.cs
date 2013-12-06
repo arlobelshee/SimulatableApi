@@ -24,10 +24,10 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.Directory).AsImmediateTask();
 		}
 
-		public bool FileExists(FsPath path)
+		public Task<bool> FileExists(FsPath path)
 		{
-			return _GetStorage(path)
-				.Kind == _StorageKind.File;
+			return (_GetStorage(path)
+				.Kind == _StorageKind.File).AsImmediateTask();
 		}
 
 		public string TextContents(FsPath path)
@@ -127,13 +127,16 @@ namespace Simulated._Fs
 		{
 			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
 			if (patternExtensionDelimiter < 0)
-				return Enumerable.Empty<FsPath>().AsImmediateTask();
+				return Enumerable.Empty<FsPath>()
+					.AsImmediateTask();
 			var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
 			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
-			return _data.Where(
-				item =>
-					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
-				.Select(item => item.Key).AsImmediateTask();
+			return
+				_data.Where(
+					item =>
+						item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
+					.Select(item => item.Key)
+					.AsImmediateTask();
 		}
 
 		private void _MoveItemImpl(FsPath src, FsPath dest)

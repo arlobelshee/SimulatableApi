@@ -29,23 +29,19 @@ namespace Simulated.Tests.QueryBasicProperties
 		}
 
 		[Test]
-		public async Task DirectoriesKnowWhetherTheyExist()
+		public void DirectoriesKnowWhetherTheyExist()
 		{
-			(await _runRootFolder.Exists).Should()
-				.BeFalse();
-			(await _runRootFolder.Parent.Exists).Should()
-				.BeTrue();
+			_runRootFolder.ShouldNotExist();
+			_runRootFolder.Parent.ShouldExist();
 		}
 
 		[Test]
 		public async Task FilesKnowWhetherTheyExist()
 		{
 			var testSubject = _runRootFolder.File("something.txt");
-			testSubject.Exists.Should()
-				.BeFalse();
+			testSubject.ShouldNotExist();
 			await testSubject.Overwrite("anything");
-			testSubject.Exists.Should()
-				.BeTrue();
+			testSubject.ShouldExist();
 		}
 	}
 

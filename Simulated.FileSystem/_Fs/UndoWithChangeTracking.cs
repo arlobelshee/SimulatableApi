@@ -69,7 +69,7 @@ namespace Simulated._Fs
 
 		public override async Task Overwrote(FsPath path)
 		{
-			if (!_fileSystem._Disk.FileExists(path))
+			if (!await _fileSystem._Disk.FileExists(path))
 			{
 				_AddUndoStep(() => _fileSystem._Disk.DeleteFile(path));
 				return;

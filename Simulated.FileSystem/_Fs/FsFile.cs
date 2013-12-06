@@ -61,7 +61,7 @@ namespace Simulated._Fs
 		///    Gets a value indicating whether this <see cref="FsFile" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
-		public bool Exists
+		public Task<bool> Exists
 		{
 			get { return _allFiles._Disk.FileExists(_path); }
 		}
