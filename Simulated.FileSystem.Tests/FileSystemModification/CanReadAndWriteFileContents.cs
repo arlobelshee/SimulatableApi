@@ -128,7 +128,7 @@ namespace Simulated.Tests.FileSystemModification
 		{
 			var testFile = _testFile;
 			await testFile.Overwrite(NewContents);
-			var asString = testFile.ReadAllBytes();
+			var asString = await testFile.ReadAllBytes();
 			asString.Should()
 				.Equal(Encoding.UTF8.GetBytes(NewContents));
 		}

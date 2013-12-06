@@ -153,7 +153,7 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
-		public byte[] ReadAllBytes()
+		public Task<byte[]> ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
 		}

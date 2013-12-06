@@ -14,7 +14,7 @@ namespace Simulated._Fs
 		Task<bool> DirExists([NotNull] FsPath path);
 		Task<bool> FileExists([NotNull] FsPath path);
 		Task<string> TextContents([NotNull] FsPath path);
-		byte[] RawContents([NotNull] FsPath path);
+		Task<byte[]> RawContents([NotNull] FsPath path);
 		void CreateDir([NotNull] FsPath path);
 		void Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 		void Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);

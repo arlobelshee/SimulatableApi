@@ -37,11 +37,11 @@ namespace Simulated._Fs
 			return DefaultEncoding.GetString(storage.RawContents).AsImmediateTask();
 		}
 
-		public byte[] RawContents(FsPath path)
+		public Task<byte[]> RawContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-			return storage.RawContents;
+			return storage.RawContents.AsImmediateTask();
 		}
 
 		public void CreateDir(FsPath path)

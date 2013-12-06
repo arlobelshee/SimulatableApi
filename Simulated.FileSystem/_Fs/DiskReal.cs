@@ -29,9 +29,9 @@ namespace Simulated._Fs
 			return Task.Run(() => File.ReadAllText(path.Absolute));
 		}
 
-		public byte[] RawContents(FsPath path)
+		public Task<byte[]> RawContents(FsPath path)
 		{
-			return File.ReadAllBytes(path.Absolute);
+			return Task.Run(() => File.ReadAllBytes(path.Absolute));
 		}
 
 		public void CreateDir(FsPath path)
