@@ -34,7 +34,8 @@ namespace Simulated._Fs
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-			return DefaultEncoding.GetString(storage.RawContents).AsImmediateTask();
+			return DefaultEncoding.GetString(storage.RawContents)
+				.AsImmediateTask();
 		}
 
 		public Task<byte[]> RawContents(FsPath path)
@@ -55,12 +56,13 @@ namespace Simulated._Fs
 			}
 		}
 
-		public void Overwrite(FsPath path, string newContents)
+		public Task Overwrite(FsPath path, string newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = DefaultEncoding.GetBytes(newContents)
 			};
+			return _Undo.CompletedTask;
 		}
 
 		public void Overwrite(FsPath path, byte[] newContents)
@@ -153,6 +155,7 @@ namespace Simulated._Fs
 			return (patternBaseName == "*" || baseName == patternBaseName) && (patternExtension == "*" || extension == patternExtension);
 		}
 
+// ReSharper disable once UnusedParameter.Local
 		private void _ValidateStorage(FsPath path, _Node storage)
 		{
 			if (storage.Kind == _StorageKind.Missing)

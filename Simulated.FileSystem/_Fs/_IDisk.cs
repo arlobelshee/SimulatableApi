@@ -17,7 +17,7 @@ namespace Simulated._Fs
 		Task<string> TextContents([NotNull] FsPath path);
 		Task<byte[]> RawContents([NotNull] FsPath path);
 		Task CreateDir([NotNull] FsPath path);
-		void Overwrite([NotNull] FsPath path, [NotNull] string newContents);
+		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 		void Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
 		void DeleteDir([NotNull] FsPath path);
 		void DeleteFile([NotNull] FsPath path);
