@@ -112,7 +112,7 @@ namespace Simulated._Fs
 			var parent = ContainingFolder;
 			if (!await parent.Exists)
 				await parent.EnsureExists();
-			_allFiles._Changes.Overwrote(_path);
+			await _allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -126,7 +126,7 @@ namespace Simulated._Fs
 			var parent = ContainingFolder;
 			if (!await parent.Exists)
 				await parent.EnsureExists();
-			_allFiles._Changes.Overwrote(_path);
+			await _allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -188,7 +188,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals(FsFile, FsFile)" /> .
+		///    Implements the operator ==. It is the same as Equals.
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
