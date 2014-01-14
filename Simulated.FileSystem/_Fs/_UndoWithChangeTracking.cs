@@ -11,12 +11,12 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _UndoWithChangeTracking : _Undo
+	internal class _UndoWithChangeTracking : _StorageTransform
 	{
 		[NotNull] private readonly List<UndoStep> _stepsTaken = new List<UndoStep>();
 		[NotNull] private readonly _IFsDisk _disk;
 
-		public _UndoWithChangeTracking([NotNull] _IFsDisk disk)
+		public _UndoWithChangeTracking([NotNull] _IFsDisk disk) : base(null)
 		{
 			_disk = disk;
 			var cacheLocation = FsPath.TempFolder/("UndoData." + Guid.NewGuid()

@@ -15,7 +15,7 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly _IFsDisk _disk;
-		[NotNull] private _Undo _changes;
+		[NotNull] private _StorageTransform _changes;
 
 		public _Storage([NotNull] FileSystem allFiles, [NotNull] _Undo changes, [NotNull] _IFsDisk disk)
 		{
@@ -70,13 +70,13 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public Task<bool> DoFileExists([NotNull] FsPath path)
+		public Task<bool> IsFile([NotNull] FsPath path)
 		{
 			return _disk.FileExists(path);
 		}
 
 		[NotNull]
-		public async Task DoOverwriteFileContents([NotNull] FsPath path, [NotNull] string newContents, [NotNull] FsDirectory parent)
+		public async Task OverwriteFileContents([NotNull] FsPath path, [NotNull] string newContents, [NotNull] FsDirectory parent)
 		{
 			await parent.EnsureExists();
 			await _changes.Overwrote(path);
@@ -84,7 +84,7 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public async Task DoOverwriteFileContentsBinary([NotNull] FsPath path, [NotNull] byte[] newContents, [NotNull] FsDirectory parent)
+		public async Task OverwriteFileContentsBinary([NotNull] FsPath path, [NotNull] byte[] newContents, [NotNull] FsDirectory parent)
 		{
 			await parent.EnsureExists();
 			await _changes.Overwrote(path);

@@ -56,6 +56,7 @@
     <Compile Include="_Fs\_DiskSimulated.cs" />
     <Compile Include="_Fs\_IDisk.cs" />
     <Compile Include="_Fs\_Storage.cs" />
+    <Compile Include="_Fs\_StorageTransform.cs" />
     <Compile Include="_Fs\_Undo.cs" />
     <Compile Include="_Fs\_UndoWithChangeTracking.cs" />
     <Compile Include="_LinqExtensions.cs" />

@@ -66,7 +66,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<bool> Exists
 		{
-			get { return _storage.DoFileExists(_path); }
+			get { return _storage.IsFile(_path); }
 		}
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task Overwrite([NotNull] string newContents)
 		{
-			await _storage.DoOverwriteFileContents(_path, newContents, ContainingFolder);
+			await _storage.OverwriteFileContents(_path, newContents, ContainingFolder);
 		}
 
 		/// <summary>
@@ -134,7 +134,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task OverwriteBinary([NotNull] byte[] newContents)
 		{
-			await _storage.DoOverwriteFileContentsBinary(_path, newContents, ContainingFolder);
+			await _storage.OverwriteFileContentsBinary(_path, newContents, ContainingFolder);
 		}
 
 		/// <summary>
