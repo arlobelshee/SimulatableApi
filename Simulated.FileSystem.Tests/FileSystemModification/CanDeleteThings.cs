@@ -59,15 +59,6 @@ namespace Simulated.Tests.FileSystemModification
 	}
 
 	[TestFixture]
-	public class CanDeleteThingsInRealFs : CanDeleteThings
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
 	public class CanDeleteThingsInMemoryFs : CanDeleteThings
 	{
 		protected override FileSystem MakeTestSubject()

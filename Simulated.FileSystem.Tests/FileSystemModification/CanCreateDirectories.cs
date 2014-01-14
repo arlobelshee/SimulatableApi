@@ -77,15 +77,6 @@ namespace Simulated.Tests.FileSystemModification
 	}
 
 	[TestFixture]
-	public class CanCreateDirectoriesInRealFs : CanCreateDirectories
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
 	public class CanCreateDirectoriesInMemoryFs : CanCreateDirectories
 	{
 		protected override FileSystem MakeTestSubject()

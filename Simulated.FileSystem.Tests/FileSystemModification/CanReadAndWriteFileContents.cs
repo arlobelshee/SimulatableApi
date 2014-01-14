@@ -150,15 +150,6 @@ namespace Simulated.Tests.FileSystemModification
 	}
 
 	[TestFixture]
-	public class CanReadAndWriteFileContentsInRealFs : CanReadAndWriteFileContents
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
 	public class CanReadAndWriteFileContentsInMemoryFs : CanReadAndWriteFileContents
 	{
 		protected override FileSystem MakeTestSubject()

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulated.FileSystem", "Sim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulated.FileSystem.Tests", "Simulated.FileSystem.Tests\Simulated.FileSystem.Tests.csproj", "{DF78229E-26D5-42C9-B910-AF0433970079}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulated.FileSystem.Tests.Platform", "Simulated.FileSystem.Tests.Platform\Simulated.FileSystem.Tests.Platform.csproj", "{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,16 @@ Global
 		{DF78229E-26D5-42C9-B910-AF0433970079}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DF78229E-26D5-42C9-B910-AF0433970079}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DF78229E-26D5-42C9-B910-AF0433970079}.Release|x86.ActiveCfg = Release|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{17EF9BB1-1C98-43C8-B3E6-B93CEADCDEDC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

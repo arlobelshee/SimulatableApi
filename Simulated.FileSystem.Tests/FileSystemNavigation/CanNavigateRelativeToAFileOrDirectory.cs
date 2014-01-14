@@ -62,15 +62,6 @@ namespace Simulated.Tests.FileSystemNavigation
 	}
 
 	[TestFixture]
-	public class CanNavigateRelativeToAFileOrDirectoryRealFs : CanNavigateRelativeToAFileOrDirectory
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
 	public class CanNavigateRelativeToAFileOrDirectoryMemoryFs : CanNavigateRelativeToAFileOrDirectory
 	{
 		protected override FileSystem MakeTestSubject()

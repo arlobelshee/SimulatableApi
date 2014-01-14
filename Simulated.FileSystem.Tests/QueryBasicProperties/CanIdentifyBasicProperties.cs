@@ -6,6 +6,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using Simulated.Tests.FileSystemNavigation;
 using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.QueryBasicProperties
@@ -38,7 +39,8 @@ namespace Simulated.Tests.QueryBasicProperties
 		[Test]
 		public void FilesKnowTheirFileSystem()
 		{
-			_runRootFolder.File("unused.name").FileSystem.Should()
+			_runRootFolder.File("unused.name")
+				.FileSystem.Should()
 				.BeSameAs(_testSubject);
 		}
 
@@ -56,15 +58,6 @@ namespace Simulated.Tests.QueryBasicProperties
 			testSubject.ShouldNotExist();
 			await testSubject.Overwrite("anything");
 			testSubject.ShouldExist();
-		}
-	}
-
-	[TestFixture]
-	public class CanIdentifyBasicPropertiesRealFs : CanIdentifyBasicProperties
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
 		}
 	}
 

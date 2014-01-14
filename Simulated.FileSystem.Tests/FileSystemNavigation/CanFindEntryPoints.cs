@@ -44,13 +44,4 @@ namespace Simulated.Tests.FileSystemNavigation
 			return FileSystem.Simulated();
 		}
 	}
-
-	[TestFixture]
-	public class CanFindEntryPointsRealFs : CanFindEntryPoints
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
 }
