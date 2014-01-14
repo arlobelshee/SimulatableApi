@@ -33,9 +33,6 @@ namespace Simulated._Fs
 		{
 			if (await IsDirectory(path))
 				return;
-			_AllMissingDirectoriesInPathFromBottomUp(path)
-				.Reverse()
-				.Each(dir => _disk.CreatedDirectory(new FsPath(dir)));
 			await _disk.CreateDir(path);
 		}
 
@@ -51,18 +48,6 @@ namespace Simulated._Fs
 		public async Task<IEnumerable<FsFile>> KnownFilesIn([NotNull] string searchPattern, [NotNull] FsPath path)
 		{
 			return (await _disk.FindFiles(path, searchPattern)).Select(p => new FsFile(_allFiles, p, this));
-		}
-
-		[NotNull]
-		private IEnumerable<string> _AllMissingDirectoriesInPathFromBottomUp([NotNull] FsPath path)
-		{
-			var dir = new DirectoryInfo(path.Absolute);
-			var root = dir.Root;
-			while (dir != null && (!dir.Exists && dir != root))
-			{
-				yield return dir.FullName;
-				dir = dir.Parent;
-			}
 		}
 
 		[NotNull]

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -52,9 +53,15 @@ namespace Simulated._Fs
 			return _EnsureUndoDataCacheIsGone();
 		}
 
-		public override void CreatedDirectory(FsPath path)
+		public override Task CreateDir(FsPath path)
 		{
-			_AddUndoStep(() => Next.DeleteDir(path));
+			_AllMissingDirectoriesInPathFromBottomUp(path)
+				.Reverse()
+				.Each(dir =>
+				{
+					_AddUndoStep(() => Next.DeleteDir(new FsPath(dir)));
+				});
+			return base.CreateDir(path);
 		}
 
 		public override async Task DeleteDir(FsPath path)
@@ -123,6 +130,18 @@ namespace Simulated._Fs
 
 			[NotNull]
 			public Action Undo { get; private set; }
+		}
+
+		[NotNull]
+		public static IEnumerable<string> _AllMissingDirectoriesInPathFromBottomUp([NotNull] FsPath path)
+		{
+			var dir = new DirectoryInfo(path.Absolute);
+			var root = dir.Root;
+			while (dir != null && (!dir.Exists && dir != root))
+			{
+				yield return dir.FullName;
+				dir = dir.Parent;
+			}
 		}
 	}
 }

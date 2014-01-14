@@ -36,11 +36,6 @@ namespace Simulated._Fs
 			throw new NotImplementedException();
 		}
 
-		public virtual void CreatedDirectory([NotNull] FsPath path)
-		{
-			throw new NotImplementedException();
-		}
-
 		[NotNull]
 		public virtual Task<bool> DirExists([NotNull] FsPath path)
 		{
