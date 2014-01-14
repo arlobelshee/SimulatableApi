@@ -51,7 +51,7 @@ namespace Simulated._Fs
 			{
 				_data[path] = new _Node(_StorageKind.Directory);
 				if (path.IsRoot)
-					return _Undo.CompletedTask;
+					return CompletedTask;
 				path = path.Parent;
 			}
 		}
@@ -62,7 +62,7 @@ namespace Simulated._Fs
 			{
 				RawContents = DefaultEncoding.GetBytes(newContents)
 			};
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task Overwrite(FsPath path, byte[] newContents)
@@ -71,7 +71,7 @@ namespace Simulated._Fs
 			{
 				RawContents = newContents
 			};
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task DeleteDir(FsPath path)
@@ -79,12 +79,12 @@ namespace Simulated._Fs
 			var storageKind = _GetStorage(path)
 				.Kind;
 			if (storageKind == _StorageKind.Missing)
-				return _Undo.CompletedTask;
+				return CompletedTask;
 			if (storageKind == _StorageKind.File)
 				throw new ArgumentException("path", string.Format("Path {0} was a file, and you attempted to delete a directory.", path.Absolute));
 			var toDelete = _ItemsInScopeOfDirectory(path);
 			toDelete.Each(p => _data.Remove(p.Key));
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task DeleteFile(FsPath path)
@@ -92,11 +92,11 @@ namespace Simulated._Fs
 			var storageKind = _GetStorage(path)
 				.Kind;
 			if (storageKind == _StorageKind.Missing)
-				return _Undo.CompletedTask;
+				return CompletedTask;
 			if (storageKind == _StorageKind.Directory)
 				throw new ArgumentException("path", string.Format("Path {0} was a directory, and you attempted to delete a file.", path.Absolute));
 			_data.Remove(path);
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task MoveFile(FsPath src, FsPath dest)
@@ -108,7 +108,7 @@ namespace Simulated._Fs
 				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
 			_MoveItemImpl(src, dest);
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task MoveDir(FsPath src, FsPath dest)
@@ -121,7 +121,7 @@ namespace Simulated._Fs
 				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
-			return _Undo.CompletedTask;
+			return CompletedTask;
 		}
 
 		public override Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)

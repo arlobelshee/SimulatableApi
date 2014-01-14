@@ -31,12 +31,12 @@ namespace Simulated._Fs
 
 		public override Task CommitAll()
 		{
-			return _next != null ? _next.CommitAll() : _Undo.CompletedTask;
+			return _next != null ? _next.CommitAll() : CompletedTask;
 		}
 
 		public override Task RevertAll()
 		{
-			return _next != null ? _next.RevertAll() : _Undo.CompletedTask;
+			return _next != null ? _next.RevertAll() : CompletedTask;
 		}
 
 		public override void CreatedDirectory(FsPath path)
@@ -45,14 +45,9 @@ namespace Simulated._Fs
 				_next.CreatedDirectory(path);
 		}
 
-		public override Task Overwrote(FsPath path)
-		{
-			return _next != null ? _next.Overwrote(path) : _Undo.CompletedTask;
-		}
-
 		public override Task DeletedDirectory(FsPath path)
 		{
-			return _next != null ? _next.DeletedDirectory(path) : _Undo.CompletedTask;
+			return _next != null ? _next.DeletedDirectory(path) : CompletedTask;
 		}
 
 		public override Task<bool> DirExists(FsPath path)
@@ -77,37 +72,37 @@ namespace Simulated._Fs
 
 		public override Task CreateDir(FsPath path)
 		{
-			return _next != null ? _next.CreateDir(path) : _Undo.CompletedTask;
+			return _next != null ? _next.CreateDir(path) : CompletedTask;
 		}
 
 		public override Task Overwrite(FsPath path, string newContents)
 		{
-			return _next != null ? _next.Overwrite(path, newContents) : _Undo.CompletedTask;
+			return _next != null ? _next.Overwrite(path, newContents) : CompletedTask;
 		}
 
 		public override Task Overwrite(FsPath path, byte[] newContents)
 		{
-			return _next != null ? _next.Overwrite(path, newContents) : _Undo.CompletedTask;
+			return _next != null ? _next.Overwrite(path, newContents) : CompletedTask;
 		}
 
 		public override Task DeleteDir(FsPath path)
 		{
-			return _next != null ? _next.DeleteDir(path) : _Undo.CompletedTask;
+			return _next != null ? _next.DeleteDir(path) : CompletedTask;
 		}
 
 		public override Task DeleteFile(FsPath path)
 		{
-			return _next != null ? _next.DeleteFile(path) : _Undo.CompletedTask;
+			return _next != null ? _next.DeleteFile(path) : CompletedTask;
 		}
 
 		public override Task MoveFile(FsPath src, FsPath dest)
 		{
-			return _next != null ? _next.MoveFile(src, dest) : _Undo.CompletedTask;
+			return _next != null ? _next.MoveFile(src, dest) : CompletedTask;
 		}
 
 		public override Task MoveDir(FsPath src, FsPath dest)
 		{
-			return _next != null ? _next.MoveDir(src, dest) : _Undo.CompletedTask;
+			return _next != null ? _next.MoveDir(src, dest) : CompletedTask;
 		}
 
 		public override Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)

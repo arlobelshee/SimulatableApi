@@ -29,7 +29,7 @@ namespace Simulated
 
 		private FileSystem([NotNull] _StorageSink disk)
 		{
-			_underlyingStorage = new _Storage(this, new _Undo(), disk);
+			_underlyingStorage = new _Storage(this, disk);
 			_tempDirectory = Directory(Path.GetTempPath()).CreateInBackground();
 		}
 

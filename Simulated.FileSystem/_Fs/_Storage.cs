@@ -17,11 +17,11 @@ namespace Simulated._Fs
 		[NotNull] private readonly _StorageSink _disk;
 		[NotNull] private _StorageSink _changes;
 
-		public _Storage([NotNull] FileSystem allFiles, [NotNull] _Undo changes, [NotNull] _StorageSink disk)
+		public _Storage([NotNull] FileSystem allFiles, [NotNull] _StorageSink disk)
 		{
 			_allFiles = allFiles;
 			_disk = disk;
-			_changes = changes;
+			_changes = disk;
 		}
 
 		[NotNull]
@@ -79,16 +79,14 @@ namespace Simulated._Fs
 		public async Task OverwriteFileContents([NotNull] FsPath path, [NotNull] string newContents, [NotNull] FsDirectory parent)
 		{
 			await parent.EnsureExists();
-			await _changes.Overwrote(path);
-			await _disk.Overwrite(path, newContents);
+			await _changes.Overwrite(path, newContents);
 		}
 
 		[NotNull]
 		public async Task OverwriteFileContentsBinary([NotNull] FsPath path, [NotNull] byte[] newContents, [NotNull] FsDirectory parent)
 		{
 			await parent.EnsureExists();
-			await _changes.Overwrote(path);
-			await _disk.Overwrite(path, newContents);
+			await _changes.Overwrite(path, newContents);
 		}
 
 		[NotNull]
@@ -109,10 +107,10 @@ namespace Simulated._Fs
 			if (_changes.IsTrackingChanges)
 			{
 				var oldChanges = _changes;
-				_changes = new _Undo();
+				_changes = oldChanges.Next;
 				return oldChanges.RevertAll();
 			}
-			return _Undo.CompletedTask;
+			return _StorageSink.CompletedTask;
 		}
 
 		[NotNull]
@@ -124,7 +122,7 @@ namespace Simulated._Fs
 				_changes = oldChanges.Next;
 				return oldChanges.CommitAll();
 			}
-			return _Undo.CompletedTask;
+			return _StorageSink.CompletedTask;
 		}
 
 		public void StartTrackingChanges()
@@ -138,7 +136,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public _Storage Clone()
 		{
-			return new _Storage(_allFiles, new _Undo(), _disk);
+			return new _Storage(_allFiles, _disk);
 		}
 
 		[NotNull]

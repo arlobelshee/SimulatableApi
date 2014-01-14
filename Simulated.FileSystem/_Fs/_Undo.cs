@@ -11,8 +11,6 @@ namespace Simulated._Fs
 {
 	internal class _Undo : _StorageTransform
 	{
-		[NotNull] public static readonly Task CompletedTask = true.AsImmediateTask();
-
 		public _Undo(): base(null) {}
 	}
 }

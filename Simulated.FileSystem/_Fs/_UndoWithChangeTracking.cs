@@ -65,7 +65,8 @@ namespace Simulated._Fs
 			_AddUndoStep(() => Next.MoveDir(randomDirectoryName, path));
 		}
 
-		public override async Task Overwrote(FsPath path)
+		[NotNull]
+		private async Task _Overwrote([NotNull] FsPath path)
 		{
 			if (!await Next.FileExists(path))
 			{
@@ -76,6 +77,18 @@ namespace Simulated._Fs
 				.ToString("N");
 			await Next.MoveFile(path, randomFileName);
 			_AddUndoStep(() => _RestoreFileFromCache(path, randomFileName));
+		}
+
+		public override async Task Overwrite(FsPath path, string newContents)
+		{
+			await _Overwrote(path);
+			await base.Overwrite(path, newContents);
+		}
+
+		public override async Task Overwrite(FsPath path, byte[] newContents)
+		{
+			await _Overwrote(path);
+			await base.Overwrite(path, newContents);
 		}
 
 		[NotNull]

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -36,12 +37,6 @@ namespace Simulated._Fs
 		}
 
 		public virtual void CreatedDirectory([NotNull] FsPath path)
-		{
-			throw new NotImplementedException();
-		}
-
-		[NotNull]
-		public virtual Task Overwrote([NotNull] FsPath path)
 		{
 			throw new NotImplementedException();
 		}
@@ -123,5 +118,7 @@ namespace Simulated._Fs
 		{
 			throw new NotImplementedException();
 		}
+
+		[NotNull] internal static readonly Task CompletedTask = true.AsImmediateTask();
 	}
 }
