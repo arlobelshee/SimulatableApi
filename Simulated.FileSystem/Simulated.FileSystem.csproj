@@ -54,7 +54,6 @@
     <Compile Include="_Fs\AsyncLazy.cs" />
     <Compile Include="_Fs\_DiskReal.cs" />
     <Compile Include="_Fs\_DiskSimulated.cs" />
-    <Compile Include="_Fs\_IDisk.cs" />
     <Compile Include="_Fs\_Storage.cs" />
     <Compile Include="_Fs\_StorageSink.cs" />
     <Compile Include="_Fs\_StorageTransform.cs" />
