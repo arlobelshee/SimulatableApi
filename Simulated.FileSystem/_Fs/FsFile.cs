@@ -20,9 +20,9 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly FsPath _path;
-		private readonly Storage _storage;
+		[NotNull] private readonly _Storage _storage;
 
-		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] Storage storage)
+		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] _Storage storage)
 		{
 			if (allFiles == null)
 				throw new ArgumentNullException("allFiles");

@@ -25,7 +25,7 @@ namespace Simulated.Tests.FileSystemModification
 			await _runRootFolder.EnsureExists();
 
 			_runRootFolder.ShouldExist();
-			await _testSubject.RevertAllChanges();
+			await _testSubject.RevertChanges();
 			_runRootFolder.ShouldNotExist();
 		}
 
@@ -62,7 +62,7 @@ namespace Simulated.Tests.FileSystemModification
 			await subDir.EnsureExists();
 
 			subDir.Parent.ShouldExist();
-			await _testSubject.RevertAllChanges();
+			await _testSubject.RevertChanges();
 			subDir.Parent.ShouldNotExist();
 		}
 

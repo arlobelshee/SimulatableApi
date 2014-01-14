@@ -31,7 +31,7 @@ namespace Simulated.Tests.FileSystemModification
 			await _testFile.Overwrite(OriginalContents);
 
 			_testFile.ShouldContain(OriginalContents);
-			await _testSubject.RevertAllChanges();
+			await _testSubject.RevertChanges();
 			_testFile.ShouldNotExist();
 		}
 
@@ -78,7 +78,7 @@ namespace Simulated.Tests.FileSystemModification
 
 				(await originalDataCache.FilesThatExist("*.*")).Should()
 					.NotBeEmpty();
-				await secondView.RevertAllChanges();
+				await secondView.RevertChanges();
 				originalDataCache.ShouldNotExist();
 			}
 		}

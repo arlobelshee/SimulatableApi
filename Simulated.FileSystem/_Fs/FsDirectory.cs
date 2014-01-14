@@ -18,9 +18,9 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly FsPath _path;
-		[NotNull] private readonly Storage _underlyingStorage;
+		[NotNull] private readonly _Storage _underlyingStorage;
 
-		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] Storage underlyingStorage)
+		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] _Storage underlyingStorage)
 		{
 			if (path == null)
 				throw new ArgumentNullException("path");

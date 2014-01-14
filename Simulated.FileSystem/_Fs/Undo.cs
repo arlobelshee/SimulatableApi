@@ -11,7 +11,7 @@ namespace Simulated._Fs
 {
 	internal class _Undo
 	{
-		public static readonly Task CompletedTask = true.AsImmediateTask();
+		[NotNull] public static readonly Task CompletedTask = true.AsImmediateTask();
 
 		public virtual bool IsTrackingChanges
 		{

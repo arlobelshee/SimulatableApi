@@ -15,7 +15,7 @@ namespace Simulated
 	///    Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory)
 	///    one. In either case, FileSystem and its helpers allow a user to interact with an abstraction of this storage.
 	///    FileSystem also supports change tracking. If you call EnableRevertToHere, then you will begin tracking changes from
-	///    that point. At any point you can dispose the FileSystem view or call RevertAllChanges to revert to the last save
+	///    that point. At any point you can dispose the FileSystem view or call RevertChanges to revert to the last save
 	///    point. You can also call CommitChanges to commit all pending changes.
 	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved, not rolled
 	///    back.
@@ -24,36 +24,43 @@ namespace Simulated
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
-		[NotNull] private readonly AsyncLazy<FsDirectory> _tempDirectory;
-		[NotNull] private readonly Storage _underlyingStorage;
+		[NotNull] private AsyncLazy<FsDirectory> _tempDirectory;
+		[NotNull] private readonly _Storage _underlyingStorage;
 
 		private FileSystem([NotNull] _IFsDisk disk)
 		{
-			_Changes = new _Undo();
-			_Disk = disk;
-			_underlyingStorage = new Storage(this);
+			_underlyingStorage = new _Storage(this, new _Undo(), disk);
+			_InitTempDirectory();
+		}
+
+		private FileSystem([NotNull] _Storage storage)
+		{
+			_underlyingStorage = storage;
+			_InitTempDirectory();
+		}
+
+		private void _InitTempDirectory()
+		{
 			var temp = Directory(Path.GetTempPath());
 			_tempDirectory = new AsyncLazy<FsDirectory>(temp.EnsureExists()
-				.ContinueWith(result => temp));
+				.ContinueWith(result =>
+				{
+					result.Wait(); // observe any exceptions.
+					return temp;
+				}));
 		}
 
 		/// <summary>
 		///    Rolls back any un-committed changes.
-		///    If the <see cref="FileSystem" /> has a save point, then this Dispose will <see cref="RevertAllChanges" />.
+		///    If the <see cref="FileSystem" /> has a save point, then this Dispose will <see cref="RevertChanges" />.
 		///    If there is no save point or if all changes have been committed with <see cref="CommitChanges" />,
 		///    then disposing will have no effect.
 		/// </summary>
 		public void Dispose()
 		{
-			RevertAllChanges()
+			RevertChanges()
 				.Wait();
 		}
-
-		[NotNull]
-		internal _IFsDisk _Disk { get; private set; }
-
-		[NotNull]
-		internal _Undo _Changes { get; private set; }
 
 		/// <summary>
 		///    Gets the temp directory.
@@ -67,7 +74,7 @@ namespace Simulated
 		[NotNull]
 		internal async Task<FsDirectory> _UndoDataCache()
 		{
-			var undoWithChangeTracking = _Changes as _UndoWithChangeTracking;
+			var undoWithChangeTracking = _underlyingStorage._changes as _UndoWithChangeTracking;
 			if (undoWithChangeTracking == null)
 				return null;
 			return Directory(await undoWithChangeTracking.UndoDataCache);
@@ -152,31 +159,22 @@ namespace Simulated
 		}
 
 		/// <summary>
-		///    Sets a save point. <see cref="RevertAllChanges" /> will revert to this save point.
+		///    Sets a save point. <see cref="RevertChanges" /> will revert to this save point.
 		///    Does not override any existing save point. If a save point is already set then
 		///    this call has no effect.
 		/// </summary>
 		public void EnableRevertToHere()
 		{
-			if (!_Changes.IsTrackingChanges)
-			{
-				_Changes = new _UndoWithChangeTracking(this);
-			}
+			_underlyingStorage.StartTrackingChanges();
 		}
 
 		/// <summary>
 		///    Reverts all changes since the save point.
 		/// </summary>
 		[NotNull]
-		public Task RevertAllChanges()
+		public Task RevertChanges()
 		{
-			if (_Changes.IsTrackingChanges)
-			{
-				var oldChanges = _Changes;
-				_Changes = new _Undo();
-				return oldChanges.RevertAll();
-			}
-			return _Undo.CompletedTask;
+			return _underlyingStorage.RevertChanges();
 		}
 
 		/// <summary>
@@ -185,13 +183,7 @@ namespace Simulated
 		[NotNull]
 		public Task CommitChanges()
 		{
-			if (_Changes.IsTrackingChanges)
-			{
-				var oldChanges = _Changes;
-				_Changes = new _Undo();
-				return oldChanges.CommitAll();
-			}
-			return _Undo.CompletedTask;
+			return _underlyingStorage.CommitChanges();
 		}
 
 		/// <summary>
@@ -199,13 +191,13 @@ namespace Simulated
 		///    The clone shares storage with this instance. Each will see changes made by the other.
 		///    The clone has its own save point. Each has its own transaction and can roll back independently.
 		///    Each will see the not-yet-committed data from the other. The only difference between the
-		///    clones is where they will revert to when they <see cref="RevertAllChanges" />.
+		///    clones is where they will revert to when they <see cref="RevertChanges" />.
 		/// </summary>
-		/// <returns>a file system with the same storage as this instance</returns>
+		/// <returns>a file system with the same storage as this instance but an independent save point</returns>
 		[NotNull]
 		public FileSystem Clone()
 		{
-			return new FileSystem(_Disk);
+			return new FileSystem(_underlyingStorage.Clone());
 		}
 	}
 }

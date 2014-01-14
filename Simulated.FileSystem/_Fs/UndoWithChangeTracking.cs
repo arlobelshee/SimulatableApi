@@ -13,12 +13,12 @@ namespace Simulated._Fs
 {
 	internal class _UndoWithChangeTracking : _Undo
 	{
-		[NotNull] private readonly FileSystem _fileSystem;
 		[NotNull] private readonly List<UndoStep> _stepsTaken = new List<UndoStep>();
+		[NotNull] private readonly _IFsDisk _disk;
 
-		public _UndoWithChangeTracking([NotNull] FileSystem fileSystem)
+		public _UndoWithChangeTracking([NotNull] _IFsDisk disk)
 		{
-			_fileSystem = fileSystem;
+			_disk = disk;
 			var cacheLocation = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
 				.ToString("N"));
 			UndoDataCache = new AsyncLazy<FsPath>(_EnsureDirExists(cacheLocation));
@@ -27,8 +27,8 @@ namespace Simulated._Fs
 		[NotNull]
 		private async Task<FsPath> _EnsureDirExists([NotNull] FsPath cacheLocation)
 		{
-			if (!await _fileSystem._Disk.DirExists(cacheLocation))
-				await _fileSystem._Disk.CreateDir(cacheLocation);
+			if (!await _disk.DirExists(cacheLocation))
+				await _disk.CreateDir(cacheLocation);
 			return cacheLocation;
 		}
 
@@ -56,35 +56,35 @@ namespace Simulated._Fs
 
 		public override void CreatedDirectory(FsPath path)
 		{
-			_AddUndoStep(() => _fileSystem._Disk.DeleteDir(path));
+			_AddUndoStep(() => _disk.DeleteDir(path));
 		}
 
 		public override async Task DeletedDirectory(FsPath path)
 		{
 			var randomDirectoryName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
-			await _fileSystem._Disk.MoveDir(path, randomDirectoryName);
-			_AddUndoStep(() => _fileSystem._Disk.MoveDir(randomDirectoryName, path));
+			await _disk.MoveDir(path, randomDirectoryName);
+			_AddUndoStep(() => _disk.MoveDir(randomDirectoryName, path));
 		}
 
 		public override async Task Overwrote(FsPath path)
 		{
-			if (!await _fileSystem._Disk.FileExists(path))
+			if (!await _disk.FileExists(path))
 			{
-				_AddUndoStep(() => _fileSystem._Disk.DeleteFile(path));
+				_AddUndoStep(() => _disk.DeleteFile(path));
 				return;
 			}
 			var randomFileName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");
-			await _fileSystem._Disk.MoveFile(path, randomFileName);
+			await _disk.MoveFile(path, randomFileName);
 			_AddUndoStep(() => _RestoreFileFromCache(path, randomFileName));
 		}
 
 		[NotNull]
 		private async Task _RestoreFileFromCache([NotNull] FsPath path, [NotNull] FsPath randomFileName)
 		{
-			await _fileSystem._Disk.DeleteFile(path);
-			await _fileSystem._Disk.MoveFile(randomFileName, path);
+			await _disk.DeleteFile(path);
+			await _disk.MoveFile(randomFileName, path);
 		}
 
 		private void _AddUndoStep([NotNull] Func<Task> undo)
@@ -96,9 +96,9 @@ namespace Simulated._Fs
 		private async Task _EnsureUndoDataCacheIsGone()
 		{
 			var cachePath = await UndoDataCache;
-			if (await _fileSystem._Disk.DirExists(cachePath))
+			if (await _disk.DirExists(cachePath))
 			{
-				await _fileSystem._Disk.DeleteDir(cachePath);
+				await _disk.DeleteDir(cachePath);
 			}
 		}
 

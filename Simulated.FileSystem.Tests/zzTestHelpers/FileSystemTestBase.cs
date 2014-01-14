@@ -38,7 +38,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Teardown()
 		{
 			BeginTeardown();
-			_testSubject.RevertAllChanges();
+			_testSubject.RevertChanges();
 		}
 	}
 }
