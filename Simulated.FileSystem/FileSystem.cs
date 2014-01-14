@@ -60,12 +60,6 @@ namespace Simulated
 			get { return _tempDirectory; }
 		}
 
-		[NotNull]
-		internal Task<FsDirectory> _UndoDataCache()
-		{
-			return _underlyingStorage.UndoCache(this);
-		}
-
 		/// <summary>
 		///    Creates a file system instance backed by the actual file system.
 		/// </summary>

@@ -48,42 +48,6 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public async Task CommittingChangesShouldCompletelyEliminateAllUndoData()
-		{
-			await _testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				await secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-				var originalDataCache = await secondView._UndoDataCache();
-
-				(await originalDataCache.FilesThatExist("*.*")).Should()
-					.NotBeEmpty();
-				await secondView.CommitChanges();
-				originalDataCache.ShouldNotExist();
-			}
-		}
-
-		[Test]
-		public async Task RollingBackChangesShouldCompletelyEliminateAllUndoData()
-		{
-			await _testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				await secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-				var originalDataCache = await secondView._UndoDataCache();
-
-				(await originalDataCache.FilesThatExist("*.*")).Should()
-					.NotBeEmpty();
-				await secondView.RevertChanges();
-				originalDataCache.ShouldNotExist();
-			}
-		}
-
-		[Test]
 		public async Task RevertingChangedFileContentsShouldRevertToOriginalContents()
 		{
 			await _testFile.Overwrite(OriginalContents);

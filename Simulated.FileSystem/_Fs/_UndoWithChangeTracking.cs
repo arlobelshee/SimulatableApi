@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: UndoWithChangeTracking.cs
+// File: _UndoWithChangeTracking.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -15,12 +15,13 @@ namespace Simulated._Fs
 	internal class _UndoWithChangeTracking : _StorageTransform
 	{
 		[NotNull] private readonly List<UndoStep> _stepsTaken = new List<UndoStep>();
+		[NotNull] private readonly AsyncLazy<FsPath> _undoDataCache;
 
 		public _UndoWithChangeTracking([NotNull] _StorageSink next) : base(next)
 		{
 			var cacheLocation = FsPath.TempFolder/("UndoData." + Guid.NewGuid()
 				.ToString("N"));
-			UndoDataCache = new AsyncLazy<FsPath>(_EnsureDirExists(cacheLocation));
+			_undoDataCache = new AsyncLazy<FsPath>(_EnsureDirExists(cacheLocation));
 		}
 
 		[NotNull]
@@ -30,9 +31,6 @@ namespace Simulated._Fs
 				await Next.CreateDir(cacheLocation);
 			return cacheLocation;
 		}
-
-		[NotNull]
-		public AsyncLazy<FsPath> UndoDataCache { get; private set; }
 
 		public override bool IsTrackingChanges
 		{
@@ -57,16 +55,13 @@ namespace Simulated._Fs
 		{
 			_AllMissingDirectoriesInPathFromBottomUp(path)
 				.Reverse()
-				.Each(dir =>
-				{
-					_AddUndoStep(() => Next.DeleteDir(new FsPath(dir)));
-				});
+				.Each(dir => { _AddUndoStep(() => Next.DeleteDir(new FsPath(dir))); });
 			return base.CreateDir(path);
 		}
 
 		public override async Task DeleteDir(FsPath path)
 		{
-			var randomDirectoryName = (await UndoDataCache)/Guid.NewGuid()
+			var randomDirectoryName = (await _undoDataCache)/Guid.NewGuid()
 				.ToString("N");
 			await Next.MoveDir(path, randomDirectoryName);
 			_AddUndoStep(() => Next.MoveDir(randomDirectoryName, path));
@@ -80,7 +75,7 @@ namespace Simulated._Fs
 				_AddUndoStep(() => Next.DeleteFile(path));
 				return;
 			}
-			var randomFileName = (await UndoDataCache)/Guid.NewGuid()
+			var randomFileName = (await _undoDataCache)/Guid.NewGuid()
 				.ToString("N");
 			await Next.MoveFile(path, randomFileName);
 			_AddUndoStep(() => _RestoreFileFromCache(path, randomFileName));
@@ -113,7 +108,7 @@ namespace Simulated._Fs
 		[NotNull]
 		private async Task _EnsureUndoDataCacheIsGone()
 		{
-			var cachePath = await UndoDataCache;
+			var cachePath = await _undoDataCache;
 			if (await Next.DirExists(cachePath))
 			{
 				await Next.DeleteDir(cachePath);

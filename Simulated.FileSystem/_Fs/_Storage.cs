@@ -119,14 +119,5 @@ namespace Simulated._Fs
 		{
 			return new _Storage(_allFiles, _disk.IsTrackingChanges ? _disk.Next : _disk);
 		}
-
-		[NotNull]
-		public async Task<FsDirectory> UndoCache([NotNull] FileSystem fileSystem)
-		{
-			var undoWithChangeTracking = _disk as _UndoWithChangeTracking;
-			if (undoWithChangeTracking == null)
-				return null;
-			return fileSystem.Directory(await undoWithChangeTracking.UndoDataCache);
-		}
 	}
 }
