@@ -14,8 +14,8 @@ namespace Simulated._Fs
 	internal class _Storage
 	{
 		[NotNull] private readonly FileSystem _allFiles;
-		[NotNull] public readonly _IFsDisk _disk;
-		[NotNull] public _Undo _changes;
+		[NotNull] private readonly _IFsDisk _disk;
+		[NotNull] private _Undo _changes;
 
 		public _Storage([NotNull] FileSystem allFiles, [NotNull] _Undo changes, [NotNull] _IFsDisk disk)
 		{
@@ -139,6 +139,15 @@ namespace Simulated._Fs
 		public _Storage Clone()
 		{
 			return new _Storage(_allFiles, new _Undo(), _disk);
+		}
+
+		[NotNull]
+		public async Task<FsDirectory> UndoCache([NotNull] FileSystem fileSystem)
+		{
+			var undoWithChangeTracking = _changes as _UndoWithChangeTracking;
+			if (undoWithChangeTracking == null)
+				return null;
+			return fileSystem.Directory(await undoWithChangeTracking.UndoDataCache);
 		}
 	}
 }

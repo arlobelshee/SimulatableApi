@@ -61,12 +61,9 @@ namespace Simulated
 		}
 
 		[NotNull]
-		internal async Task<FsDirectory> _UndoDataCache()
+		internal Task<FsDirectory> _UndoDataCache()
 		{
-			var undoWithChangeTracking = _underlyingStorage._changes as _UndoWithChangeTracking;
-			if (undoWithChangeTracking == null)
-				return null;
-			return Directory(await undoWithChangeTracking.UndoDataCache);
+			return _underlyingStorage.UndoCache(this);
 		}
 
 		/// <summary>
