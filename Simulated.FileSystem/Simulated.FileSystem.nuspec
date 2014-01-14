@@ -16,9 +16,11 @@ This is not your typical files and directories API. There is a single instance t
 
 Whole-system savepoints are built in and you can revert to the last savepoint at any time.
 	</description>
-	<releaseNotes>API is now locked. I will maintain backwards compatibility from here on. Future experimentation will happen in the Simulated.Experimental namespace. Everything outside of that namespace will be compatible.
+	<releaseNotes>Everything is performed async, with Tasks exposed to the user. Make sure you await operations.
 	
-	This release also adds the ability to delete files and directories, still with full transactional gurantees.</releaseNotes>
+		This release also adds the ability to delete files and directories, still with full transactional gurantees.
+
+		API is not yet locked but will be soon. At tht point, I will maintain backwards compatibility from there on. Future experimentation will happen in the Simulated.Experimental namespace. Everything outside of that namespace will be compatible.</releaseNotes>
 	<copyright>Copyright 2011</copyright>
 	<tags>filesystem simulator</tags>
   </metadata>
