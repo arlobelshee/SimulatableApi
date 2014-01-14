@@ -20,15 +20,19 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly FsPath _path;
+		private readonly Storage _storage;
 
-		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FsPath path)
+		internal FsFile([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] Storage storage)
 		{
 			if (allFiles == null)
 				throw new ArgumentNullException("allFiles");
 			if (path == null)
 				throw new ArgumentNullException("path");
+			if (storage == null)
+				throw new ArgumentNullException("storage");
 			_allFiles = allFiles;
 			_path = path;
+			_storage = storage;
 		}
 
 		/// <summary>
@@ -52,7 +56,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory ContainingFolder
 		{
-			get { return new FsDirectory(_allFiles, _path.Parent, new DirectoryModifier(_allFiles)); }
+			get { return new FsDirectory(_allFiles, _path.Parent, _storage); }
 		}
 
 		/// <summary>
@@ -62,7 +66,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<bool> Exists
 		{
-			get { return _allFiles._Disk.FileExists(_path); }
+			get { return _storage.DoFileExists(_path); }
 		}
 
 		/// <summary>
@@ -103,7 +107,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		/// Gets the FileSystem instance that contains this file.
+		///    Gets the FileSystem instance that contains this file.
 		/// </summary>
 		[NotNull]
 		public FileSystem FileSystem
@@ -119,11 +123,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task Overwrite([NotNull] string newContents)
 		{
-			var parent = ContainingFolder;
-			if (!await parent.Exists)
-				await parent.EnsureExists();
-			await _allFiles._Changes.Overwrote(_path);
-			await _allFiles._Disk.Overwrite(_path, newContents);
+			await _storage.DoOverwriteFileContents(_path, newContents, ContainingFolder);
 		}
 
 		/// <summary>
@@ -134,11 +134,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task OverwriteBinary([NotNull] byte[] newContents)
 		{
-			var parent = ContainingFolder;
-			if (!await parent.Exists)
-				await parent.EnsureExists();
-			await _allFiles._Changes.Overwrote(_path);
-			await _allFiles._Disk.Overwrite(_path, newContents);
+			await _storage.DoOverwriteFileContentsBinary(_path, newContents, ContainingFolder);
 		}
 
 		/// <summary>
@@ -153,7 +149,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<string> ReadAllText()
 		{
-			return _allFiles._Disk.TextContents(_path);
+			return _storage.TextContents(_path);
 		}
 
 		/// <summary>
@@ -168,7 +164,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<byte[]> ReadAllBytes()
 		{
-			return _allFiles._Disk.RawContents(_path);
+			return _storage.RawContents(_path);
 		}
 
 		/// <summary>

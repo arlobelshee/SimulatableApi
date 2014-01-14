@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: DirectoryModifier.cs
+// File: Storage.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -11,11 +11,11 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	public class DirectoryModifier
+	public class Storage
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 
-		public DirectoryModifier([NotNull] FileSystem allFiles)
+		public Storage([NotNull] FileSystem allFiles)
 		{
 			_allFiles = allFiles;
 		}
@@ -50,7 +50,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task<IEnumerable<FsFile>> KnownFilesIn([NotNull] string searchPattern, [NotNull] FsPath path)
 		{
-			return (await _allFiles._Disk.FindFiles(path, searchPattern)).Select(p => new FsFile(_allFiles, p));
+			return (await _allFiles._Disk.FindFiles(path, searchPattern)).Select(p => new FsFile(_allFiles, p, this));
 		}
 
 		[NotNull]
@@ -63,6 +63,39 @@ namespace Simulated._Fs
 				yield return dir.FullName;
 				dir = dir.Parent;
 			}
+		}
+
+		public Task<bool> DoFileExists(FsPath path)
+		{
+			return _allFiles._Disk.FileExists(path);
+		}
+
+		[NotNull]
+		public async Task DoOverwriteFileContents([NotNull] FsPath path, [NotNull] string newContents, [NotNull] FsDirectory parent)
+		{
+			await parent.EnsureExists();
+			await _allFiles._Changes.Overwrote(path);
+			await _allFiles._Disk.Overwrite(path, newContents);
+		}
+
+		[NotNull]
+		public async Task DoOverwriteFileContentsBinary([NotNull] FsPath path, [NotNull] byte[] newContents, [NotNull] FsDirectory parent)
+		{
+			await parent.EnsureExists();
+			await _allFiles._Changes.Overwrote(path);
+			await _allFiles._Disk.Overwrite(path, newContents);
+		}
+
+		[NotNull]
+		public Task<string> TextContents([NotNull] FsPath path)
+		{
+			return _allFiles._Disk.TextContents(path);
+		}
+
+		[NotNull]
+		public Task<byte[]> RawContents([NotNull] FsPath path)
+		{
+			return _allFiles._Disk.RawContents(path);
 		}
 	}
 }
