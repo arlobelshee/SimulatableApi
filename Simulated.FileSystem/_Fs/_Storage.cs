@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: Storage.cs
+// File: _Storage.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -44,9 +44,7 @@ namespace Simulated._Fs
 		{
 			if (!await IsDirectory(path))
 				return;
-			await _disk.DeletedDirectory(path);
-			if (await IsDirectory(path))
-				await _disk.DeleteDir(path);
+			await _disk.DeleteDir(path);
 		}
 
 		[NotNull]

@@ -45,11 +45,6 @@ namespace Simulated._Fs
 				_next.CreatedDirectory(path);
 		}
 
-		public override Task DeletedDirectory(FsPath path)
-		{
-			return _next != null ? _next.DeletedDirectory(path) : CompletedTask;
-		}
-
 		public override Task<bool> DirExists(FsPath path)
 		{
 			return _next != null ? _next.DirExists(path) : false.AsImmediateTask();

@@ -57,7 +57,7 @@ namespace Simulated._Fs
 			_AddUndoStep(() => Next.DeleteDir(path));
 		}
 
-		public override async Task DeletedDirectory(FsPath path)
+		public override async Task DeleteDir(FsPath path)
 		{
 			var randomDirectoryName = (await UndoDataCache)/Guid.NewGuid()
 				.ToString("N");

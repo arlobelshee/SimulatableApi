@@ -42,12 +42,6 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public virtual Task DeletedDirectory([NotNull] FsPath path)
-		{
-			throw new NotImplementedException();
-		}
-
-		[NotNull]
 		public virtual Task<bool> DirExists([NotNull] FsPath path)
 		{
 			throw new NotImplementedException();
