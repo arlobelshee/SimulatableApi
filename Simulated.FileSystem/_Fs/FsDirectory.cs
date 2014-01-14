@@ -35,6 +35,7 @@ namespace Simulated._Fs
 		///    Gets a value indicating whether this <see cref="FsDirectory" /> exists.
 		/// </summary>
 		/// <value>&lt;c&gt;true&lt;/c&gt; if it exists; otherwise, &lt;c&gt;false&lt;/c&gt;.</value>
+		[NotNull]
 		public Task<bool> Exists
 		{
 			get { return _allFiles._Disk.DirExists(_path); }
@@ -59,12 +60,18 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
+		/// Gets the FileSystem that holds this directory.
+		/// </summary>
+		[NotNull]
+		public FileSystem FileSystem { get { return _allFiles; } }
+
+		/// <summary>
 		///    Gets a drectory instance that represents a sub-directory of this directory.
 		/// </summary>
 		/// <param name="subdirName"> Name of the subdir. </param>
 		/// <returns> the subdir as a directory object </returns>
 		[NotNull]
-		public FsDirectory Dir(string subdirName)
+		public FsDirectory Dir([NotNull] string subdirName)
 		{
 			return new FsDirectory(_allFiles, _path/subdirName);
 		}
@@ -73,6 +80,7 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory existing at this object's Path. This
 		///    operation is revertable.
 		/// </summary>
+		[NotNull]
 		public async Task EnsureExists()
 		{
 			if (await Exists)
@@ -87,6 +95,7 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory no longer existing at this object's
 		///    Path. This operation is revertable.
 		/// </summary>
+		[NotNull]
 		public async Task EnsureDoesNotExist()
 		{
 			if (!await Exists)
@@ -101,7 +110,8 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
 		/// <returns>a file in this directory</returns>
-		public FsFile File(string fileName)
+		[NotNull]
+		public FsFile File([NotNull] string fileName)
 		{
 			return new FsFile(_allFiles, _path/fileName);
 		}
@@ -116,7 +126,8 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="searchPattern">A filter to apply. Uses file system shell pattern matching (e.g., *.txt).</param>
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
-		public async Task<IEnumerable<FsFile>> Files(string searchPattern)
+		[NotNull]
+		public async Task<IEnumerable<FsFile>> Files([NotNull] string searchPattern)
 		{
 			return (await _allFiles._Disk.FindFiles(_path, searchPattern)).Select(p => new FsFile(_allFiles, p));
 		}
@@ -127,7 +138,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals(FsDirectory other)
+		public bool Equals([CanBeNull] FsDirectory other)
 		{
 			if (ReferenceEquals(null, other))
 				return false;
@@ -137,9 +148,9 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Returns a <see cref="System.String" /> that represents this instance.
+		///    A programmer display of the type and value data for this directory.
 		/// </summary>
-		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
+		/// <returns> A <see cref="System.String" /> representation for help debugging. </returns>
 		public override string ToString()
 		{
 			return string.Format("Directory({0})", _path);
@@ -151,7 +162,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="obj"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public override bool Equals(object obj)
+		public override bool Equals([CanBeNull] object obj)
 		{
 			return Equals(obj as FsDirectory);
 		}

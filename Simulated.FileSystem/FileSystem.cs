@@ -13,18 +13,14 @@ namespace Simulated
 {
 	/// <summary>
 	///    Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory)
-	///    one. In either case, FileSystem and its
-	///    helpers allow a user to interact with an abstraction of this storage.
+	///    one. In either case, FileSystem and its helpers allow a user to interact with an abstraction of this storage.
 	///    FileSystem also supports change tracking. If you call EnableRevertToHere, then you will begin tracking changes from
-	///    that point. At any point
-	///    you can dispose the FileSystem view or call RevertAllChanges to revert to the last save point. You can also call
-	///    CommitChanges to commit
-	///    all pending changes.
+	///    that point. At any point you can dispose the FileSystem view or call RevertAllChanges to revert to the last save
+	///    point. You can also call CommitChanges to commit all pending changes.
 	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved, not rolled
 	///    back.
 	///    Each FileSystem instance is its own view of the storage with its own save point. Call Clone to create another view
-	///    with the same underlying storage but
-	///    an independent save point.
+	///    with the same underlying storage but an independent save point.
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
@@ -169,6 +165,7 @@ namespace Simulated
 		/// <summary>
 		///    Reverts all changes since the save point.
 		/// </summary>
+		[NotNull]
 		public Task RevertAllChanges()
 		{
 			if (_Changes.IsTrackingChanges)
@@ -183,6 +180,7 @@ namespace Simulated
 		/// <summary>
 		///    Commits any pending changes and removes the save point.
 		/// </summary>
+		[NotNull]
 		public Task CommitChanges()
 		{
 			if (_Changes.IsTrackingChanges)

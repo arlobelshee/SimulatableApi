@@ -13,10 +13,8 @@ namespace Simulated._Fs
 	/// <summary>
 	///    Represents a file in the underlying data store. This file may or may not exist. This class exposes methods to read,
 	///    write, and delete the file. It also exposes methods to ask for information about the file. Multiple file instances
-	///    can have the same path and
-	///    <see
-	///       cref="FileSystem" />
-	///    . If so, they will share storage. Any change made in one will be immediately visible in the all others.
+	///    can have the same path and <see cref="FileSystem" />. If so, they will share storage. Any change made in one will be
+	///    immediately visible in the all others.
 	/// </summary>
 	public class FsFile : IEquatable<FsFile>
 	{
@@ -39,7 +37,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals(FsFile other)
+		public bool Equals([CanBeNull] FsFile other)
 		{
 			if (ReferenceEquals(null, other))
 				return false;
@@ -61,6 +59,7 @@ namespace Simulated._Fs
 		///    Gets a value indicating whether this <see cref="FsFile" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
+		[NotNull]
 		public Task<bool> Exists
 		{
 			get { return _allFiles._Disk.FileExists(_path); }
@@ -79,6 +78,7 @@ namespace Simulated._Fs
 		/// <summary>
 		///    Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
 		/// </summary>
+		[NotNull]
 		public string FileBaseName
 		{
 			get { return Path.GetFileNameWithoutExtension(_path.Absolute); }
@@ -103,10 +103,20 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
+		/// Gets the FileSystem instance that contains this file.
+		/// </summary>
+		[NotNull]
+		public FileSystem FileSystem
+		{
+			get { return _allFiles; }
+		}
+
+		/// <summary>
 		///    Regardless of the previous state of the file system, results in a file existing at this file's path with the
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
+		[NotNull]
 		public async Task Overwrite([NotNull] string newContents)
 		{
 			var parent = ContainingFolder;
@@ -121,6 +131,7 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
+		[NotNull]
 		public async Task OverwriteBinary([NotNull] byte[] newContents)
 		{
 			var parent = ContainingFolder;
@@ -139,6 +150,7 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
+		[NotNull]
 		public Task<string> ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
@@ -153,15 +165,16 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
+		[NotNull]
 		public Task<byte[]> ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
 		}
 
 		/// <summary>
-		///    Returns a <see cref="System.String" /> that represents this instance.
+		///    A programmer display of the type and value data for this file.
 		/// </summary>
-		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
+		/// <returns> A <see cref="System.String" /> representation for help debugging. </returns>
 		public override string ToString()
 		{
 			return string.Format("File({0})", _path);
@@ -173,7 +186,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public override bool Equals(object other)
+		public override bool Equals([CanBeNull] object other)
 		{
 			return Equals(other as FsFile);
 		}

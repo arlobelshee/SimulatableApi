@@ -18,11 +18,13 @@ namespace Simulated._Fs
 			get { return false; }
 		}
 
+		[NotNull]
 		public virtual Task CommitAll()
 		{
 			return CompletedTask;
 		}
 
+		[NotNull]
 		public virtual Task RevertAll()
 		{
 			return CompletedTask;
@@ -30,12 +32,14 @@ namespace Simulated._Fs
 
 		public virtual void CreatedDirectory([NotNull] FsPath path) {}
 
+		[NotNull]
 		public virtual Task Overwrote([NotNull] FsPath path)
 		{
 			return CompletedTask;
 		}
 
-		public virtual Task DeletedDirectory(FsPath path)
+		[NotNull]
+		public virtual Task DeletedDirectory([NotNull] FsPath path)
 		{
 			return CompletedTask;
 		}

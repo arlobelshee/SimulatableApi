@@ -24,13 +24,15 @@ namespace Simulated._Fs
 			UndoDataCache = new AsyncLazy<FsPath>(_EnsureDirExists(cacheLocation));
 		}
 
-		private async Task<FsPath> _EnsureDirExists(FsPath cacheLocation)
+		[NotNull]
+		private async Task<FsPath> _EnsureDirExists([NotNull] FsPath cacheLocation)
 		{
 			if (!await _fileSystem._Disk.DirExists(cacheLocation))
 				await _fileSystem._Disk.CreateDir(cacheLocation);
 			return cacheLocation;
 		}
 
+		[NotNull]
 		public AsyncLazy<FsPath> UndoDataCache { get; private set; }
 
 		public override bool IsTrackingChanges
@@ -78,17 +80,19 @@ namespace Simulated._Fs
 			_AddUndoStep(() => _RestoreFileFromCache(path, randomFileName));
 		}
 
-		private async Task _RestoreFileFromCache(FsPath path, FsPath randomFileName)
+		[NotNull]
+		private async Task _RestoreFileFromCache([NotNull] FsPath path, [NotNull] FsPath randomFileName)
 		{
 			await _fileSystem._Disk.DeleteFile(path);
 			await _fileSystem._Disk.MoveFile(randomFileName, path);
 		}
 
-		private void _AddUndoStep(Func<Task> undo)
+		private void _AddUndoStep([NotNull] Func<Task> undo)
 		{
 			_stepsTaken.Add(new UndoStep(undo));
 		}
 
+		[NotNull]
 		private async Task _EnsureUndoDataCacheIsGone()
 		{
 			var cachePath = await UndoDataCache;
@@ -102,7 +106,8 @@ namespace Simulated._Fs
 		{
 			public UndoStep([NotNull] Func<Task> undo)
 			{
-				Undo = ()=> undo().Wait();
+				Undo = () => undo()
+					.Wait();
 			}
 
 			[NotNull]

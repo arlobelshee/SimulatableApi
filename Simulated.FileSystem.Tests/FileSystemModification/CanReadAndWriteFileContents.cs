@@ -61,8 +61,6 @@ namespace Simulated.Tests.FileSystemModification
 				(await originalDataCache.Files("*.*")).Should()
 					.NotBeEmpty();
 				await secondView.CommitChanges();
-				(await originalDataCache.Files("*.*")).Should()
-					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
 		}
@@ -81,8 +79,6 @@ namespace Simulated.Tests.FileSystemModification
 				(await originalDataCache.Files("*.*")).Should()
 					.NotBeEmpty();
 				await secondView.RevertAllChanges();
-				(await originalDataCache.Files("*.*")).Should()
-					.BeEquivalentTo();
 				originalDataCache.ShouldNotExist();
 			}
 		}

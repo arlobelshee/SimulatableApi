@@ -29,6 +29,20 @@ namespace Simulated.Tests.QueryBasicProperties
 		}
 
 		[Test]
+		public void DirectoriesKnowTheirFileSystem()
+		{
+			_runRootFolder.FileSystem.Should()
+				.BeSameAs(_testSubject);
+		}
+
+		[Test]
+		public void FilesKnowTheirFileSystem()
+		{
+			_runRootFolder.File("unused.name").FileSystem.Should()
+				.BeSameAs(_testSubject);
+		}
+
+		[Test]
 		public void DirectoriesKnowWhetherTheyExist()
 		{
 			_runRootFolder.ShouldNotExist();
