@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -21,10 +22,12 @@ namespace System.Linq // ReSharper restore CheckNamespace
 			}
 		}
 
+		[NotNull]
 		public static Task<T> AsImmediateTask<T>(this T result)
 		{
 			var source = new TaskCompletionSource<T>();
 			source.SetResult(result);
+			Debug.Assert(source.Task != null, "source.Task != null");
 			return source.Task;
 		}
 	}

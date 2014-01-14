@@ -14,10 +14,10 @@ namespace Simulated._Fs
 	internal class _Storage
 	{
 		[NotNull] private readonly FileSystem _allFiles;
-		[NotNull] private readonly _IFsDisk _disk;
-		[NotNull] private _StorageTransform _changes;
+		[NotNull] private readonly _StorageSink _disk;
+		[NotNull] private _StorageSink _changes;
 
-		public _Storage([NotNull] FileSystem allFiles, [NotNull] _Undo changes, [NotNull] _IFsDisk disk)
+		public _Storage([NotNull] FileSystem allFiles, [NotNull] _Undo changes, [NotNull] _StorageSink disk)
 		{
 			_allFiles = allFiles;
 			_disk = disk;
@@ -121,7 +121,7 @@ namespace Simulated._Fs
 			if (_changes.IsTrackingChanges)
 			{
 				var oldChanges = _changes;
-				_changes = new _Undo();
+				_changes = oldChanges.Next;
 				return oldChanges.CommitAll();
 			}
 			return _Undo.CompletedTask;

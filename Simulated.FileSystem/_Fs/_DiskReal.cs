@@ -10,36 +10,36 @@ using System.Threading.Tasks;
 
 namespace Simulated._Fs
 {
-	internal class _DiskReal : _IFsDisk
+	internal class _DiskReal : _StorageSink
 	{
-		public Task<bool> DirExists(FsPath path)
+		public override Task<bool> DirExists(FsPath path)
 		{
 			return Directory.Exists(path.Absolute)
 				.AsImmediateTask();
 		}
 
-		public Task<bool> FileExists(FsPath path)
+		public override Task<bool> FileExists(FsPath path)
 		{
 			return File.Exists(path.Absolute)
 				.AsImmediateTask();
 		}
 
-		public Task<string> TextContents(FsPath path)
+		public override Task<string> TextContents(FsPath path)
 		{
 			return Task.Run(() => File.ReadAllText(path.Absolute));
 		}
 
-		public Task<byte[]> RawContents(FsPath path)
+		public override Task<byte[]> RawContents(FsPath path)
 		{
 			return Task.Run(() => File.ReadAllBytes(path.Absolute));
 		}
 
-		public Task CreateDir(FsPath path)
+		public override Task CreateDir(FsPath path)
 		{
 			return Task.Run(() => Directory.CreateDirectory(path.Absolute));
 		}
 
-		public async Task Overwrite(FsPath path, string newContents)
+		public override async Task Overwrite(FsPath path, string newContents)
 		{
 			using (var writer = File.CreateText(path.Absolute))
 			{
@@ -48,7 +48,7 @@ namespace Simulated._Fs
 			}
 		}
 
-		public async Task Overwrite(FsPath path, byte[] newContents)
+		public override async Task Overwrite(FsPath path, byte[] newContents)
 		{
 			using (var writer = File.OpenWrite(path.Absolute))
 			{
@@ -57,27 +57,27 @@ namespace Simulated._Fs
 			}
 		}
 
-		public Task DeleteDir(FsPath path)
+		public override Task DeleteDir(FsPath path)
 		{
 			return Task.Run(() => Directory.Delete(path.Absolute, true));
 		}
 
-		public Task DeleteFile(FsPath path)
+		public override Task DeleteFile(FsPath path)
 		{
 			return Task.Run(() => File.Delete(path.Absolute));
 		}
 
-		public Task MoveFile(FsPath src, FsPath dest)
+		public override Task MoveFile(FsPath src, FsPath dest)
 		{
 			return Task.Run(() => File.Move(src.Absolute, dest.Absolute));
 		}
 
-		public Task MoveDir(FsPath src, FsPath dest)
+		public override Task MoveDir(FsPath src, FsPath dest)
 		{
 			return Task.Run(() => Directory.Move(src.Absolute, dest.Absolute));
 		}
 
-		public async Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
+		public override async Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
 		{
 			if (!await DirExists(path))
 				return Enumerable.Empty<FsPath>();

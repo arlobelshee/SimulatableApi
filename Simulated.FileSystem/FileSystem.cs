@@ -27,7 +27,7 @@ namespace Simulated
 		[NotNull] private readonly AsyncLazy<FsDirectory> _tempDirectory;
 		[NotNull] private readonly _Storage _underlyingStorage;
 
-		private FileSystem([NotNull] _IFsDisk disk)
+		private FileSystem([NotNull] _StorageSink disk)
 		{
 			_underlyingStorage = new _Storage(this, new _Undo(), disk);
 			_tempDirectory = Directory(Path.GetTempPath()).CreateInBackground();

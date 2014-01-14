@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: DiskSimulated.cs
+// File: _DiskSimulated.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -13,24 +13,24 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _DiskSimulated : _IFsDisk
+	internal class _DiskSimulated : _StorageSink
 	{
-		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
-		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+		[NotNull] private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
+		[NotNull] private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		public Task<bool> DirExists(FsPath path)
+		public override Task<bool> DirExists(FsPath path)
 		{
 			return (_GetStorage(path)
 				.Kind == _StorageKind.Directory).AsImmediateTask();
 		}
 
-		public Task<bool> FileExists(FsPath path)
+		public override Task<bool> FileExists(FsPath path)
 		{
 			return (_GetStorage(path)
 				.Kind == _StorageKind.File).AsImmediateTask();
 		}
 
-		public Task<string> TextContents(FsPath path)
+		public override Task<string> TextContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
@@ -38,14 +38,14 @@ namespace Simulated._Fs
 				.AsImmediateTask();
 		}
 
-		public Task<byte[]> RawContents(FsPath path)
+		public override Task<byte[]> RawContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
 			return storage.RawContents.AsImmediateTask();
 		}
 
-		public Task CreateDir(FsPath path)
+		public override Task CreateDir(FsPath path)
 		{
 			while (true)
 			{
@@ -56,7 +56,7 @@ namespace Simulated._Fs
 			}
 		}
 
-		public Task Overwrite(FsPath path, string newContents)
+		public override Task Overwrite(FsPath path, string newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File)
 			{
@@ -65,7 +65,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public Task Overwrite(FsPath path, byte[] newContents)
+		public override Task Overwrite(FsPath path, byte[] newContents)
 		{
 			_data[path] = new _Node(_StorageKind.File)
 			{
@@ -74,7 +74,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public Task DeleteDir(FsPath path)
+		public override Task DeleteDir(FsPath path)
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
@@ -87,7 +87,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public Task DeleteFile(FsPath path)
+		public override Task DeleteFile(FsPath path)
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
@@ -99,7 +99,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public Task MoveFile(FsPath src, FsPath dest)
+		public override Task MoveFile(FsPath src, FsPath dest)
 		{
 			if (_GetStorage(src)
 				.Kind != _StorageKind.File)
@@ -111,7 +111,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		public Task MoveDir(FsPath src, FsPath dest)
+		public override Task MoveDir(FsPath src, FsPath dest)
 		{
 			if (_GetStorage(src)
 				.Kind != _StorageKind.Directory)
@@ -124,13 +124,7 @@ namespace Simulated._Fs
 			return _Undo.CompletedTask;
 		}
 
-		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory(FsPath path)
-		{
-			return _data.Where(item => path.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
-				.ToList();
-		}
-
-		public Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
+		public override Task<IEnumerable<FsPath>> FindFiles(FsPath path, string searchPattern)
 		{
 			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
 			if (patternExtensionDelimiter < 0)
@@ -146,13 +140,13 @@ namespace Simulated._Fs
 					.AsImmediateTask();
 		}
 
-		private void _MoveItemImpl(FsPath src, FsPath dest)
+		private void _MoveItemImpl([NotNull] FsPath src, [NotNull] FsPath dest)
 		{
 			_data[dest] = _data[src];
 			_data.Remove(src);
 		}
 
-		private bool _PatternMatches(string patternBaseName, string patternExtension, string fileName)
+		private bool _PatternMatches([NotNull] string patternBaseName, [NotNull] string patternExtension, [NotNull] string fileName)
 		{
 			var extension = Path.GetExtension(fileName);
 			extension = string.IsNullOrEmpty(extension) ? string.Empty : extension.Substring(1);
@@ -161,7 +155,7 @@ namespace Simulated._Fs
 		}
 
 // ReSharper disable once UnusedParameter.Local
-		private void _ValidateStorage(FsPath path, _Node storage)
+		private void _ValidateStorage([NotNull] FsPath path, [NotNull] _Node storage)
 		{
 			if (storage.Kind == _StorageKind.Missing)
 				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
@@ -176,6 +170,13 @@ namespace Simulated._Fs
 				return new _Node(_StorageKind.Directory);
 			_Node storage;
 			return !_data.TryGetValue(path, out storage) ? new _Node(_StorageKind.Missing) : storage;
+		}
+
+		[NotNull]
+		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory([NotNull] FsPath path)
+		{
+			return _data.Where(item => path.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
+				.ToList();
 		}
 
 		private class _Node
