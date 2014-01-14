@@ -86,9 +86,24 @@ namespace Simulated._Fs
 		///    operation is revertable.
 		/// </summary>
 		[NotNull]
-		public async Task EnsureExists()
+		public Task EnsureExists()
 		{
-			await _underlyingStorage.EnsureDirectoryExists(_path);
+			return _underlyingStorage.EnsureDirectoryExists(_path);
+		}
+
+		/// <summary>
+		/// Ensures the directory exists in the background and gives back a lazy reference to it.
+		/// </summary>
+		/// <returns>An awaitable that will guarantee the directory exists when await returns.</returns>
+		[NotNull]
+		public AsyncLazy<FsDirectory> CreateInBackground()
+		{
+			return new AsyncLazy<FsDirectory>(EnsureExists()
+				.ContinueWith(result =>
+				{
+					result.Wait(); // observe any exceptions.
+					return this;
+				}));
 		}
 
 		/// <summary>
@@ -96,9 +111,9 @@ namespace Simulated._Fs
 		///    Path. This operation is revertable.
 		/// </summary>
 		[NotNull]
-		public async Task EnsureDoesNotExist()
+		public Task EnsureDoesNotExist()
 		{
-			await _underlyingStorage.EnsureDirectoryDoesNotExist(_path);
+			return _underlyingStorage.EnsureDirectoryDoesNotExist(_path);
 		}
 
 		/// <summary>
