@@ -5,8 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -20,15 +18,19 @@ namespace Simulated._Fs
 	{
 		[NotNull] private readonly FileSystem _allFiles;
 		[NotNull] private readonly FsPath _path;
+		[NotNull] private readonly DirectoryModifier _underlyingStorage;
 
-		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path)
+		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] DirectoryModifier underlyingStorage)
 		{
 			if (path == null)
 				throw new ArgumentNullException("path");
 			if (allFiles == null)
 				throw new ArgumentNullException("allFiles");
+			if (underlyingStorage == null)
+				throw new ArgumentNullException("underlyingStorage");
 			_path = path;
 			_allFiles = allFiles;
+			_underlyingStorage = underlyingStorage;
 		}
 
 		/// <summary>
@@ -38,7 +40,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<bool> Exists
 		{
-			get { return _allFiles._Disk.DirExists(_path); }
+			get { return _underlyingStorage.IsDirectory(_path); }
 		}
 
 		/// <summary>
@@ -56,14 +58,17 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory Parent
 		{
-			get { return new FsDirectory(_allFiles, _path.Parent); }
+			get { return new FsDirectory(_allFiles, _path.Parent, _underlyingStorage); }
 		}
 
 		/// <summary>
-		/// Gets the FileSystem that holds this directory.
+		///    Gets the FileSystem that holds this directory.
 		/// </summary>
 		[NotNull]
-		public FileSystem FileSystem { get { return _allFiles; } }
+		public FileSystem FileSystem
+		{
+			get { return _allFiles; }
+		}
 
 		/// <summary>
 		///    Gets a drectory instance that represents a sub-directory of this directory.
@@ -73,7 +78,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory Dir([NotNull] string subdirName)
 		{
-			return new FsDirectory(_allFiles, _path/subdirName);
+			return new FsDirectory(_allFiles, _path/subdirName, _underlyingStorage);
 		}
 
 		/// <summary>
@@ -83,12 +88,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task EnsureExists()
 		{
-			if (await Exists)
-				return;
-			_AllMissingDirectoriesInPathFromBottomUp()
-				.Reverse()
-				.Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
-			await _allFiles._Disk.CreateDir(_path);
+			await _underlyingStorage.EnsureDirectoryExists(_path);
 		}
 
 		/// <summary>
@@ -98,11 +98,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public async Task EnsureDoesNotExist()
 		{
-			if (!await Exists)
-				return;
-			await _allFiles._Changes.DeletedDirectory(_path);
-			if (await Exists)
-				await _allFiles._Disk.DeleteDir(_path);
+			await _underlyingStorage.EnsureDirectoryDoesNotExist(_path);
 		}
 
 		/// <summary>
@@ -127,9 +123,9 @@ namespace Simulated._Fs
 		/// <param name="searchPattern">A filter to apply. Uses file system shell pattern matching (e.g., *.txt).</param>
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
 		[NotNull]
-		public async Task<IEnumerable<FsFile>> Files([NotNull] string searchPattern)
+		public async Task<IEnumerable<FsFile>> FilesThatExist([NotNull] string searchPattern)
 		{
-			return (await _allFiles._Disk.FindFiles(_path, searchPattern)).Select(p => new FsFile(_allFiles, p));
+			return await _underlyingStorage.KnownFilesIn(searchPattern, _path);
 		}
 
 		/// <summary>
@@ -196,18 +192,6 @@ namespace Simulated._Fs
 		public static bool operator !=(FsDirectory left, FsDirectory right)
 		{
 			return !Equals(left, right);
-		}
-
-		[NotNull]
-		private IEnumerable<string> _AllMissingDirectoriesInPathFromBottomUp()
-		{
-			var dir = new DirectoryInfo(_path.Absolute);
-			var root = dir.Root;
-			while (dir != null && (!dir.Exists && dir != root))
-			{
-				yield return dir.FullName;
-				dir = dir.Parent;
-			}
 		}
 	}
 }

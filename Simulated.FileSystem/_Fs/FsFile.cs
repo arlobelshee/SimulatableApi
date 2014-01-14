@@ -52,7 +52,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory ContainingFolder
 		{
-			get { return new FsDirectory(_allFiles, _path.Parent); }
+			get { return new FsDirectory(_allFiles, _path.Parent, new DirectoryModifier(_allFiles)); }
 		}
 
 		/// <summary>

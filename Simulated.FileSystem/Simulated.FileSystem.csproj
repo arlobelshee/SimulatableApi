@@ -49,6 +49,7 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="FsPath.cs" />
+    <Compile Include="_Fs\DirectoryModifier.cs" />
     <Compile Include="_Fs\DiskReal.cs" />
     <Compile Include="_Fs\DiskSimulated.cs" />
     <Compile Include="_Fs\FsDirectory.cs" />

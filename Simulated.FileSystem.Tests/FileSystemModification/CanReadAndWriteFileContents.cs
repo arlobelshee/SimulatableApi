@@ -58,7 +58,7 @@ namespace Simulated.Tests.FileSystemModification
 					.Overwrite(NewContents);
 				var originalDataCache = await secondView._UndoDataCache();
 
-				(await originalDataCache.Files("*.*")).Should()
+				(await originalDataCache.FilesThatExist("*.*")).Should()
 					.NotBeEmpty();
 				await secondView.CommitChanges();
 				originalDataCache.ShouldNotExist();
@@ -76,7 +76,7 @@ namespace Simulated.Tests.FileSystemModification
 					.Overwrite(NewContents);
 				var originalDataCache = await secondView._UndoDataCache();
 
-				(await originalDataCache.Files("*.*")).Should()
+				(await originalDataCache.FilesThatExist("*.*")).Should()
 					.NotBeEmpty();
 				await secondView.RevertAllChanges();
 				originalDataCache.ShouldNotExist();

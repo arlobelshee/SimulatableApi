@@ -52,10 +52,10 @@ namespace Simulated.Tests.FileSystemNavigation
 			var secondFile = _runRootFolder.File("secondFile" + extension);
 			await firstFile.Overwrite(ArbitraryContents);
 			await secondFile.Overwrite(ArbitraryContents);
-			(await _runRootFolder.Files("*" + extension))
+			(await _runRootFolder.FilesThatExist("*" + extension))
 				.Should()
 				.BeEquivalentTo(firstFile, secondFile);
-			(await _runRootFolder.Files(firstFile.FileBaseName + ".*"))
+			(await _runRootFolder.FilesThatExist(firstFile.FileBaseName + ".*"))
 				.Should()
 				.BeEquivalentTo(firstFile);
 		}

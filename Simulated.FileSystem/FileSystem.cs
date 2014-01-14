@@ -24,12 +24,14 @@ namespace Simulated
 	/// </summary>
 	public class FileSystem : IDisposable
 	{
-		private readonly AsyncLazy<FsDirectory> _tempDirectory;
+		[NotNull] private readonly AsyncLazy<FsDirectory> _tempDirectory;
+		[NotNull] private readonly DirectoryModifier _underlyingStorage;
 
 		private FileSystem([NotNull] _IFsDisk disk)
 		{
 			_Changes = new _Undo();
 			_Disk = disk;
+			_underlyingStorage = new DirectoryModifier(this);
 			var temp = Directory(Path.GetTempPath());
 			_tempDirectory = new AsyncLazy<FsDirectory>(temp.EnsureExists()
 				.ContinueWith(result => temp));
@@ -117,7 +119,7 @@ namespace Simulated
 		[NotNull]
 		public FsDirectory Directory([NotNull] FsPath path)
 		{
-			return new FsDirectory(this, path);
+			return new FsDirectory(this, path, _underlyingStorage);
 		}
 
 		/// <summary>
