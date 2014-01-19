@@ -28,7 +28,6 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Setup()
 		{
 			_testSubject = MakeTestSubject();
-			_testSubject.EnableRevertToHere();
 			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
 			FinishSetup();
 		}
@@ -37,7 +36,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Teardown()
 		{
 			BeginTeardown();
-			_testSubject.RevertAllChanges();
+			_runRootFolder.EnsureDoesNotExist();
 		}
 	}
 }

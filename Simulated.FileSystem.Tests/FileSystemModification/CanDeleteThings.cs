@@ -28,33 +28,6 @@ namespace Simulated.Tests.FileSystemModification
 			dir.EnsureDoesNotExist();
 			dir.ShouldNotExist();
 		}
-
-		[Test]
-		public void RevertingADirectoryDeleteShouldRestoreSubdirsAndFiles()
-		{
-			var dir = _runRootFolder.Dir(ArbitraryDirName);
-			dir.EnsureExists();
-			dir.Dir(ArbitraryDirName)
-				.EnsureExists();
-			dir.File(ArbitraryFileName)
-				.Overwrite(ArbitraryContents);
-			using (var fs = _testSubject.Clone())
-			{
-				fs.EnableRevertToHere();
-				fs.Directory(dir.Path)
-					.EnsureDoesNotExist();
-				dir.ShouldNotExist();
-				dir.Dir(ArbitraryDirName)
-					.ShouldNotExist();
-				dir.File(ArbitraryFileName)
-					.ShouldNotExist();
-			}
-			dir.ShouldExist();
-			dir.Dir(ArbitraryDirName)
-				.ShouldExist();
-			dir.File(ArbitraryFileName)
-				.ShouldContain(ArbitraryContents);
-		}
 	}
 
 	[TestFixture]

@@ -25,83 +25,12 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void RollingBackShouldRemoveAnyCreatedFiles()
+		public void AllFileObjectsWithTheSamePathShouldReferToSameStorage()
 		{
 			_testFile.Overwrite(OriginalContents);
-
-			_testFile.ShouldContain(OriginalContents);
-			_testSubject.RevertAllChanges();
-			_testFile.ShouldNotExist();
-		}
-
-		[Test]
-		public void ChangingContentsOfFileShouldChangeContentsSeenByAllViews()
-		{
-			_testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-			}
+			_testSubject.File(_testFile.FullPath)
+				.Overwrite(NewContents);
 			_testFile.ShouldContain(NewContents);
-		}
-
-		[Test]
-		public void CommittingChangesShouldCompletelyEliminateAllUndoData()
-		{
-			_testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-				var originalDataCache = secondView._UndoDataCache;
-
-				originalDataCache.Files("*.*")
-					.Should()
-					.NotBeEmpty();
-				secondView.CommitChanges();
-				originalDataCache.Files("*.*")
-					.Should()
-					.BeEquivalentTo();
-				originalDataCache.ShouldNotExist();
-			}
-		}
-
-		[Test]
-		public void RollingBackChangesShouldCompletelyEliminateAllUndoData()
-		{
-			_testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-				var originalDataCache = secondView._UndoDataCache;
-
-				originalDataCache.Files("*.*")
-					.Should()
-					.NotBeEmpty();
-				secondView.RevertAllChanges();
-				originalDataCache.Files("*.*")
-					.Should()
-					.BeEquivalentTo();
-				originalDataCache.ShouldNotExist();
-			}
-		}
-
-		[Test]
-		public void RevertingChangedFileContentsShouldRevertToOriginalContents()
-		{
-			_testFile.Overwrite(OriginalContents);
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				secondView.File(_testFile.FullPath)
-					.Overwrite(NewContents);
-				_testFile.ShouldContain(NewContents);
-			}
-			_testFile.ShouldContain(OriginalContents);
 		}
 
 		[Test]

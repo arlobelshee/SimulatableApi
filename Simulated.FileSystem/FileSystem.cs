@@ -12,37 +12,17 @@ namespace Simulated
 {
 	/// <summary>
 	///    Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory)
-	///    one. In either case, FileSystem and its
-	///    helpers allow a user to interact with an abstraction of this storage.
-	///    FileSystem also supports change tracking. If you call EnableRevertToHere, then you will begin tracking changes from
-	///    that point. At any point
-	///    you can dispose the FileSystem view or call RevertAllChanges to revert to the last save point. You can also call
-	///    CommitChanges to commit
-	///    all pending changes.
-	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved, not rolled
-	///    back.
-	///    Each FileSystem instance is its own view of the storage with its own save point. Call Clone to create another view
-	///    with the same underlying storage but
-	///    an independent save point.
+	///    one. In either case, FileSystem and its helpers allow a user to interact with an abstraction of this storage.
+	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved.
+	///    Each FileSystem instance is its own view of the storage.
 	/// </summary>
-	public class FileSystem : IDisposable
+	public class FileSystem
 	{
-		private FileSystem([NotNull] _IFsDisk disk, bool shouldCreateTempFolder)
+		private FileSystem([NotNull] _IFsDisk disk)
 		{
 			_Changes = new _Undo();
 			_Disk = disk;
 			TempDirectory.EnsureExists();
-		}
-
-		/// <summary>
-		///    Rolls back any un-committed changes.
-		///    If the <see cref="FileSystem" /> has a save point, then this Dispose will <see cref="RevertAllChanges" />.
-		///    If there is no save point or if all changes have been committed with <see cref="CommitChanges" />,
-		///    then disposing will have no effect.
-		/// </summary>
-		public void Dispose()
-		{
-			RevertAllChanges();
 		}
 
 		[NotNull]
@@ -60,11 +40,6 @@ namespace Simulated
 			get { return Directory(Path.GetTempPath()); }
 		}
 
-		internal FsDirectory _UndoDataCache
-		{
-			get { return Directory(_Changes.UndoDataCache); }
-		}
-
 		/// <summary>
 		///    Creates a file system instance backed by the actual file system.
 		/// </summary>
@@ -72,7 +47,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Real()
 		{
-			return new FileSystem(new _DiskReal(), false);
+			return new FileSystem(new _DiskReal());
 		}
 
 		/// <summary>
@@ -82,7 +57,7 @@ namespace Simulated
 		[NotNull]
 		public static FileSystem Simulated()
 		{
-			return new FileSystem(new _DiskSimulated(), true);
+			return new FileSystem(new _DiskSimulated());
 		}
 
 		/// <summary>
@@ -141,53 +116,6 @@ namespace Simulated
 		public FsFile File([NotNull] FsPath fileName)
 		{
 			return new FsFile(this, fileName);
-		}
-
-		/// <summary>
-		///    Sets a save point. <see cref="RevertAllChanges" /> will revert to this save point.
-		///    Does not override any existing save point. If a save point is already set then
-		///    this call has no effect.
-		/// </summary>
-		public void EnableRevertToHere()
-		{
-			if (!_Changes.IsTrackingChanges)
-			{
-				_Changes = new _UndoWithChangeTracking(this);
-			}
-		}
-
-		/// <summary>
-		///    Reverts all changes since the save point.
-		/// </summary>
-		public void RevertAllChanges()
-		{
-			_Changes.RevertAll();
-		}
-
-		/// <summary>
-		///    Commits any pending changes and removes the save point.
-		/// </summary>
-		public void CommitChanges()
-		{
-			if (_Changes.IsTrackingChanges)
-			{
-				_Changes.CommitAll();
-				_Changes = new _Undo();
-			}
-		}
-
-		/// <summary>
-		///    Clones this instance.
-		///    The clone shares storage with this instance. Each will see changes made by the other.
-		///    The clone has its own save point. Each has its own transaction and can roll back independently.
-		///    Each will see the not-yet-committed data from the other. The only difference between the
-		///    clones is where they will revert to when they <see cref="RevertAllChanges" />.
-		/// </summary>
-		/// <returns>a file system with the same storage as this instance</returns>
-		[NotNull]
-		public FileSystem Clone()
-		{
-			return new FileSystem(_Disk, false);
 		}
 	}
 }

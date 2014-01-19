@@ -19,27 +19,12 @@ namespace Simulated.Tests.FileSystemModification
 		}
 
 		[Test]
-		public void ShouldBeAbleToRollBackDirectoryCreation()
-		{
-			_runRootFolder.EnsureExists();
-
-			_runRootFolder.ShouldExist();
-			_testSubject.RevertAllChanges();
-			_runRootFolder.ShouldNotExist();
-		}
-
-		[Test]
-		public void CreatingADirectoryThatAlreadyExistsAndRollingItBackShouldDoNothing()
+		public void CreatingADirectoryThatAlreadyExistsShouldDoNothing()
 		{
 			_runRootFolder.EnsureExists();
 			_runRootFolder.ShouldExist();
-			using (var secondView = _testSubject.Clone())
-			{
-				secondView.EnableRevertToHere();
-				secondView.Directory(_runRootFolder.Path)
-					.EnsureExists();
-				_runRootFolder.ShouldExist();
-			}
+			_testSubject.Directory(_runRootFolder.Path)
+				.EnsureExists();
 			_runRootFolder.ShouldExist();
 		}
 
@@ -51,17 +36,6 @@ namespace Simulated.Tests.FileSystemModification
 			subDir.Parent.ShouldNotExist();
 			subDir.EnsureExists();
 			subDir.Parent.ShouldExist();
-		}
-
-		[Test]
-		public void DirectoriesCreatedBySideEffectOfDeepCreateShouldRollBackCorrectly()
-		{
-			var subDir = _runRootFolder.Dir("A");
-			subDir.EnsureExists();
-
-			subDir.Parent.ShouldExist();
-			_testSubject.RevertAllChanges();
-			subDir.Parent.ShouldNotExist();
 		}
 
 		[Test]
