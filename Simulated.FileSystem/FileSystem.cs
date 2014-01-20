@@ -20,16 +20,12 @@ namespace Simulated
 	{
 		private FileSystem([NotNull] _IFsDisk disk)
 		{
-			_Changes = new _Undo();
 			_Disk = disk;
 			TempDirectory.EnsureExists();
 		}
 
 		[NotNull]
 		internal _IFsDisk _Disk { get; private set; }
-
-		[NotNull]
-		internal _Undo _Changes { get; private set; }
 
 		/// <summary>
 		///    Gets the temp directory.

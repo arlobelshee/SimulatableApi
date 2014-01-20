@@ -38,7 +38,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals(FsFile other)
+		public bool Equals([CanBeNull] FsFile other)
 		{
 			if (ReferenceEquals(null, other))
 				return false;
@@ -78,6 +78,7 @@ namespace Simulated._Fs
 		/// <summary>
 		///    Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
 		/// </summary>
+		[NotNull]
 		public string FileBaseName
 		{
 			get { return Path.GetFileNameWithoutExtension(_path.Absolute); }
@@ -111,7 +112,6 @@ namespace Simulated._Fs
 			var parent = ContainingFolder;
 			if (!parent.Exists)
 				parent.EnsureExists();
-			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -125,7 +125,6 @@ namespace Simulated._Fs
 			var parent = ContainingFolder;
 			if (!parent.Exists)
 				parent.EnsureExists();
-			_allFiles._Changes.Overwrote(_path);
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -138,6 +137,7 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
+		[NotNull]
 		public string ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
@@ -152,6 +152,8 @@ namespace Simulated._Fs
 		///    Thrown if this object's FullPath actually refers to a directory in
 		///    the file system.
 		/// </exception>
+		[NotNull]
+// ReSharper disable once ReturnTypeCanBeEnumerable.Global
 		public byte[] ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
@@ -170,9 +172,9 @@ namespace Simulated._Fs
 		///    Indicates whether two files represent the same path. They may come from different file systems and still be termed
 		///    equal.
 		/// </summary>
-		/// <param name="other"> A file instance to compare with this object. </param>
+		/// <param name="obj"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public override bool Equals(object obj)
+		public override bool Equals([CanBeNull] object obj)
 		{
 			return Equals(obj as FsFile);
 		}
@@ -187,7 +189,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as Equals.
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>

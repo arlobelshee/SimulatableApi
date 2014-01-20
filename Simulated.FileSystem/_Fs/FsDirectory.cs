@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 
@@ -63,7 +62,7 @@ namespace Simulated._Fs
 		/// <param name="subdirName"> Name of the subdir. </param>
 		/// <returns> the subdir as a directory object </returns>
 		[NotNull]
-		public FsDirectory Dir(string subdirName)
+		public FsDirectory Dir([NotNull] string subdirName)
 		{
 			return new FsDirectory(_allFiles, _path/subdirName);
 		}
@@ -76,9 +75,6 @@ namespace Simulated._Fs
 		{
 			if (Exists)
 				return;
-			_AllMissingDirectoriesInPathFromBottomUp()
-				.Reverse()
-				.Each(dir => _allFiles._Changes.CreatedDirectory(new FsPath(dir)));
 			_allFiles._Disk.CreateDir(_path);
 		}
 
@@ -90,9 +86,7 @@ namespace Simulated._Fs
 		{
 			if (!Exists)
 				return;
-			_allFiles._Changes.DeletedDirectory(_path);
-			if (Exists)
-				_allFiles._Disk.DeleteDir(_path);
+			_allFiles._Disk.DeleteDir(_path);
 		}
 
 		/// <summary>
@@ -100,7 +94,8 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
 		/// <returns>a file in this directory</returns>
-		public FsFile File(string fileName)
+		[NotNull]
+		public FsFile File([NotNull] string fileName)
 		{
 			return new FsFile(_allFiles, _path/fileName);
 		}
@@ -115,7 +110,8 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="searchPattern">A filter to apply. Uses file system shell pattern matching (e.g., *.txt).</param>
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
-		public IEnumerable<FsFile> Files(string searchPattern)
+		[NotNull]
+		public IEnumerable<FsFile> Files([NotNull] string searchPattern)
 		{
 			return _allFiles._Disk.FindFiles(_path, searchPattern)
 				.Select(p => new FsFile(_allFiles, p));
@@ -127,7 +123,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals(FsDirectory other)
+		public bool Equals([CanBeNull] FsDirectory other)
 		{
 			if (ReferenceEquals(null, other))
 				return false;
@@ -149,9 +145,9 @@ namespace Simulated._Fs
 		///    Indicates whether two folders represent the same path. They may come from different file systems and still be termed
 		///    equal.
 		/// </summary>
-		/// <param name="other"> A directory instance to compare with this object. </param>
+		/// <param name="obj"> A directory instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public override bool Equals(object obj)
+		public override bool Equals([NotNull] object obj)
 		{
 			return Equals(obj as FsDirectory);
 		}
@@ -166,7 +162,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as Equals.
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
@@ -185,18 +181,6 @@ namespace Simulated._Fs
 		public static bool operator !=(FsDirectory left, FsDirectory right)
 		{
 			return !Equals(left, right);
-		}
-
-		[NotNull]
-		private IEnumerable<string> _AllMissingDirectoriesInPathFromBottomUp()
-		{
-			var dir = new DirectoryInfo(_path.Absolute);
-			var root = dir.Root;
-			while (!dir.Exists && dir != root)
-			{
-				yield return dir.FullName;
-				dir = dir.Parent;
-			}
 		}
 	}
 }
