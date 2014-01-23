@@ -198,25 +198,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
-		{
-			var dirName = _baseFolder/"sub";
-			_testSubject.CreateDir(dirName);
-			Action deleteFile = () => _testSubject.DeleteFile(dirName);
-			deleteFile.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
-		}
-
-		[Test]
-		public void UsingDeleteDirectoryOnAFileShouldResultInNoChange()
-		{
-			var fileName = _baseFolder/"sub.txt";
-			_testSubject.Overwrite(fileName, ArbitraryFileContents);
-			_testSubject.DeleteDir(fileName);
-			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
-		}
-
-		[Test]
 		public void UsingMoveDirectoryOnAFileShouldDenyAccess()
 		{
 			var fileName = _baseFolder/"sub.txt";
@@ -269,6 +250,25 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			_testSubject.ShouldNotExist(newPath);
 			_testSubject.DeleteFile(newPath);
 			_testSubject.ShouldNotExist(newPath);
+		}
+
+		[Test]
+		public void UsingDeleteDirectoryOnAFileShouldNoOp()
+		{
+			var newPath = _baseFolder/"sub.txt";
+			_testSubject.Overwrite(newPath, ArbitraryFileContents);
+			_testSubject.DeleteDir(newPath);
+			_testSubject.ShouldBeFile(newPath, ArbitraryFileContents);
+		}
+
+		[Test]
+		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
+		{
+			var dirName = _baseFolder / "sub";
+			_testSubject.CreateDir(dirName);
+			Action deleteFile = () => _testSubject.DeleteFile(dirName);
+			deleteFile.ShouldThrow<UnauthorizedAccessException>()
+				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
 
 		[Test]
