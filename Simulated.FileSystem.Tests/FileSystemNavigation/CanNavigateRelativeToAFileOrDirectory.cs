@@ -9,7 +9,7 @@ using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.FileSystemNavigation
 {
-	public abstract class CanNavigateRelativeToAFileOrDirectory : FileSystemTestBase
+	public class CanNavigateRelativeToAFileOrDirectory : FileSystemTestBase
 	{
 		[Test]
 		public void CanGetTheParentOfADirectory()
@@ -43,35 +43,6 @@ namespace Simulated.Tests.FileSystemNavigation
 				.Be(_runRootFolder);
 		}
 
-		[Test]
-		public void CanGetAllFilesWithinADirectory()
-		{
-			var firstFile = _runRootFolder.File(ArbitraryFileName);
-			var extension = firstFile.Extension;
-			var secondFile = _runRootFolder.File("secondFile" + extension);
-			firstFile.Overwrite(ArbitraryContents);
-			secondFile.Overwrite(ArbitraryContents);
-			_runRootFolder.Files("*" + extension)
-				.Should()
-				.BeEquivalentTo(firstFile, secondFile);
-			_runRootFolder.Files(firstFile.FileBaseName + ".*")
-				.Should()
-				.BeEquivalentTo(firstFile);
-		}
-	}
-
-	[TestFixture]
-	public class CanNavigateRelativeToAFileOrDirectoryRealFs : CanNavigateRelativeToAFileOrDirectory
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
-	public class CanNavigateRelativeToAFileOrDirectoryMemoryFs : CanNavigateRelativeToAFileOrDirectory
-	{
 		protected override FileSystem MakeTestSubject()
 		{
 			return FileSystem.Simulated();

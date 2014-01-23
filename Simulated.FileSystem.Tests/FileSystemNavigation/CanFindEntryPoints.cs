@@ -3,7 +3,6 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
 using FluentAssertions;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -32,12 +31,6 @@ namespace Simulated.Tests.FileSystemNavigation
 			_testSubject.Directory(ArbitraryMissingFolder)
 				.Path.Absolute.Should()
 				.Be(ArbitraryMissingFolder);
-		}
-
-		private static void _Throws<TException>(Action code, string message) where TException : Exception
-		{
-			code.ShouldThrow<TException>()
-				.WithMessage(message);
 		}
 
 		private const string ArbitraryMissingFolder = @"C:\theroot\folder";

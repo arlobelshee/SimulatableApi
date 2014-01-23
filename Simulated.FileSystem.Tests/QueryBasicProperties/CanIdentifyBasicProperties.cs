@@ -9,7 +9,7 @@ using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.QueryBasicProperties
 {
-	public abstract class CanIdentifyBasicProperties : FileSystemTestBase
+	public class CanIdentifyBasicProperties : FileSystemTestBase
 	{
 		[Test]
 		public void AFileKnowsItsFileNameParts()
@@ -46,20 +46,6 @@ namespace Simulated.Tests.QueryBasicProperties
 			testSubject.Exists.Should()
 				.BeTrue();
 		}
-	}
-
-	[TestFixture]
-	public class CanIdentifyBasicPropertiesRealFs : CanIdentifyBasicProperties
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
-	public class CanIdentifyBasicPropertiesMemoryFs : CanIdentifyBasicProperties
-	{
 		protected override FileSystem MakeTestSubject()
 		{
 			return FileSystem.Simulated();

@@ -177,13 +177,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = _baseFolder/"sub";
 			_testSubject.CreateDir(newPath);
-			_testSubject.DirExists(newPath)
-				.Should()
-				.BeTrue();
+			_testSubject.ShouldBeDir(newPath);
 			_testSubject.DeleteDir(newPath);
-			_testSubject.DirExists(newPath)
-				.Should()
-				.BeFalse();
+			_testSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
