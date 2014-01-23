@@ -97,7 +97,7 @@ namespace Simulated._Fs
 		{
 			if (_GetStorage(src)
 				.Kind != _StorageKind.File)
-				throw new ArgumentException("path", string.Format("Attempted to move file {0}, which is not a file.", src.Absolute));
+				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
@@ -106,9 +106,12 @@ namespace Simulated._Fs
 
 		public void MoveDir(FsPath src, FsPath dest)
 		{
-			if (_GetStorage(src)
-				.Kind != _StorageKind.Directory)
-				throw new ArgumentException("path", string.Format("Attempted to move directory {0}, which is not a directory.", src.Absolute));
+			var srcKind = _GetStorage(src)
+				.Kind;
+			if (srcKind == _StorageKind.File)
+				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
+			if (srcKind == _StorageKind.Missing)
+				throw new DirectoryNotFoundException(string.Format("Could not find a part of the path '{0}'.", src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));

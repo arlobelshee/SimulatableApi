@@ -40,6 +40,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var fileName = _baseFolder/"file.txt";
 			_testSubject.ShouldNotExist(fileName);
 			_testSubject.Overwrite(fileName, ArbitraryFileContents);
+			_testSubject.DirExists(fileName)
+				.Should()
+				.BeFalse();
 			_testSubject.FileExists(fileName)
 				.Should()
 				.BeTrue();
@@ -90,6 +93,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			_testSubject.DirExists(newPath)
 				.Should()
 				.BeTrue();
+			_testSubject.FileExists(newPath)
+				.Should()
+				.BeFalse();
 		}
 
 		[Test]
@@ -191,7 +197,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			_testSubject.ShouldNotExist(newPath);
 		}
 
-		[Test]	
+		[Test]
 		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
 		{
 			var dirName = _baseFolder/"sub";
@@ -201,13 +207,50 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
 
-		[Test]	
+		[Test]
 		public void UsingDeleteDirectoryOnAFileShouldResultInNoChange()
 		{
 			var fileName = _baseFolder/"sub.txt";
 			_testSubject.Overwrite(fileName, ArbitraryFileContents);
 			_testSubject.DeleteDir(fileName);
 			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
+		}
+
+		[Test]
+		public void UsingMoveDirectoryOnAFileShouldDenyAccess()
+		{
+			var fileName = _baseFolder/"sub.txt";
+			_testSubject.Overwrite(fileName, ArbitraryFileContents);
+			Action moveDir = () => _testSubject.MoveDir(fileName, _baseFolder/"dir");
+			moveDir.ShouldThrow<UnauthorizedAccessException>()
+				.WithMessage(string.Format("Cannot move the directory '{0}' because it is a file.", fileName));
+		}
+
+		[Test]
+		public void UsingMoveFileOnADirectoryShouldFailToFindFile()
+		{
+			var dirName = _baseFolder/"sub";
+			_testSubject.CreateDir(dirName);
+			Action moveFile = () => _testSubject.MoveFile(dirName, _baseFolder/"dest.txt");
+			moveFile.ShouldThrow<FileNotFoundException>()
+				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
+		}
+
+		[Test]
+		public void MovingMissingFileShouldFailToFindFile()
+		{
+			var dirName = _baseFolder/"src.txt";
+			Action moveFile = () => _testSubject.MoveFile(dirName, _baseFolder/"dest.txt");
+			moveFile.ShouldThrow<FileNotFoundException>()
+				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
+		}
+
+		[Test]
+		public void MovingMissingDirectoryShouldFailToFindDirectory()
+		{
+			Action moveDir = () => _testSubject.MoveDir(_baseFolder/"src", _baseFolder / "dest");
+			moveDir.ShouldThrow<DirectoryNotFoundException>()
+				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _baseFolder/"src"));
 		}
 
 		[Test]

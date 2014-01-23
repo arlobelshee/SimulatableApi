@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -66,6 +67,8 @@ namespace Simulated._Fs
 
 		public void MoveDir(FsPath src, FsPath dest)
 		{
+			if (FileExists(src))
+				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
 			Directory.Move(src.Absolute, dest.Absolute);
 		}
 
