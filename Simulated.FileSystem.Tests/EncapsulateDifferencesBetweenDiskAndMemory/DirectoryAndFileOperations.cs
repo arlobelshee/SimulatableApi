@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Linq;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -67,6 +68,21 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			_testSubject.Overwrite(fileName, ArbitraryFileContents);
 			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
 			_testSubject.ShouldBeDir(dirName);
+		}
+
+		[Test]
+		[TestCase("matches.*", "matches.txt", "matches.jpg")]
+		[TestCase("*.*", "matches.txt", "matches.jpg", "no_match.txt")]
+		[TestCase("*.txt", "matches.txt", "no_match.txt")]
+		[TestCase("matches.txt", "matches.txt")]
+		public void FileMatchingShouldMatchStarPatterns(string searchPattern, params string[] expectedMatches)
+		{
+			_testSubject.Overwrite(_baseFolder/"matches.txt", ArbitraryFileContents);
+			_testSubject.Overwrite(_baseFolder/"matches.jpg", ArbitraryFileContents);
+			_testSubject.Overwrite(_baseFolder/"no_match.txt", ArbitraryFileContents);
+			_testSubject.FindFiles(_baseFolder, searchPattern)
+				.Should()
+				.BeEquivalentTo(expectedMatches.Select(m => _baseFolder/m));
 		}
 
 		[Test]
