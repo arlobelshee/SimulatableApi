@@ -272,6 +272,46 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
+		public void MovingADirectoryToAnExistingFileShouldFail()
+		{
+			_testSubject.CreateDir(_baseFolder/"src");
+			_testSubject.Overwrite(_baseFolder/"dest", ArbitraryFileContents);
+			Action move = ()=>_testSubject.MoveDir(_baseFolder/"src", _baseFolder/"dest");
+			move.ShouldThrow<IOException>()
+				.WithMessage("Cannot create a file when that file already exists.\r\n");
+		}
+
+		[Test]
+		public void MovingADirectoryToAnExistingDirectoryShouldFail()
+		{
+			_testSubject.CreateDir(_baseFolder/"src");
+			_testSubject.CreateDir(_baseFolder/"dest");
+			Action move = ()=>_testSubject.MoveDir(_baseFolder/"src", _baseFolder/"dest");
+			move.ShouldThrow<IOException>()
+				.WithMessage("Cannot create a file when that file already exists.\r\n");
+		}
+
+		[Test]
+		public void MovingAFileToAnExistingFileShouldFail()
+		{
+			_testSubject.Overwrite(_baseFolder/"src", ArbitraryFileContents);
+			_testSubject.Overwrite(_baseFolder/"dest", ArbitraryFileContents);
+			Action move = ()=>_testSubject.MoveFile(_baseFolder/"src", _baseFolder/"dest");
+			move.ShouldThrow<IOException>()
+				.WithMessage("Cannot create a file when that file already exists.\r\n");
+		}
+
+		[Test]
+		public void MovingAFileToAnExistingDirectoryShouldFail()
+		{
+			_testSubject.Overwrite(_baseFolder/"src", ArbitraryFileContents);
+			_testSubject.CreateDir(_baseFolder/"dest");
+			Action move = ()=>_testSubject.MoveFile(_baseFolder/"src", _baseFolder/"dest");
+			move.ShouldThrow<IOException>()
+				.WithMessage("Cannot create a file when that file already exists.\r\n");
+		}
+
+		[Test]
 		public void StringsShouldBeEncodedInUtf8ByDefault()
 		{
 			var testFile = _baseFolder/"hello.txt";

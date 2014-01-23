@@ -100,7 +100,7 @@ namespace Simulated._Fs
 				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
-				throw new ArgumentException("path", string.Format("Attempted to move file to destination {0}, which already exists.", dest.Absolute));
+				throw new IOException("Cannot create a file when that file already exists.\r\n");
 			_MoveItemImpl(src, dest);
 		}
 
@@ -108,13 +108,16 @@ namespace Simulated._Fs
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;
+			var destKind = _GetStorage(dest)
+				.Kind;
 			if (srcKind == _StorageKind.File)
 				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
 			if (srcKind == _StorageKind.Missing)
 				throw new DirectoryNotFoundException(string.Format("Could not find a part of the path '{0}'.", src.Absolute));
-			if (_GetStorage(dest)
-				.Kind != _StorageKind.Missing)
-				throw new ArgumentException("path", string.Format("Attempted to move directory to destination {0}, which already exists.", dest.Absolute));
+			if (destKind == _StorageKind.File)
+				throw new IOException("Cannot create a file when that file already exists.\r\n");
+			if (destKind == _StorageKind.Directory)
+				throw new IOException("Cannot create a file when that file already exists.\r\n");
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
 		}
