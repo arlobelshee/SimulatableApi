@@ -60,6 +60,19 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.BeFalse();
 		}
 
+		[Test]
+		public void DeletingMissingDirectoryShouldNoop()
+		{
+			var newPath = _baseFolder / "sub";
+			_testSubject.DirExists(newPath)
+				.Should()
+				.BeFalse();
+			_testSubject.DeleteDir(newPath);
+			_testSubject.DirExists(newPath)
+				.Should()
+				.BeFalse();
+		}
+
 		[SetUp]
 		public void Setup()
 		{

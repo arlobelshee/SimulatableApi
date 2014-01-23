@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: DiskReal.cs
+// File: _DiskReal.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -48,7 +48,8 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
-			Directory.Delete(path.Absolute, true);
+			if (DirExists(path))
+				Directory.Delete(path.Absolute, true);
 		}
 
 		public void DeleteFile(FsPath path)
