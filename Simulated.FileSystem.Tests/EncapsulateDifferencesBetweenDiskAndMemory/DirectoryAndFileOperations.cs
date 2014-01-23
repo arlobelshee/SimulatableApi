@@ -183,16 +183,49 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
+		public void DeletedFileShouldNotExist()
+		{
+			var newPath = _baseFolder/"sub.txt";
+			_testSubject.Overwrite(newPath, ArbitraryFileContents);
+			_testSubject.DeleteFile(newPath);
+			_testSubject.ShouldNotExist(newPath);
+		}
+
+		[Test]	
+		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
+		{
+			var dirName = _baseFolder/"sub";
+			_testSubject.CreateDir(dirName);
+			Action deleteFile = () => _testSubject.DeleteFile(dirName);
+			deleteFile.ShouldThrow<UnauthorizedAccessException>()
+				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
+		}
+
+		[Test]	
+		public void UsingDeleteDirectoryOnAFileShouldResultInNoChange()
+		{
+			var fileName = _baseFolder/"sub.txt";
+			_testSubject.Overwrite(fileName, ArbitraryFileContents);
+			_testSubject.DeleteDir(fileName);
+			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
+		}
+
+		[Test]
 		public void DeletingMissingDirectoryShouldNoop()
 		{
 			var newPath = _baseFolder/"sub";
-			_testSubject.DirExists(newPath)
-				.Should()
-				.BeFalse();
+			_testSubject.ShouldNotExist(newPath);
 			_testSubject.DeleteDir(newPath);
-			_testSubject.DirExists(newPath)
-				.Should()
-				.BeFalse();
+			_testSubject.ShouldNotExist(newPath);
+		}
+
+		[Test]
+		public void DeletingMissingFileShouldNoop()
+		{
+			var newPath = _baseFolder/"sub.txt";
+			_testSubject.ShouldNotExist(newPath);
+			_testSubject.DeleteFile(newPath);
+			_testSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
