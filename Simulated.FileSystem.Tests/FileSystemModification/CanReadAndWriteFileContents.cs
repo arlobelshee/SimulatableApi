@@ -3,10 +3,6 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
-using System.IO;
-using System.Text;
-using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -14,16 +10,8 @@ using Simulated._Fs;
 
 namespace Simulated.Tests.FileSystemModification
 {
-	public abstract class CanReadAndWriteFileContents : FileSystemTestBase
+	public class CanReadAndWriteFileContents : FileSystemTestBase
 	{
-		[Test]
-		public void CanCreateFileAndReadItsContents()
-		{
-			_testFile.ShouldNotExist();
-			_testFile.Overwrite(OriginalContents);
-			_testFile.ShouldContain(OriginalContents);
-		}
-
 		[Test]
 		public void AllFileObjectsWithTheSamePathShouldReferToSameStorage()
 		{
@@ -31,48 +19,6 @@ namespace Simulated.Tests.FileSystemModification
 			_testSubject.File(_testFile.FullPath)
 				.Overwrite(NewContents);
 			_testFile.ShouldContain(NewContents);
-		}
-
-		[Test]
-		public void CannotReadContentsOfMissingFile()
-		{
-			var testFile = _testSubject.TempDirectory.File("CreatedByTest.txt");
-			_Throws<FileNotFoundException>(() => testFile.ReadAllText(), string.Format("Could not find file '{0}'.", testFile.FullPath.Absolute));
-		}
-
-		[Test]
-		public void CannotReadContentsOfFolder()
-		{
-			var testFile = _testFile;
-			_testSubject.Directory(testFile.FullPath)
-				.EnsureExists();
-			_Throws<UnauthorizedAccessException>(() => testFile.ReadAllText(), string.Format("Access to the path '{0}' is denied.", testFile.FullPath.Absolute));
-		}
-
-		[Test]
-		public void StringsShouldBeEncodedInUtf8ByDefault()
-		{
-			var testFile = _testFile;
-			testFile.Overwrite(NewContents);
-			var asString = testFile.ReadAllBytes();
-			asString.Should()
-				.Equal(Encoding.UTF8.GetBytes(NewContents));
-		}
-
-		[Test]
-		public void BinaryFilesWithValidStringDataShouldBeReadableAsText()
-		{
-			var testFile = _testFile;
-			testFile.OverwriteBinary(Encoding.UTF8.GetBytes(NewContents));
-			var asString = testFile.ReadAllText();
-			asString.Should()
-				.Be(NewContents);
-		}
-
-		private static void _Throws<TException>(TestDelegate code, string message) where TException : Exception
-		{
-			Assert.That(Assert.Throws<TException>(code), Has.Property("Message")
-				.EqualTo(message));
 		}
 
 		private const string OriginalContents = "Original contents";
@@ -83,20 +29,7 @@ namespace Simulated.Tests.FileSystemModification
 		{
 			_testFile = _runRootFolder.File("CreatedByTest.txt");
 		}
-	}
 
-	[TestFixture]
-	public class CanReadAndWriteFileContentsInRealFs : CanReadAndWriteFileContents
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
-	}
-
-	[TestFixture]
-	public class CanReadAndWriteFileContentsInMemoryFs : CanReadAndWriteFileContents
-	{
 		protected override FileSystem MakeTestSubject()
 		{
 			return FileSystem.Simulated();
