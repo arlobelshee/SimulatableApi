@@ -43,10 +43,10 @@
     <Compile Include="Annotations.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="FsPath.cs" />
-    <Compile Include="_Fs\DiskReal.cs" />
-    <Compile Include="_Fs\DiskSimulated.cs" />
     <Compile Include="_Fs\FsDirectory.cs" />
     <Compile Include="_Fs\FsFile.cs" />
+    <Compile Include="_Fs\_DiskReal.cs" />
+    <Compile Include="_Fs\_DiskSimulated.cs" />
     <Compile Include="_Fs\_IDisk.cs" />
     <Compile Include="_LinqExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

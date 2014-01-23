@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DirectoryAndFileOperations.cs" />
     <Compile Include="FileSystemModification\CanCreateDirectories.cs" />
     <Compile Include="FileSystemModification\CanDeleteThings.cs" />
     <Compile Include="FileSystemModification\CanReadAndWriteFileContents.cs" />
