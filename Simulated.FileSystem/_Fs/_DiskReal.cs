@@ -38,11 +38,13 @@ namespace Simulated._Fs
 
 		public void Overwrite(FsPath path, string newContents)
 		{
+			CreateDir(path.Parent);
 			File.WriteAllText(path.Absolute, newContents);
 		}
 
 		public void Overwrite(FsPath path, byte[] newContents)
 		{
+			CreateDir(path.Parent);
 			File.WriteAllBytes(path.Absolute, newContents);
 		}
 

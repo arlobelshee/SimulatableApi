@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: DiskSimulated.cs
+// File: _DiskSimulated.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -56,6 +56,7 @@ namespace Simulated._Fs
 
 		public void Overwrite(FsPath path, string newContents)
 		{
+			CreateDir(path.Parent);
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = DefaultEncoding.GetBytes(newContents)
@@ -64,6 +65,7 @@ namespace Simulated._Fs
 
 		public void Overwrite(FsPath path, byte[] newContents)
 		{
+			CreateDir(path.Parent);
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = newContents
@@ -116,7 +118,8 @@ namespace Simulated._Fs
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
 		}
 
-		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory(FsPath path)
+		[NotNull]
+		private List<KeyValuePair<FsPath, _Node>> _ItemsInScopeOfDirectory([NotNull] FsPath path)
 		{
 			return _data.Where(item => path.IsAncestorOf(item.Key, item.Value.Kind == _StorageKind.Directory))
 				.ToList();
@@ -135,13 +138,13 @@ namespace Simulated._Fs
 				.Select(item => item.Key);
 		}
 
-		private void _MoveItemImpl(FsPath src, FsPath dest)
+		private void _MoveItemImpl([NotNull] FsPath src, [NotNull] FsPath dest)
 		{
 			_data[dest] = _data[src];
 			_data.Remove(src);
 		}
 
-		private bool _PatternMatches(string patternBaseName, string patternExtension, string fileName)
+		private static bool _PatternMatches([NotNull] string patternBaseName, [NotNull] string patternExtension, [NotNull] string fileName)
 		{
 			var extension = Path.GetExtension(fileName);
 			extension = string.IsNullOrEmpty(extension) ? string.Empty : extension.Substring(1);
@@ -149,7 +152,8 @@ namespace Simulated._Fs
 			return (patternBaseName == "*" || baseName == patternBaseName) && (patternExtension == "*" || extension == patternExtension);
 		}
 
-		private void _ValidateStorage(FsPath path, _Node storage)
+// ReSharper disable once UnusedParameter.Local
+		private static void _ValidateStorage([NotNull] FsPath path, [NotNull] _Node storage)
 		{
 			if (storage.Kind == _StorageKind.Missing)
 				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
@@ -175,6 +179,8 @@ namespace Simulated._Fs
 			}
 
 			public _StorageKind Kind { get; private set; }
+
+			[NotNull]
 			public byte[] RawContents { get; set; }
 		}
 

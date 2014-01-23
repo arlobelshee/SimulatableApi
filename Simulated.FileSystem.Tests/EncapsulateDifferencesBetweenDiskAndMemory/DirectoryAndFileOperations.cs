@@ -47,9 +47,32 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
+		public void MovingDirectoryShouldMoveAllContents()
+		{
+			var originalRoot = _baseFolder/"original";
+			var newRoot = _baseFolder/"new";
+			var filePath = originalRoot/"something"/"file.txt";
+			_testSubject.Overwrite(filePath, ArbitraryFileContents);
+			_testSubject.MoveDir(originalRoot, newRoot);
+			_testSubject.ShouldBeDir(newRoot);
+			_testSubject.ShouldNotExist(originalRoot);
+			_testSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
+		}
+
+		[Test]
+		public void CreatingFileShouldCreateMissingIntermediateDirectories()
+		{
+			var dirName = _baseFolder/"missing_dir";
+			var fileName = dirName/"file.txt";
+			_testSubject.Overwrite(fileName, ArbitraryFileContents);
+			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
+			_testSubject.ShouldBeDir(dirName);
+		}
+
+		[Test]
 		public void DeletedDirectoryShouldNotExist()
 		{
-			var newPath = _baseFolder / "sub";
+			var newPath = _baseFolder/"sub";
 			_testSubject.CreateDir(newPath);
 			_testSubject.DirExists(newPath)
 				.Should()
@@ -63,7 +86,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void DeletingMissingDirectoryShouldNoop()
 		{
-			var newPath = _baseFolder / "sub";
+			var newPath = _baseFolder/"sub";
 			_testSubject.DirExists(newPath)
 				.Should()
 				.BeFalse();
@@ -93,13 +116,16 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		internal abstract _IFsDisk _MakeTestSubject();
 	}
 
-	public class DirectoryAndFileOperationsDiskFs : DirectoryAndFileOperations {
+	public class DirectoryAndFileOperationsDiskFs : DirectoryAndFileOperations
+	{
 		internal override _IFsDisk _MakeTestSubject()
 		{
 			return new _DiskReal();
 		}
 	}
-	public class DirectoryAndFileOperationsMemoryFs : DirectoryAndFileOperations {
+
+	public class DirectoryAndFileOperationsMemoryFs : DirectoryAndFileOperations
+	{
 		internal override _IFsDisk _MakeTestSubject()
 		{
 			return new _DiskSimulated();
