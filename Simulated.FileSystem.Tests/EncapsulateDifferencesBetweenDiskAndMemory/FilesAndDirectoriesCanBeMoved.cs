@@ -43,7 +43,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		[Test]
 		[TestCaseSource("ErrorCases")]
-		public void AllMoveErrorCasesShouldBeConsistentAndInformative(MoveKind operationToAttempt, [NotNull] string srcName, [NotNull] string destName)
+		public void AllMoveErrorCasesShouldBeConsistentAndInformative(MoveKind operationToAttempt, [NotNull] string srcName, [NotNull] string destName,
+			[NotNull] string expectedError)
 		{
 			var src = BaseFolder/srcName;
 			var dest = BaseFolder/destName;
@@ -62,7 +63,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				}
 			};
 			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
+				.WithMessage(string.Format(expectedError, src.Absolute, dest.Absolute));
 		}
 
 		[Test]
@@ -94,14 +95,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
 		}
 
-		[Test]
-		public void MovingMissingDirectoryShouldFailToFindDirectory()
-		{
-			Action moveDir = () => TestSubject.MoveDir(_src, _dest);
-			moveDir.ShouldThrow<DirectoryNotFoundException>()
-				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _src));
-		}
-
 		private const string DestBlockingDir = "dest_blocking_dir";
 		private const string DestBlockingFile = "dest_blocking_file.txt";
 		private const string DestUnblocked = "dest_new";
@@ -113,10 +106,11 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			{
 				return new[]
 				{
-					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir},
-					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile},
-					new object[] {MoveKind.File, SrcFile, DestBlockingDir},
-					new object[] {MoveKind.File, SrcFile, DestBlockingFile}
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir, MoveFailureBlockingDestination},
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile, MoveFailureBlockingDestination},
+					new object[] {MoveKind.Directory, SrcMissing, DestUnblocked, MoveFailureMissingSource},
+					new object[] {MoveKind.File, SrcFile, DestBlockingDir, MoveFailureBlockingDestination},
+					new object[] {MoveKind.File, SrcFile, DestBlockingFile, MoveFailureBlockingDestination}
 				};
 			}
 		}
@@ -142,6 +136,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		private const string SrcDir = "src_dir";
 		private const string SrcFile = "src_file.txt";
 		private const string SrcMissing = "src_missing";
+		private const string MoveFailureBlockingDestination = "Cannot move '{0}' to '{1}' because there is already something at the destination.";
+		private const string MoveFailureMissingSource = "Cannot move '{0}' because it does not exist.";
 		private FsPath _dest;
 		private FsPath _src;
 	}

@@ -112,7 +112,7 @@ namespace Simulated._Fs
 			if (srcKind == _StorageKind.File)
 				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
 			if (srcKind == _StorageKind.Missing)
-				throw new DirectoryNotFoundException(string.Format("Could not find a part of the path '{0}'.", src.Absolute));
+				throw new BadStorageRequest(string.Format("Cannot move '{0}' because it does not exist.", src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
