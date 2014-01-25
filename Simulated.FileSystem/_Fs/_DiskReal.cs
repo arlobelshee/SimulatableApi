@@ -62,6 +62,8 @@ namespace Simulated._Fs
 
 		public void MoveFile(FsPath src, FsPath dest)
 		{
+			if (FileExists(dest) || DirExists(dest))
+				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
 			File.Move(src.Absolute, dest.Absolute);
 		}
 
@@ -69,6 +71,8 @@ namespace Simulated._Fs
 		{
 			if (FileExists(src))
 				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
+			if (FileExists(dest) || DirExists(dest))
+				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
 			Directory.Move(src.Absolute, dest.Absolute);
 		}
 

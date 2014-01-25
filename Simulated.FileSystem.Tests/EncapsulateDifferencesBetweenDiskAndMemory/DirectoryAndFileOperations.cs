@@ -25,6 +25,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var runName = "TestRun-" + Guid.NewGuid()
 				.ToString("N");
 			_baseFolder = FsPath.TempFolder/runName;
+			_src = _baseFolder / "src";
+			_dest = _baseFolder / "dest";
 			_testSubject.CreateDir(_baseFolder);
 		}
 
@@ -229,9 +231,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void MovingMissingDirectoryShouldFailToFindDirectory()
 		{
-			Action moveDir = () => _testSubject.MoveDir(_baseFolder/"src", _baseFolder / "dest");
+			Action moveDir = () => _testSubject.MoveDir(_src, _dest);
 			moveDir.ShouldThrow<DirectoryNotFoundException>()
-				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _baseFolder/"src"));
+				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _src));
 		}
 
 		[Test]
@@ -274,41 +276,41 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void MovingADirectoryToAnExistingFileShouldFail()
 		{
-			_testSubject.CreateDir(_baseFolder/"src");
-			_testSubject.Overwrite(_baseFolder/"dest", ArbitraryFileContents);
-			Action move = ()=>_testSubject.MoveDir(_baseFolder/"src", _baseFolder/"dest");
-			move.ShouldThrow<IOException>()
-				.WithMessage("Cannot create a file when that file already exists.\r\n");
+			_testSubject.CreateDir(_src);
+			_testSubject.Overwrite(_dest, ArbitraryFileContents);
+			Action move = ()=>_testSubject.MoveDir(_src, _dest);
+			move.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
 		}
 
 		[Test]
 		public void MovingADirectoryToAnExistingDirectoryShouldFail()
 		{
-			_testSubject.CreateDir(_baseFolder/"src");
-			_testSubject.CreateDir(_baseFolder/"dest");
-			Action move = ()=>_testSubject.MoveDir(_baseFolder/"src", _baseFolder/"dest");
-			move.ShouldThrow<IOException>()
-				.WithMessage("Cannot create a file when that file already exists.\r\n");
+			_testSubject.CreateDir(_src);
+			_testSubject.CreateDir(_dest);
+			Action move = ()=>_testSubject.MoveDir(_src, _dest);
+			move.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
 		}
 
 		[Test]
 		public void MovingAFileToAnExistingFileShouldFail()
 		{
-			_testSubject.Overwrite(_baseFolder/"src", ArbitraryFileContents);
-			_testSubject.Overwrite(_baseFolder/"dest", ArbitraryFileContents);
-			Action move = ()=>_testSubject.MoveFile(_baseFolder/"src", _baseFolder/"dest");
-			move.ShouldThrow<IOException>()
-				.WithMessage("Cannot create a file when that file already exists.\r\n");
+			_testSubject.Overwrite(_src, ArbitraryFileContents);
+			_testSubject.Overwrite(_dest, ArbitraryFileContents);
+			Action move = ()=>_testSubject.MoveFile(_src, _dest);
+			move.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
 		}
 
 		[Test]
 		public void MovingAFileToAnExistingDirectoryShouldFail()
 		{
-			_testSubject.Overwrite(_baseFolder/"src", ArbitraryFileContents);
-			_testSubject.CreateDir(_baseFolder/"dest");
-			Action move = ()=>_testSubject.MoveFile(_baseFolder/"src", _baseFolder/"dest");
-			move.ShouldThrow<IOException>()
-				.WithMessage("Cannot create a file when that file already exists.\r\n");
+			_testSubject.Overwrite(_src, ArbitraryFileContents);
+			_testSubject.CreateDir(_dest);
+			Action move = ()=>_testSubject.MoveFile(_src, _dest);
+			move.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
 		}
 
 		[Test]
@@ -339,6 +341,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		private FsPath _baseFolder;
 		private _IFsDisk _testSubject;
+		private FsPath _src;
+		private FsPath _dest;
 	}
 
 	public class DirectoryAndFileOperationsDiskFs : DirectoryAndFileOperations
