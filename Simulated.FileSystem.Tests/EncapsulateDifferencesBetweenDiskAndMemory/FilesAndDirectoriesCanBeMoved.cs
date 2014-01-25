@@ -106,20 +106,17 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			{
 				return new[]
 				{
-					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir, MoveFailureBlockingDestination},
-					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile, MoveFailureBlockingDestination},
-					new object[] {MoveKind.Directory, SrcMissing, DestUnblocked, MoveFailureMissingSource},
-					new object[] {MoveKind.File, SrcFile, DestBlockingDir, MoveFailureBlockingDestination},
-					new object[] {MoveKind.File, SrcFile, DestBlockingFile, MoveFailureBlockingDestination}
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir, UserMessages.MoveErrorDestinationBlocked},
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile, UserMessages.MoveErrorDestinationBlocked},
+					new object[] {MoveKind.Directory, SrcMissing, DestUnblocked, UserMessages.MoveErrorMissingSource},
+					new object[] {MoveKind.File, SrcFile, DestBlockingDir, UserMessages.MoveErrorDestinationBlocked},
+					new object[] {MoveKind.File, SrcFile, DestBlockingFile, UserMessages.MoveErrorDestinationBlocked}
 				};
 			}
 		}
 
 		protected override void FinishSetup()
 		{
-			_src = BaseFolder/"src";
-			_dest = BaseFolder/"dest";
-
 			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents);
 			TestSubject.CreateDir(BaseFolder/SrcDir);
 
@@ -136,10 +133,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		private const string SrcDir = "src_dir";
 		private const string SrcFile = "src_file.txt";
 		private const string SrcMissing = "src_missing";
-		private const string MoveFailureBlockingDestination = "Cannot move '{0}' to '{1}' because there is already something at the destination.";
-		private const string MoveFailureMissingSource = "Cannot move '{0}' because it does not exist.";
-		private FsPath _dest;
-		private FsPath _src;
 	}
 
 	public class FilesAndDirectoriesCanBeMovedDiskFs : FilesAndDirectoriesCanBeMoved

@@ -44,6 +44,11 @@
     <Compile Include="BadStorageRequest.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="FsPath.cs" />
+    <Compile Include="UserMessages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UserMessages.resx</DependentUpon>
+    </Compile>
     <Compile Include="_Fs\FsDirectory.cs" />
     <Compile Include="_Fs\FsFile.cs" />
     <Compile Include="_Fs\_DiskReal.cs" />
@@ -56,7 +61,12 @@
     <None Include="Package.bat" />
     <None Include="Simulated.FileSystem.nuspec" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="UserMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UserMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

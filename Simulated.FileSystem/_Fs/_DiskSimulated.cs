@@ -100,7 +100,7 @@ namespace Simulated._Fs
 				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
 			CreateDir(dest.Parent);
 			_MoveItemImpl(src, dest);
 		}
@@ -112,10 +112,10 @@ namespace Simulated._Fs
 			if (srcKind == _StorageKind.File)
 				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
 			if (srcKind == _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format("Cannot move '{0}' because it does not exist.", src.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
 		}
