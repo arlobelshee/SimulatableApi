@@ -16,39 +16,21 @@ using Simulated._Fs;
 namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 {
 	[TestFixture]
-	public abstract class DirectoryAndFileOperations
+	public abstract class DirectoryAndFileOperations : DiskTestBase
 	{
-		[SetUp]
-		public void Setup()
-		{
-			_testSubject = _MakeTestSubject();
-			var runName = "TestRun-" + Guid.NewGuid()
-				.ToString("N");
-			_baseFolder = FsPath.TempFolder/runName;
-			_src = _baseFolder / "src";
-			_dest = _baseFolder / "dest";
-			_testSubject.CreateDir(_baseFolder);
-		}
-
-		[TearDown]
-		public void Teardown()
-		{
-			_testSubject.DeleteDir(_baseFolder);
-		}
-
 		[Test]
 		public void CanCreateFileAndReadItsContents()
 		{
-			var fileName = _baseFolder/"file.txt";
-			_testSubject.ShouldNotExist(fileName);
-			_testSubject.Overwrite(fileName, ArbitraryFileContents);
-			_testSubject.DirExists(fileName)
+			var fileName = BaseFolder/"file.txt";
+			TestSubject.ShouldNotExist(fileName);
+			TestSubject.Overwrite(fileName, ArbitraryFileContents);
+			TestSubject.DirExists(fileName)
 				.Should()
 				.BeFalse();
-			_testSubject.FileExists(fileName)
+			TestSubject.FileExists(fileName)
 				.Should()
 				.BeTrue();
-			_testSubject.TextContents(fileName)
+			TestSubject.TextContents(fileName)
 				.Should()
 				.Be(ArbitraryFileContents);
 		}
@@ -56,14 +38,14 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void CanCreateBinaryFileAndReadItsContents()
 		{
-			var fileName = _baseFolder/"file.txt";
-			_testSubject.ShouldNotExist(fileName);
+			var fileName = BaseFolder/"file.txt";
+			TestSubject.ShouldNotExist(fileName);
 			var contents = Encoding.UTF8.GetBytes(ArbitraryFileContents);
-			_testSubject.Overwrite(fileName, contents);
-			_testSubject.FileExists(fileName)
+			TestSubject.Overwrite(fileName, contents);
+			TestSubject.FileExists(fileName)
 				.Should()
 				.BeTrue();
-			_testSubject.RawContents(fileName)
+			TestSubject.RawContents(fileName)
 				.Should()
 				.Equal(contents);
 		}
@@ -71,31 +53,31 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void WritingToFileInMissingDirectoryShouldCreateParentDirs()
 		{
-			var fileName = _baseFolder/"parent"/"file.txt";
-			_testSubject.Overwrite(fileName, ArbitraryFileContents);
-			_testSubject.ShouldBeDir(_baseFolder/"parent");
+			var fileName = BaseFolder/"parent"/"file.txt";
+			TestSubject.Overwrite(fileName, ArbitraryFileContents);
+			TestSubject.ShouldBeDir(BaseFolder/"parent");
 		}
 
 		[Test]
 		public void WritingBinaryContentsToFileInMissingDirectoryShouldCreateParentDirs()
 		{
-			var fileName = _baseFolder/"parent"/"file.txt";
-			_testSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(ArbitraryFileContents));
-			_testSubject.ShouldBeDir(_baseFolder/"parent");
+			var fileName = BaseFolder/"parent"/"file.txt";
+			TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(ArbitraryFileContents));
+			TestSubject.ShouldBeDir(BaseFolder/"parent");
 		}
 
 		[Test]
 		public void NewDirectoryShouldExistWhenCreated()
 		{
-			var newPath = _baseFolder/"sub";
-			_testSubject.DirExists(newPath)
+			var newPath = BaseFolder/"sub";
+			TestSubject.DirExists(newPath)
 				.Should()
 				.BeFalse();
-			_testSubject.CreateDir(newPath);
-			_testSubject.DirExists(newPath)
+			TestSubject.CreateDir(newPath);
+			TestSubject.DirExists(newPath)
 				.Should()
 				.BeTrue();
-			_testSubject.FileExists(newPath)
+			TestSubject.FileExists(newPath)
 				.Should()
 				.BeFalse();
 		}
@@ -103,47 +85,34 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void CreatingNewDirectoryShouldCreateAllParents()
 		{
-			_testSubject.CreateDir(_baseFolder/"one"/"two"/"three");
-			_testSubject.ShouldBeDir(_baseFolder/"one");
-			_testSubject.ShouldBeDir(_baseFolder/"one"/"two");
-			_testSubject.ShouldBeDir(_baseFolder/"one"/"two"/"three");
+			TestSubject.CreateDir(BaseFolder/"one"/"two"/"three");
+			TestSubject.ShouldBeDir(BaseFolder/"one");
+			TestSubject.ShouldBeDir(BaseFolder/"one"/"two");
+			TestSubject.ShouldBeDir(BaseFolder/"one"/"two"/"three");
 		}
 
 		[Test]
 		public void CreatingDirectoryWhichExistsShouldNoop()
 		{
-			var newPath = _baseFolder/"sub";
+			var newPath = BaseFolder/"sub";
 			var filePath = newPath/"file.txt";
-			_testSubject.CreateDir(newPath);
-			_testSubject.Overwrite(filePath, ArbitraryFileContents);
-			_testSubject.CreateDir(newPath);
-			_testSubject.DirExists(newPath)
+			TestSubject.CreateDir(newPath);
+			TestSubject.Overwrite(filePath, ArbitraryFileContents);
+			TestSubject.CreateDir(newPath);
+			TestSubject.DirExists(newPath)
 				.Should()
 				.BeTrue();
-			_testSubject.ShouldBeFile(filePath, ArbitraryFileContents);
-		}
-
-		[Test]
-		public void MovingDirectoryShouldMoveAllContents()
-		{
-			var originalRoot = _baseFolder/"original";
-			var newRoot = _baseFolder/"new";
-			var filePath = originalRoot/"something"/"file.txt";
-			_testSubject.Overwrite(filePath, ArbitraryFileContents);
-			_testSubject.MoveDir(originalRoot, newRoot);
-			_testSubject.ShouldBeDir(newRoot);
-			_testSubject.ShouldNotExist(originalRoot);
-			_testSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
+			TestSubject.ShouldBeFile(filePath, ArbitraryFileContents);
 		}
 
 		[Test]
 		public void CreatingFileShouldCreateMissingIntermediateDirectories()
 		{
-			var dirName = _baseFolder/"missing_dir";
+			var dirName = BaseFolder/"missing_dir";
 			var fileName = dirName/"file.txt";
-			_testSubject.Overwrite(fileName, ArbitraryFileContents);
-			_testSubject.ShouldBeFile(fileName, ArbitraryFileContents);
-			_testSubject.ShouldBeDir(dirName);
+			TestSubject.Overwrite(fileName, ArbitraryFileContents);
+			TestSubject.ShouldBeFile(fileName, ArbitraryFileContents);
+			TestSubject.ShouldBeDir(dirName);
 		}
 
 		[Test]
@@ -153,19 +122,19 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[TestCase("matches.txt", "matches.txt")]
 		public void FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] params string[] expectedMatches)
 		{
-			_testSubject.Overwrite(_baseFolder/"matches.txt", ArbitraryFileContents);
-			_testSubject.Overwrite(_baseFolder/"matches.jpg", ArbitraryFileContents);
-			_testSubject.Overwrite(_baseFolder/"no_match.txt", ArbitraryFileContents);
-			_testSubject.FindFiles(_baseFolder, searchPattern)
+			TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents);
+			TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents);
+			TestSubject.Overwrite(BaseFolder/"no_match.txt", ArbitraryFileContents);
+			TestSubject.FindFiles(BaseFolder, searchPattern)
 				.Should()
-				.BeEquivalentTo(expectedMatches.Select(m => _baseFolder/m));
+				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));
 		}
 
 		[Test]
 		public void CannotReadContentsOfMissingFile()
 		{
-			var missingFileName = _baseFolder/"missing.txt";
-			Action readMissingFile = () => _testSubject.TextContents(missingFileName);
+			var missingFileName = BaseFolder/"missing.txt";
+			Action readMissingFile = () => TestSubject.TextContents(missingFileName);
 			readMissingFile.ShouldThrow<FileNotFoundException>()
 				.WithMessage(string.Format("Could not find file '{0}'.", missingFileName));
 		}
@@ -173,9 +142,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void CannotReadContentsOfFolder()
 		{
-			var dirName = _baseFolder/"directory.git";
-			_testSubject.CreateDir(dirName);
-			Action readMissingFile = () => _testSubject.TextContents(dirName);
+			var dirName = BaseFolder/"directory.git";
+			TestSubject.CreateDir(dirName);
+			Action readMissingFile = () => TestSubject.TextContents(dirName);
 			readMissingFile.ShouldThrow<UnauthorizedAccessException>()
 				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
@@ -183,142 +152,65 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void DeletedDirectoryShouldNotExist()
 		{
-			var newPath = _baseFolder/"sub";
-			_testSubject.CreateDir(newPath);
-			_testSubject.ShouldBeDir(newPath);
-			_testSubject.DeleteDir(newPath);
-			_testSubject.ShouldNotExist(newPath);
+			var newPath = BaseFolder/"sub";
+			TestSubject.CreateDir(newPath);
+			TestSubject.ShouldBeDir(newPath);
+			TestSubject.DeleteDir(newPath);
+			TestSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
 		public void DeletedFileShouldNotExist()
 		{
-			var newPath = _baseFolder/"sub.txt";
-			_testSubject.Overwrite(newPath, ArbitraryFileContents);
-			_testSubject.DeleteFile(newPath);
-			_testSubject.ShouldNotExist(newPath);
-		}
-
-		[Test]
-		public void UsingMoveDirectoryOnAFileShouldDenyAccess()
-		{
-			var fileName = _baseFolder/"sub.txt";
-			_testSubject.Overwrite(fileName, ArbitraryFileContents);
-			Action moveDir = () => _testSubject.MoveDir(fileName, _baseFolder/"dir");
-			moveDir.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Cannot move the directory '{0}' because it is a file.", fileName));
-		}
-
-		[Test]
-		public void UsingMoveFileOnADirectoryShouldFailToFindFile()
-		{
-			var dirName = _baseFolder/"sub";
-			_testSubject.CreateDir(dirName);
-			Action moveFile = () => _testSubject.MoveFile(dirName, _baseFolder/"dest.txt");
-			moveFile.ShouldThrow<FileNotFoundException>()
-				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
-		}
-
-		[Test]
-		public void MovingMissingFileShouldFailToFindFile()
-		{
-			var dirName = _baseFolder/"src.txt";
-			Action moveFile = () => _testSubject.MoveFile(dirName, _baseFolder/"dest.txt");
-			moveFile.ShouldThrow<FileNotFoundException>()
-				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
-		}
-
-		[Test]
-		public void MovingMissingDirectoryShouldFailToFindDirectory()
-		{
-			Action moveDir = () => _testSubject.MoveDir(_src, _dest);
-			moveDir.ShouldThrow<DirectoryNotFoundException>()
-				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _src));
+			var newPath = BaseFolder/"sub.txt";
+			TestSubject.Overwrite(newPath, ArbitraryFileContents);
+			TestSubject.DeleteFile(newPath);
+			TestSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
 		public void DeletingMissingDirectoryShouldNoop()
 		{
-			var newPath = _baseFolder/"sub";
-			_testSubject.ShouldNotExist(newPath);
-			_testSubject.DeleteDir(newPath);
-			_testSubject.ShouldNotExist(newPath);
+			var newPath = BaseFolder/"sub";
+			TestSubject.ShouldNotExist(newPath);
+			TestSubject.DeleteDir(newPath);
+			TestSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
 		public void DeletingMissingFileShouldNoop()
 		{
-			var newPath = _baseFolder/"sub.txt";
-			_testSubject.ShouldNotExist(newPath);
-			_testSubject.DeleteFile(newPath);
-			_testSubject.ShouldNotExist(newPath);
+			var newPath = BaseFolder/"sub.txt";
+			TestSubject.ShouldNotExist(newPath);
+			TestSubject.DeleteFile(newPath);
+			TestSubject.ShouldNotExist(newPath);
 		}
 
 		[Test]
 		public void UsingDeleteDirectoryOnAFileShouldNoOp()
 		{
-			var newPath = _baseFolder/"sub.txt";
-			_testSubject.Overwrite(newPath, ArbitraryFileContents);
-			_testSubject.DeleteDir(newPath);
-			_testSubject.ShouldBeFile(newPath, ArbitraryFileContents);
+			var newPath = BaseFolder/"sub.txt";
+			TestSubject.Overwrite(newPath, ArbitraryFileContents);
+			TestSubject.DeleteDir(newPath);
+			TestSubject.ShouldBeFile(newPath, ArbitraryFileContents);
 		}
 
 		[Test]
 		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
 		{
-			var dirName = _baseFolder / "sub";
-			_testSubject.CreateDir(dirName);
-			Action deleteFile = () => _testSubject.DeleteFile(dirName);
+			var dirName = BaseFolder / "sub";
+			TestSubject.CreateDir(dirName);
+			Action deleteFile = () => TestSubject.DeleteFile(dirName);
 			deleteFile.ShouldThrow<UnauthorizedAccessException>()
 				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
 
 		[Test]
-		public void MovingADirectoryToAnExistingFileShouldFail()
-		{
-			_testSubject.CreateDir(_src);
-			_testSubject.Overwrite(_dest, ArbitraryFileContents);
-			Action move = ()=>_testSubject.MoveDir(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
-		public void MovingADirectoryToAnExistingDirectoryShouldFail()
-		{
-			_testSubject.CreateDir(_src);
-			_testSubject.CreateDir(_dest);
-			Action move = ()=>_testSubject.MoveDir(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
-		public void MovingAFileToAnExistingFileShouldFail()
-		{
-			_testSubject.Overwrite(_src, ArbitraryFileContents);
-			_testSubject.Overwrite(_dest, ArbitraryFileContents);
-			Action move = ()=>_testSubject.MoveFile(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
-		public void MovingAFileToAnExistingDirectoryShouldFail()
-		{
-			_testSubject.Overwrite(_src, ArbitraryFileContents);
-			_testSubject.CreateDir(_dest);
-			Action move = ()=>_testSubject.MoveFile(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
 		public void StringsShouldBeEncodedInUtf8ByDefault()
 		{
-			var testFile = _baseFolder/"hello.txt";
-			_testSubject.Overwrite(testFile, UnicodeContents);
-			var asBytes = _testSubject.RawContents(testFile);
+			var testFile = BaseFolder/"hello.txt";
+			TestSubject.Overwrite(testFile, UnicodeContents);
+			var asBytes = TestSubject.RawContents(testFile);
 			asBytes.Should()
 				.Equal(Encoding.UTF8.GetBytes(UnicodeContents));
 		}
@@ -326,23 +218,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void BinaryFilesWithValidStringDataShouldBeReadableAsText()
 		{
-			var testFile = _baseFolder/"hello.txt";
-			_testSubject.Overwrite(testFile, Encoding.UTF8.GetBytes(UnicodeContents));
-			var asString = _testSubject.TextContents(testFile);
+			var testFile = BaseFolder/"hello.txt";
+			TestSubject.Overwrite(testFile, Encoding.UTF8.GetBytes(UnicodeContents));
+			var asString = TestSubject.TextContents(testFile);
 			asString.Should()
 				.Be(UnicodeContents);
 		}
-
-		private const string ArbitraryFileContents = "contents";
-		private const string UnicodeContents = "helȽo ﺷ";
-
-		[NotNull]
-		internal abstract _IFsDisk _MakeTestSubject();
-
-		private FsPath _baseFolder;
-		private _IFsDisk _testSubject;
-		private FsPath _src;
-		private FsPath _dest;
 	}
 
 	public class DirectoryAndFileOperationsDiskFs : DirectoryAndFileOperations

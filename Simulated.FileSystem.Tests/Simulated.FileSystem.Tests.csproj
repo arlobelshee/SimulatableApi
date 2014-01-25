@@ -58,7 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\FilesAndDirectoriesCanBeMoved.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DirectoryAndFileOperations.cs" />
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DiskTestBase.cs" />
     <Compile Include="FileSystemModification\CanReadAndWriteFileContents.cs" />
     <Compile Include="zzTestHelpers\FileSystemTestBase.cs" />
     <Compile Include="FileSystemNavigation\CanComputePathsUsingFsPath.cs" />

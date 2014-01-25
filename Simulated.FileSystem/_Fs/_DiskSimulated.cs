@@ -101,6 +101,7 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
+			CreateDir(dest.Parent);
 			_MoveItemImpl(src, dest);
 		}
 

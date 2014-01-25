@@ -64,6 +64,7 @@ namespace Simulated._Fs
 		{
 			if (FileExists(dest) || DirExists(dest))
 				throw new BadStorageRequest(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
+			CreateDir(dest.Parent);
 			File.Move(src.Absolute, dest.Absolute);
 		}
 
