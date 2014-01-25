@@ -1,12 +1,10 @@
 ﻿// SimulatableAPI
-// File: DirectoryAndFileOperations.cs
+// File: FilesAndDirectoriesCanBeMoved.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -35,12 +33,36 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void MovingFileShouldChangeItsLocation()
 		{
 			var originalFile = BaseFolder/"something"/"file.txt";
-			var dest = BaseFolder / "new_path" / "file_new.txt";
+			var dest = BaseFolder/"new_path"/"file_new.txt";
 			TestSubject.Overwrite(originalFile, ArbitraryFileContents);
 			TestSubject.MoveFile(originalFile, dest);
-			TestSubject.ShouldBeDir(BaseFolder / "new_path");
+			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
 			TestSubject.ShouldBeFile(dest, ArbitraryFileContents);
+		}
+
+		[Test]
+		[TestCaseSource("ErrorCases")]
+		public void AllMoveErrorCasesShouldBeConsistentAndInformative(MoveKind operationToAttempt, [NotNull] string srcName, [NotNull] string destName)
+		{
+			var src = BaseFolder/srcName;
+			var dest = BaseFolder/destName;
+			Action move = () =>
+			{
+				switch (operationToAttempt)
+				{
+					case MoveKind.Directory:
+						TestSubject.MoveDir(src, dest);
+						break;
+					case MoveKind.File:
+						TestSubject.MoveFile(src, dest);
+						break;
+					default:
+						throw new NotImplementedException(string.Format("Test not yet written for operation {0}.", operationToAttempt));
+				}
+			};
+			move.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", src.Absolute, dest.Absolute));
 		}
 
 		[Test]
@@ -80,54 +102,48 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.WithMessage(string.Format("Could not find a part of the path '{0}'.", _src));
 		}
 
-		[Test]
-		public void MovingADirectoryToAnExistingFileShouldFail()
-		{
-			TestSubject.CreateDir(_src);
-			TestSubject.Overwrite(_dest, ArbitraryFileContents);
-			Action move = ()=>TestSubject.MoveDir(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
+		private const string DestBlockingDir = "dest_blocking_dir";
+		private const string DestBlockingFile = "dest_blocking_file.txt";
+		private const string DestUnblocked = "dest_new";
 
-		[Test]
-		public void MovingADirectoryToAnExistingDirectoryShouldFail()
+		[NotNull]
+		public object[][] ErrorCases
 		{
-			TestSubject.CreateDir(_src);
-			TestSubject.CreateDir(_dest);
-			Action move = ()=>TestSubject.MoveDir(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
-		public void MovingAFileToAnExistingFileShouldFail()
-		{
-			TestSubject.Overwrite(_src, ArbitraryFileContents);
-			TestSubject.Overwrite(_dest, ArbitraryFileContents);
-			Action move = ()=>TestSubject.MoveFile(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
-		}
-
-		[Test]
-		public void MovingAFileToAnExistingDirectoryShouldFail()
-		{
-			TestSubject.Overwrite(_src, ArbitraryFileContents);
-			TestSubject.CreateDir(_dest);
-			Action move = ()=>TestSubject.MoveFile(_src, _dest);
-			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format("Cannot move '{0}' to '{1}' because there is already something at the destination.", _src.Absolute, _dest.Absolute));
+			get
+			{
+				return new[]
+				{
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir},
+					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile},
+					new object[] {MoveKind.File, SrcFile, DestBlockingDir},
+					new object[] {MoveKind.File, SrcFile, DestBlockingFile}
+				};
+			}
 		}
 
 		protected override void FinishSetup()
 		{
 			_src = BaseFolder/"src";
 			_dest = BaseFolder/"dest";
+
+			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents);
+			TestSubject.CreateDir(BaseFolder/SrcDir);
+
+			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents);
+			TestSubject.CreateDir(BaseFolder/DestBlockingDir);
 		}
 
-		private FsPath _src;
+		public enum MoveKind
+		{
+			Directory,
+			File
+		}
+
+		private const string SrcDir = "src_dir";
+		private const string SrcFile = "src_file.txt";
+		private const string SrcMissing = "src_missing";
 		private FsPath _dest;
+		private FsPath _src;
 	}
 
 	public class FilesAndDirectoriesCanBeMovedDiskFs : FilesAndDirectoriesCanBeMoved
