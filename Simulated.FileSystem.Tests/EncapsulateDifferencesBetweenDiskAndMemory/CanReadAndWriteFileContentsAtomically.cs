@@ -49,18 +49,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void WritingToFileInMissingDirectoryShouldCreateParentDirs()
+		[TestCaseSource("FileFormats")]
+		public void WritingToFileInMissingDirectoryShouldCreateParentDirs(FileFormat fileFormat)
 		{
 			var fileName = BaseFolder/"parent"/"file.txt";
-			TestSubject.Overwrite(fileName, ArbitraryFileContents);
-			TestSubject.ShouldBeDir(BaseFolder/"parent");
-		}
-
-		[Test]
-		public void WritingBinaryContentsToFileInMissingDirectoryShouldCreateParentDirs()
-		{
-			var fileName = BaseFolder/"parent"/"file.txt";
-			TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(ArbitraryFileContents));
+			var writeToFile = _PickFileWriter(fileFormat, fileName);
+			writeToFile(ArbitraryFileContents);
 			TestSubject.ShouldBeDir(BaseFolder/"parent");
 		}
 
@@ -118,14 +112,28 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[NotNull]
-		private Action _PickFileReader(FileFormat fileFormat, [NotNull] FsPath dirName)
+		private Action _PickFileReader(FileFormat fileFormat, [NotNull] FsPath fileName)
 		{
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return () => TestSubject.TextContents(dirName);
+					return () => TestSubject.TextContents(fileName);
 				case FileFormat.Binary:
-					return () => TestSubject.RawContents(dirName);
+					return () => TestSubject.RawContents(fileName);
+				default:
+					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
+			}
+		}
+
+		[NotNull]
+		private Action<string> _PickFileWriter(FileFormat fileFormat, [NotNull] FsPath fileName)
+		{
+			switch (fileFormat)
+			{
+				case FileFormat.Text:
+					return contents => TestSubject.Overwrite(fileName, contents);
+				case FileFormat.Binary:
+					return contents => TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(contents));
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}
