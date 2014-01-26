@@ -62,6 +62,10 @@ namespace Simulated._Fs
 
 		public void MoveFile(FsPath src, FsPath dest)
 		{
+			if (DirExists(src))
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src.Absolute, dest.Absolute));
+			if (!FileExists(src))
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute, dest.Absolute));
 			if (FileExists(dest) || DirExists(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
 			CreateDir(dest.Parent);
@@ -71,7 +75,7 @@ namespace Simulated._Fs
 		public void MoveDir(FsPath src, FsPath dest)
 		{
 			if (FileExists(src))
-				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src.Absolute));
 			if (!DirExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute));
 			if (FileExists(dest) || DirExists(dest))

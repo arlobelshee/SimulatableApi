@@ -104,4 +104,10 @@
 	<data name="MoveErrorMissingSource" xml:space="preserve">
     <value>Cannot move '{0}' because it does not exist.</value>
   </data>
+	<data name="MoveErrorMovedDirectoryAsFile" xml:space="preserve">
+    <value>Failed to move the file '{0}'. Found a directory there instead.</value>
+  </data>
+	<data name="MoveErrorMovedFileAsDirectory" xml:space="preserve">
+    <value>Failed to move the directory '{0}'. Found a file there instead.</value>
+  </data>
 </root>

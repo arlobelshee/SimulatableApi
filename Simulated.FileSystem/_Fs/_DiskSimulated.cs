@@ -95,9 +95,12 @@ namespace Simulated._Fs
 
 		public void MoveFile(FsPath src, FsPath dest)
 		{
-			if (_GetStorage(src)
-				.Kind != _StorageKind.File)
-				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", src.Absolute));
+			var srcKind = _GetStorage(src)
+				.Kind;
+			if (srcKind == _StorageKind.Missing)
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute, dest.Absolute));
+			if (srcKind == _StorageKind.Directory)
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src.Absolute, dest.Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
@@ -110,7 +113,7 @@ namespace Simulated._Fs
 			var srcKind = _GetStorage(src)
 				.Kind;
 			if (srcKind == _StorageKind.File)
-				throw new UnauthorizedAccessException(string.Format("Cannot move the directory '{0}' because it is a file.", src.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src.Absolute));
 			if (srcKind == _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute));
 			if (_GetStorage(dest)

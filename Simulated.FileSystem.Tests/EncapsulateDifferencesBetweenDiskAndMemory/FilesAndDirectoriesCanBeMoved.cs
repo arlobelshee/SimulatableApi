@@ -66,35 +66,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.WithMessage(string.Format(expectedError, src.Absolute, dest.Absolute));
 		}
 
-		[Test]
-		public void UsingMoveDirectoryOnAFileShouldDenyAccess()
-		{
-			var fileName = BaseFolder/"sub.txt";
-			TestSubject.Overwrite(fileName, ArbitraryFileContents);
-			Action moveDir = () => TestSubject.MoveDir(fileName, BaseFolder/"dir");
-			moveDir.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Cannot move the directory '{0}' because it is a file.", fileName));
-		}
-
-		[Test]
-		public void UsingMoveFileOnADirectoryShouldFailToFindFile()
-		{
-			var dirName = BaseFolder/"sub";
-			TestSubject.CreateDir(dirName);
-			Action moveFile = () => TestSubject.MoveFile(dirName, BaseFolder/"dest.txt");
-			moveFile.ShouldThrow<FileNotFoundException>()
-				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
-		}
-
-		[Test]
-		public void MovingMissingFileShouldFailToFindFile()
-		{
-			var dirName = BaseFolder/"src.txt";
-			Action moveFile = () => TestSubject.MoveFile(dirName, BaseFolder/"dest.txt");
-			moveFile.ShouldThrow<FileNotFoundException>()
-				.WithMessage(string.Format("Could not find file '{0}'.", dirName));
-		}
-
 		private const string DestBlockingDir = "dest_blocking_dir";
 		private const string DestBlockingFile = "dest_blocking_file.txt";
 		private const string DestUnblocked = "dest_new";
@@ -106,9 +77,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			{
 				return new[]
 				{
+					new object[] {MoveKind.Directory, SrcMissing, DestUnblocked, UserMessages.MoveErrorMissingSource},
+					new object[] {MoveKind.Directory, SrcFile, DestUnblocked, UserMessages.MoveErrorMovedFileAsDirectory},
 					new object[] {MoveKind.Directory, SrcDir, DestBlockingDir, UserMessages.MoveErrorDestinationBlocked},
 					new object[] {MoveKind.Directory, SrcDir, DestBlockingFile, UserMessages.MoveErrorDestinationBlocked},
-					new object[] {MoveKind.Directory, SrcMissing, DestUnblocked, UserMessages.MoveErrorMissingSource},
+					new object[] {MoveKind.File, SrcMissing, DestUnblocked, UserMessages.MoveErrorMissingSource},
+					new object[] {MoveKind.File, SrcDir, DestUnblocked, UserMessages.MoveErrorMovedDirectoryAsFile},
 					new object[] {MoveKind.File, SrcFile, DestBlockingDir, UserMessages.MoveErrorDestinationBlocked},
 					new object[] {MoveKind.File, SrcFile, DestBlockingFile, UserMessages.MoveErrorDestinationBlocked}
 				};
