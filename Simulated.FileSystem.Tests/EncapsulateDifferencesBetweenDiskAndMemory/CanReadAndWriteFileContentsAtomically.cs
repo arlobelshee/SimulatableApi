@@ -69,8 +69,17 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var missingFileName = BaseFolder/"missing.txt";
 			Action readMissingFile = () => TestSubject.TextContents(missingFileName);
-			readMissingFile.ShouldThrow<FileNotFoundException>()
-				.WithMessage(string.Format("Could not find file '{0}'.", missingFileName));
+			readMissingFile.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format(UserMessages.ReadErrorFileNotFound, missingFileName));
+		}
+
+		[Test]
+		public void CannotReadContentsOfMissingFileAsRawBinary()
+		{
+			var missingFileName = BaseFolder/"missing.txt";
+			Action readMissingFile = () => TestSubject.RawContents(missingFileName);
+			readMissingFile.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format(UserMessages.ReadErrorFileNotFound, missingFileName));
 		}
 
 		[Test]
@@ -80,16 +89,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			TestSubject.CreateDir(dirName);
 			Action readMissingFile = () => TestSubject.TextContents(dirName);
 			readMissingFile.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
-		}
-
-		[Test]
-		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
-		{
-			var dirName = BaseFolder/"sub";
-			TestSubject.CreateDir(dirName);
-			Action deleteFile = () => TestSubject.DeleteFile(dirName);
-			deleteFile.ShouldThrow<UnauthorizedAccessException>()
 				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
 

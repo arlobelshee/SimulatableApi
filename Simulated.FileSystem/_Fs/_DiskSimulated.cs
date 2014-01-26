@@ -161,7 +161,7 @@ namespace Simulated._Fs
 		private static void _ValidateStorage([NotNull] FsPath path, [NotNull] _Node storage)
 		{
 			if (storage.Kind == _StorageKind.Missing)
-				throw new FileNotFoundException(string.Format("Could not find file '{0}'.", path.Absolute), path.Absolute);
+				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 			if (storage.Kind == _StorageKind.Directory)
 				throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
 		}

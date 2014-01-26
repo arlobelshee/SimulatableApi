@@ -3,10 +3,10 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
@@ -24,11 +24,13 @@ namespace Simulated._Fs
 
 		public string TextContents(FsPath path)
 		{
+			_ValidatePathForReadingFile(path);
 			return File.ReadAllText(path.Absolute);
 		}
 
 		public byte[] RawContents(FsPath path)
 		{
+			_ValidatePathForReadingFile(path);
 			return File.ReadAllBytes(path.Absolute);
 		}
 
@@ -89,6 +91,12 @@ namespace Simulated._Fs
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path.Absolute, searchPattern)
 				.Select(p => new FsPath(p));
+		}
+
+		private void _ValidatePathForReadingFile([NotNull] FsPath path)
+		{
+			if (!FileExists(path) && !DirExists(path))
+				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}
 }

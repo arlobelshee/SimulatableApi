@@ -56,11 +56,11 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		[TestCase("matches.*", "matches.txt", "matches.jpg")]
-		[TestCase("*.*", "matches.txt", "matches.jpg", "no_match.txt")]
-		[TestCase("*.txt", "matches.txt", "no_match.txt")]
-		[TestCase("matches.txt", "matches.txt")]
-		public void FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] params string[] expectedMatches)
+		[TestCase("matches.*", new[] {"matches.txt", "matches.jpg"})]
+		[TestCase("*.*", new[] {"matches.txt", "matches.jpg", "no_match.txt"})]
+		[TestCase("*.txt", new[] {"matches.txt", "no_match.txt"})]
+		[TestCase("matches.txt", new[] {"matches.txt"})]
+		public void FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
 		{
 			TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents);
 			TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents);

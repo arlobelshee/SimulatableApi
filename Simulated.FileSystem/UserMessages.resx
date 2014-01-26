@@ -110,4 +110,7 @@
 	<data name="MoveErrorMovedFileAsDirectory" xml:space="preserve">
     <value>Failed to move the directory '{0}'. Found a file there instead.</value>
   </data>
+	<data name="ReadErrorFileNotFound" xml:space="preserve">
+    <value>Could not find file '{0}'.</value>
+  </data>
 </root>
