@@ -1,12 +1,12 @@
 ﻿// SimulatableAPI
-// File: DirectoryAndFileOperations - Copy.cs
+// File: CanReadAndWriteFileContentsAtomically.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
-using System.IO;
 using System.Text;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 using Simulated._Fs;
@@ -65,29 +65,22 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void CannotReadContentsOfMissingFile()
+		[TestCaseSource("FileFormats")]
+		public void CannotReadContentsOfMissingFile(FileFormat fileFormat)
 		{
 			var missingFileName = BaseFolder/"missing.txt";
-			Action readMissingFile = () => TestSubject.TextContents(missingFileName);
+			var readMissingFile = _PickFileReader(fileFormat, missingFileName);
 			readMissingFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.ReadErrorFileNotFound, missingFileName));
 		}
 
 		[Test]
-		public void CannotReadContentsOfMissingFileAsRawBinary()
-		{
-			var missingFileName = BaseFolder/"missing.txt";
-			Action readMissingFile = () => TestSubject.RawContents(missingFileName);
-			readMissingFile.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format(UserMessages.ReadErrorFileNotFound, missingFileName));
-		}
-
-		[Test]
-		public void CannotReadContentsOfFolder()
+		[TestCaseSource("FileFormats")]
+		public void CannotReadContentsOfFolder(FileFormat fileFormat)
 		{
 			var dirName = BaseFolder/"directory.git";
 			TestSubject.CreateDir(dirName);
-			Action readMissingFile = () => TestSubject.TextContents(dirName);
+			var readMissingFile = _PickFileReader(fileFormat, dirName);
 			readMissingFile.ShouldThrow<UnauthorizedAccessException>()
 				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
 		}
@@ -110,6 +103,32 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var asString = TestSubject.TextContents(testFile);
 			asString.Should()
 				.Be(UnicodeContents);
+		}
+
+		public enum FileFormat
+		{
+			Text,
+			Binary
+		}
+
+		[NotNull]
+		public object[][] FileFormats
+		{
+			get { return new[] {new object[] {FileFormat.Binary}, new object[] {FileFormat.Text}}; }
+		}
+
+		[NotNull]
+		private Action _PickFileReader(FileFormat fileFormat, [NotNull] FsPath dirName)
+		{
+			switch (fileFormat)
+			{
+				case FileFormat.Text:
+					return () => TestSubject.TextContents(dirName);
+				case FileFormat.Binary:
+					return () => TestSubject.RawContents(dirName);
+				default:
+					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
+			}
 		}
 	}
 
