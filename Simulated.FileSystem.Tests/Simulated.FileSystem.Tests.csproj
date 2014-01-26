@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\CanReadAndWriteFileContentsAtomically.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\FilesAndDirectoriesCanBeMoved.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DirectoryAndFileOperations.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DiskTestBase.cs" />
