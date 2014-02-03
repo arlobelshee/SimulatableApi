@@ -163,7 +163,7 @@ namespace Simulated._Fs
 			if (storage.Kind == _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 			if (storage.Kind == _StorageKind.Directory)
-				throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
 		}
 
 		[NotNull]

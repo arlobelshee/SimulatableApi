@@ -95,7 +95,9 @@ namespace Simulated._Fs
 
 		private void _ValidatePathForReadingFile([NotNull] FsPath path)
 		{
-			if (!FileExists(path) && !DirExists(path))
+			if (DirExists(path))
+				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
+			if (!FileExists(path))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}

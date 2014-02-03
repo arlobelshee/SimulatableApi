@@ -113,4 +113,7 @@
 	<data name="ReadErrorFileNotFound" xml:space="preserve">
     <value>Could not find file '{0}'.</value>
   </data>
+	<data name="ReadErrorPathIsDirectory" xml:space="preserve">
+    <value>Cannot read file contents of the path '{0}' because it is a directory.</value>
+  </data>
 </root>

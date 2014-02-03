@@ -75,8 +75,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var dirName = BaseFolder/"directory.git";
 			TestSubject.CreateDir(dirName);
 			var readMissingFile = _PickFileReader(fileFormat, dirName);
-			readMissingFile.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
+			readMissingFile.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format(UserMessages.ReadErrorPathIsDirectory, dirName));
 		}
 
 		[Test]
