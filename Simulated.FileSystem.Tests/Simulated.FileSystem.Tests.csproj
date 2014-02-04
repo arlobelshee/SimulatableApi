@@ -59,8 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\CanReadAndWriteFileContentsAtomically.cs" />
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\LocateExistingStructures.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\FilesAndDirectoriesCanBeMoved.cs" />
-    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DirectoryAndFileOperations.cs" />
+    <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\CanCreateAndDestroyEntries.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\DiskTestBase.cs" />
     <Compile Include="FileSystemModification\CanReadAndWriteFileContents.cs" />
     <Compile Include="zzTestHelpers\FileSystemTestBase.cs" />
