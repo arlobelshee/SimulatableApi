@@ -53,12 +53,16 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
+			if(FileExists(path))
+				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
 			if (DirExists(path))
 				Directory.Delete(path.Absolute, true);
 		}
 
 		public void DeleteFile(FsPath path)
 		{
+			if(DirExists(path))
+				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedDirectoryAsFile, path));
 			File.Delete(path.Absolute);
 		}
 

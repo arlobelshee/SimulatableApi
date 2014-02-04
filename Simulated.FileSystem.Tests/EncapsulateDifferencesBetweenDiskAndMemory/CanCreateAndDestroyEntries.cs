@@ -91,22 +91,23 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void UsingDeleteDirectoryOnAFileShouldNoOp()
+		public void UsingDeleteDirectoryOnAFileShouldFail()
 		{
 			var newPath = BaseFolder/"sub.txt";
 			TestSubject.Overwrite(newPath, ArbitraryFileContents);
-			TestSubject.DeleteDir(newPath);
-			TestSubject.ShouldBeFile(newPath, ArbitraryFileContents);
+			Action delete = () => TestSubject.DeleteDir(newPath);
+			delete.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, newPath));
 		}
 
 		[Test]
-		public void UsingDeleteFileOnADirectoryShouldRefuseAccess()
+		public void UsingDeleteFileOnADirectoryShouldFail()
 		{
 			var dirName = BaseFolder/"sub";
 			TestSubject.CreateDir(dirName);
 			Action deleteFile = () => TestSubject.DeleteFile(dirName);
-			deleteFile.ShouldThrow<UnauthorizedAccessException>()
-				.WithMessage(string.Format("Access to the path '{0}' is denied.", dirName));
+			deleteFile.ShouldThrow<BadStorageRequest>()
+				.WithMessage(string.Format("Failed to delete the file '{0}' because it is a directory.", dirName));
 		}
 	}
 

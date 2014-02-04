@@ -76,8 +76,10 @@ namespace Simulated._Fs
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
-			if (storageKind != _StorageKind.Directory)
+			if (storageKind == _StorageKind.Missing)
 				return;
+			if (storageKind == _StorageKind.File)
+				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
 			var toDelete = _ItemsInScopeOfDirectory(path);
 			toDelete.Each(p => _data.Remove(p.Key));
 		}
@@ -89,7 +91,7 @@ namespace Simulated._Fs
 			if (storageKind == _StorageKind.Missing)
 				return;
 			if (storageKind == _StorageKind.Directory)
-				throw new UnauthorizedAccessException(string.Format("Access to the path '{0}' is denied.", path.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedDirectoryAsFile, path));
 			_data.Remove(path);
 		}
 
