@@ -33,21 +33,6 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Indicates whether two files represent the same path. They may come from different file systems and still be termed
-		///    equal.
-		/// </summary>
-		/// <param name="other"> A file instance to compare with this object. </param>
-		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
-		public bool Equals([CanBeNull] FsFile other)
-		{
-			if (ReferenceEquals(null, other))
-				return false;
-			if (ReferenceEquals(this, other))
-				return true;
-			return Equals(other._path, _path);
-		}
-
-		/// <summary>
 		///    Gets the folder that contains this file.
 		/// </summary>
 		[NotNull]
@@ -109,9 +94,6 @@ namespace Simulated._Fs
 		/// <param name="newContents"> The new contents for the file </param>
 		public void Overwrite([NotNull] string newContents)
 		{
-			var parent = ContainingFolder;
-			if (!parent.Exists)
-				parent.EnsureExists();
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -122,9 +104,6 @@ namespace Simulated._Fs
 		/// <param name="newContents"> The new contents for the file </param>
 		public void OverwriteBinary([NotNull] byte[] newContents)
 		{
-			var parent = ContainingFolder;
-			if (!parent.Exists)
-				parent.EnsureExists();
 			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
@@ -157,6 +136,21 @@ namespace Simulated._Fs
 		public byte[] ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
+		}
+
+		/// <summary>
+		///    Indicates whether two files represent the same path. They may come from different file systems and still be termed
+		///    equal.
+		/// </summary>
+		/// <param name="other"> A file instance to compare with this object. </param>
+		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
+		public bool Equals([CanBeNull] FsFile other)
+		{
+			if (ReferenceEquals(null, other))
+				return false;
+			if (ReferenceEquals(this, other))
+				return true;
+			return Equals(other._path, _path);
 		}
 
 		/// <summary>

@@ -57,7 +57,7 @@ namespace Simulated._Fs
 		}
 
 		/// <summary>
-		///    Gets a drectory instance that represents a sub-directory of this directory.
+		///    Gets a directory instance that represents a sub-directory of this directory.
 		/// </summary>
 		/// <param name="subdirName"> Name of the subdir. </param>
 		/// <returns> the subdir as a directory object </returns>
@@ -73,8 +73,6 @@ namespace Simulated._Fs
 		/// </summary>
 		public void EnsureExists()
 		{
-			if (Exists)
-				return;
 			_allFiles._Disk.CreateDir(_path);
 		}
 
@@ -84,8 +82,6 @@ namespace Simulated._Fs
 		/// </summary>
 		public void EnsureDoesNotExist()
 		{
-			if (!Exists)
-				return;
 			_allFiles._Disk.DeleteDir(_path);
 		}
 

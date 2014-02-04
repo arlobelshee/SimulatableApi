@@ -12,14 +12,6 @@ namespace Simulated.Tests.FileSystemNavigation
 	public class CanNavigateRelativeToAFileOrDirectory : FileSystemTestBase
 	{
 		[Test]
-		public void CanGetTheParentOfADirectory()
-		{
-			TestSubject.Directory(@"C:\Base\Second")
-				.Parent.Path.Should()
-				.Be(new FsPath(@"C:\Base"));
-		}
-
-		[Test]
 		public void CanGetAFileWithinADirectory()
 		{
 			BaseFolder.File(ArbitraryFileName)
@@ -40,6 +32,14 @@ namespace Simulated.Tests.FileSystemNavigation
 		{
 			BaseFolder.File(ArbitraryFileName)
 				.ContainingFolder.Should()
+				.Be(BaseFolder);
+		}
+
+		[Test]
+		public void CanGetTheParentOfADirectory()
+		{
+			BaseFolder.Dir(ArbitraryFileName)
+				.Parent.Should()
 				.Be(BaseFolder);
 		}
 	}

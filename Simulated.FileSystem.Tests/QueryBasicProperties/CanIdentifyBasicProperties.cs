@@ -39,7 +39,7 @@ namespace Simulated.Tests.QueryBasicProperties
 		[Test]
 		public void FilesKnowWhetherTheyExist()
 		{
-			var testSubject = BaseFolder.File("something.txt");
+			var testSubject = BaseFolder.File(ArbitraryFileName);
 			testSubject.Exists.Should()
 				.BeFalse();
 			testSubject.Overwrite("anything");
