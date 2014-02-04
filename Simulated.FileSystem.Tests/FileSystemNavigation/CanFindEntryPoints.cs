@@ -14,43 +14,25 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void TempFolderShouldHaveTheCorrectPath()
 		{
-			_testSubject.TempDirectory.Path.Should()
+			TestSubject.TempDirectory.Path.Should()
 				.Be(FsPath.TempFolder);
 		}
 
 		[Test]
 		public void TempFolderShouldInitiallyExist()
 		{
-			_testSubject.TempDirectory.Exists.Should()
+			TestSubject.TempDirectory.Exists.Should()
 				.BeTrue();
 		}
 
 		[Test]
 		public void ShouldBeAbleToMakeReferenceToAbsolutePath()
 		{
-			_testSubject.Directory(ArbitraryMissingFolder)
+			TestSubject.Directory(ArbitraryMissingFolder)
 				.Path.Absolute.Should()
 				.Be(ArbitraryMissingFolder);
 		}
 
 		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
-	}
-
-	[TestFixture]
-	public class CanFindEntryPointsMemoryFs : CanFindEntryPoints
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Simulated();
-		}
-	}
-
-	[TestFixture]
-	public class CanFindEntryPointsRealFs : CanFindEntryPoints
-	{
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Real();
-		}
 	}
 }

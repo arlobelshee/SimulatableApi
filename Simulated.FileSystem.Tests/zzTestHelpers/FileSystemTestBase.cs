@@ -13,22 +13,17 @@ namespace Simulated.Tests.zzTestHelpers
 	public abstract class FileSystemTestBase
 	{
 		protected const string ArbitraryFileName = "something.txt";
-		protected const string ArbitraryContents = "Arbitrary contents.";
-		protected const string ArbitraryDirName = "ArbitraryDirectory";
-		[NotNull] protected FileSystem _testSubject;
-		[NotNull] protected FsDirectory _runRootFolder;
+		[NotNull] protected FileSystem TestSubject;
+		[NotNull] protected FsDirectory BaseFolder;
 
 		protected virtual void FinishSetup() {}
 		protected virtual void BeginTeardown() {}
 
-		[NotNull]
-		protected abstract FileSystem MakeTestSubject();
-
 		[SetUp]
 		public void Setup()
 		{
-			_testSubject = MakeTestSubject();
-			_runRootFolder = _testSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
+			TestSubject = FileSystem.Simulated();
+			BaseFolder = TestSubject.TempDirectory.Dir("CreatedByTestRun-" + Guid.NewGuid());
 			FinishSetup();
 		}
 
@@ -36,7 +31,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Teardown()
 		{
 			BeginTeardown();
-			_runRootFolder.EnsureDoesNotExist();
+			BaseFolder.EnsureDoesNotExist();
 		}
 	}
 }

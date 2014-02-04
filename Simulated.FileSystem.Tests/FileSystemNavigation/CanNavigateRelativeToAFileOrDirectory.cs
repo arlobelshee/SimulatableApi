@@ -14,7 +14,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void CanGetTheParentOfADirectory()
 		{
-			_testSubject.Directory(@"C:\Base\Second")
+			TestSubject.Directory(@"C:\Base\Second")
 				.Parent.Path.Should()
 				.Be(new FsPath(@"C:\Base"));
 		}
@@ -22,30 +22,25 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void CanGetAFileWithinADirectory()
 		{
-			_runRootFolder.File(ArbitraryFileName)
+			BaseFolder.File(ArbitraryFileName)
 				.FullPath.Should()
-				.Be(_runRootFolder.Path/ArbitraryFileName);
+				.Be(BaseFolder.Path/ArbitraryFileName);
 		}
 
 		[Test]
 		public void CanGetASubDirectory()
 		{
-			_runRootFolder.Dir(ArbitraryFileName)
+			BaseFolder.Dir(ArbitraryFileName)
 				.Path.Should()
-				.Be(_runRootFolder.Path/ArbitraryFileName);
+				.Be(BaseFolder.Path/ArbitraryFileName);
 		}
 
 		[Test]
 		public void AFileKnowsWhereItIs()
 		{
-			_runRootFolder.File(ArbitraryFileName)
+			BaseFolder.File(ArbitraryFileName)
 				.ContainingFolder.Should()
-				.Be(_runRootFolder);
-		}
-
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Simulated();
+				.Be(BaseFolder);
 		}
 	}
 }

@@ -16,7 +16,7 @@ namespace Simulated.Tests.FileSystemModification
 		public void AllFileObjectsWithTheSamePathShouldReferToSameStorage()
 		{
 			_testFile.Overwrite(OriginalContents);
-			_testSubject.File(_testFile.FullPath)
+			TestSubject.File(_testFile.FullPath)
 				.Overwrite(NewContents);
 			_testFile.ShouldContain(NewContents);
 		}
@@ -27,10 +27,10 @@ namespace Simulated.Tests.FileSystemModification
 
 		protected override void FinishSetup()
 		{
-			_testFile = _runRootFolder.File("CreatedByTest.txt");
+			_testFile = BaseFolder.File("CreatedByTest.txt");
 		}
 
-		protected override FileSystem MakeTestSubject()
+		protected virtual FileSystem MakeTestSubject()
 		{
 			return FileSystem.Simulated();
 		}

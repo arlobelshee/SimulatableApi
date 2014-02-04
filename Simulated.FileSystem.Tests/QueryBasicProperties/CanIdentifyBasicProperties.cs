@@ -18,7 +18,7 @@ namespace Simulated.Tests.QueryBasicProperties
 			const string baseName = "ArbitraryFile";
 			const string extension = ".txt";
 
-			var f = _runRootFolder.File(fileName);
+			var f = BaseFolder.File(fileName);
 			f.FileName.Should()
 				.Be(fileName);
 			f.Extension.Should()
@@ -30,25 +30,21 @@ namespace Simulated.Tests.QueryBasicProperties
 		[Test]
 		public void DirectoriesKnowWhetherTheyExist()
 		{
-			_runRootFolder.Exists.Should()
+			BaseFolder.Exists.Should()
 				.BeFalse();
-			_runRootFolder.Parent.Exists.Should()
+			BaseFolder.Parent.Exists.Should()
 				.BeTrue();
 		}
 
 		[Test]
 		public void FilesKnowWhetherTheyExist()
 		{
-			var testSubject = _runRootFolder.File("something.txt");
+			var testSubject = BaseFolder.File("something.txt");
 			testSubject.Exists.Should()
 				.BeFalse();
 			testSubject.Overwrite("anything");
 			testSubject.Exists.Should()
 				.BeTrue();
-		}
-		protected override FileSystem MakeTestSubject()
-		{
-			return FileSystem.Simulated();
 		}
 	}
 }

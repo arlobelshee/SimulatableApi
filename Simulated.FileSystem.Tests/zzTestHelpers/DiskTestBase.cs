@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated._Fs;
 
-namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
+namespace Simulated.Tests.zzTestHelpers
 {
 	public abstract class DiskTestBase
 	{
