@@ -14,6 +14,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    Indicates that marked element should be localized or not.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class LocalizationRequiredAttribute : Attribute
 	{
 		/// <summary>
@@ -60,6 +61,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    The format string should be in <see cref="string.Format(IFormatProvider,string,object[])" /> -like form
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class StringFormatMethodAttribute : Attribute
 	{
 		private readonly string myFormatParameterName;
@@ -88,6 +90,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    For example, <see cref="ArgumentNullException" /> has such parameter.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class InvokerParameterNameAttribute : Attribute {}
 
 	/// <summary>
@@ -97,6 +100,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	/// </summary>
 	/// <seealso cref="AssertionConditionAttribute" />
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class AssertionMethodAttribute : Attribute {}
 
 	/// <summary>
@@ -106,6 +110,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	/// </summary>
 	/// <seealso cref="AssertionConditionType" />
 	[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class AssertionConditionAttribute : Attribute
 	{
 		private readonly AssertionConditionType myConditionType;
@@ -160,6 +165,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    For example, it could unconditionally throw exception
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class TerminatesProgramAttribute : Attribute {}
 
 	/// <summary>
@@ -168,6 +174,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Delegate | AttributeTargets.Field,
 		AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class CanBeNullAttribute : Attribute {}
 
 	/// <summary>
@@ -175,6 +182,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Delegate | AttributeTargets.Field,
 		AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class NotNullAttribute : Attribute {}
 
 	/// <summary>
@@ -182,6 +190,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    There is only exception to compare with <c>null</c>, it is permitted
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class CannotApplyEqualityOperatorAttribute : Attribute {}
 
 	/// <summary>
@@ -201,6 +210,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	/// </example>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
 	[BaseTypeRequired(typeof (Attribute))]
+	[PublicApi]
 	public sealed class BaseTypeRequiredAttribute : Attribute
 	{
 		private readonly Type[] myBaseTypes;
@@ -228,6 +238,7 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 	///    so this symbol will not be marked as unused (as well as by other usage inspections)
 	/// </summary>
 	[AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+	[PublicApi]
 	public sealed class UsedImplicitlyAttribute : Attribute
 	{
 		[UsedImplicitly]
@@ -255,6 +266,10 @@ namespace JetBrains.Annotations // ReSharper restore CheckNamespace
 		[UsedImplicitly]
 		public ImplicitUseTargetFlags TargetFlags { get; private set; }
 	}
+
+	[MeansImplicitUse(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Itself)]
+	[PublicApi]
+	public sealed class PublicApiAttribute : Attribute { }
 
 	/// <summary>
 	///    Should be used on attributes and causes ReSharper to not mark symbols marked with such attributes as unused (as well

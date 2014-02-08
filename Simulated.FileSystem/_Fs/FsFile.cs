@@ -17,6 +17,7 @@ namespace Simulated._Fs
 	///       cref="FileSystem" />
 	///    . If so, they will share storage. Any change made in one will be immediately visible in the all others.
 	/// </summary>
+	[PublicApi]
 	public class FsFile : IEquatable<FsFile>
 	{
 		[NotNull] private readonly FileSystem _allFiles;
@@ -35,6 +36,7 @@ namespace Simulated._Fs
 		/// <summary>
 		///    Gets the folder that contains this file.
 		/// </summary>
+		[PublicApi]
 		[NotNull]
 		public FsDirectory ContainingFolder
 		{
@@ -45,6 +47,7 @@ namespace Simulated._Fs
 		///    Gets a value indicating whether this <see cref="FsFile" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
+		[PublicApi]
 		public bool Exists
 		{
 			get { return _allFiles._Disk.FileExists(_path); }
@@ -55,6 +58,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <value> The name of the file. </value>
 		[NotNull]
+		[PublicApi]
 		public string FileName
 		{
 			get { return Path.GetFileName(_path.Absolute); }
@@ -64,6 +68,7 @@ namespace Simulated._Fs
 		///    Gets the base name of  the file. For E:\example\foo.txt, this would return "foo".
 		/// </summary>
 		[NotNull]
+		[PublicApi]
 		public string FileBaseName
 		{
 			get { return Path.GetFileNameWithoutExtension(_path.Absolute); }
@@ -73,6 +78,7 @@ namespace Simulated._Fs
 		///    Gets the file's extension. For E:\example\foo.txt, this would return ".txt".
 		/// </summary>
 		[NotNull]
+		[PublicApi]
 		public string Extension
 		{
 			get { return Path.GetExtension(_path.Absolute); }
@@ -82,6 +88,7 @@ namespace Simulated._Fs
 		///    Gets the full path to this file.
 		/// </summary>
 		[NotNull]
+		[PublicApi]
 		public FsPath FullPath
 		{
 			get { return _path; }
@@ -92,6 +99,7 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
+		[PublicApi]
 		public void Overwrite([NotNull] string newContents)
 		{
 			_allFiles._Disk.Overwrite(_path, newContents);
@@ -102,6 +110,7 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
+		[PublicApi]
 		public void OverwriteBinary([NotNull] byte[] newContents)
 		{
 			_allFiles._Disk.Overwrite(_path, newContents);
@@ -117,6 +126,7 @@ namespace Simulated._Fs
 		///    the file system.
 		/// </exception>
 		[NotNull]
+		[PublicApi]
 		public string ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
@@ -132,7 +142,8 @@ namespace Simulated._Fs
 		///    the file system.
 		/// </exception>
 		[NotNull]
-// ReSharper disable once ReturnTypeCanBeEnumerable.Global
+		[PublicApi]
+		// ReSharper disable once ReturnTypeCanBeEnumerable.Global
 		public byte[] ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
@@ -144,6 +155,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="other"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
+		[PublicApi]
 		public bool Equals([CanBeNull] FsFile other)
 		{
 			if (ReferenceEquals(null, other))
@@ -157,6 +169,7 @@ namespace Simulated._Fs
 		///    Returns a <see cref="System.String" /> that represents this instance.
 		/// </summary>
 		/// <returns> A <see cref="System.String" /> that represents this instance. </returns>
+		[PublicApi]
 		public override string ToString()
 		{
 			return string.Format("File({0})", _path);
@@ -168,6 +181,7 @@ namespace Simulated._Fs
 		/// </summary>
 		/// <param name="obj"> A file instance to compare with this object. </param>
 		/// <returns> true if the two objects have the same path; otherwise, false. </returns>
+		[PublicApi]
 		public override bool Equals([CanBeNull] object obj)
 		{
 			return Equals(obj as FsFile);
@@ -177,6 +191,7 @@ namespace Simulated._Fs
 		///    Returns a hash code for this instance.
 		/// </summary>
 		/// <returns> A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. </returns>
+		[PublicApi]
 		public override int GetHashCode()
 		{
 			return _path.GetHashCode();
@@ -188,6 +203,7 @@ namespace Simulated._Fs
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
 		/// <returns> The result of the operator. </returns>
+		[PublicApi]
 		public static bool operator ==(FsFile left, FsFile right)
 		{
 			return Equals(left, right);
@@ -199,6 +215,7 @@ namespace Simulated._Fs
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
 		/// <returns> The result of the operator. </returns>
+		[PublicApi]
 		public static bool operator !=(FsFile left, FsFile right)
 		{
 			return !Equals(left, right);

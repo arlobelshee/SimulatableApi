@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -17,6 +18,7 @@ namespace Simulated
 	///    The path is agnostic to a file system. You could ask a file on one file system for its path, then use that path to
 	///    create a file on another file system.
 	/// </summary>
+	[PublicApi]
 	public class FsPath : IEquatable<FsPath>
 	{
 		[NotNull] private readonly string _absolutePath;
@@ -30,34 +32,19 @@ namespace Simulated
 		public FsPath([NotNull] string absolutePath)
 		{
 			if (string.IsNullOrEmpty(absolutePath))
-				throw new ArgumentNullException("absolutePath", "A path cannot be null or empty.");
+				throw new ArgumentNullException("absolutePath", UserMessages.ErrorPathCannotBeNullOrEmpty);
 			if (!absolutePath.Substring(1, 2)
 				.Equals(":\\"))
-				throw new ArgumentException(string.Format("The path must be absolute. '{0}' is not an absolute path.", absolutePath), "absolutePath");
+				throw new ArgumentException(string.Format(UserMessages.ErrorPathMustBeAbsolute, absolutePath), "absolutePath");
 			_absolutePath = absolutePath;
 			if (absolutePath.Length > 3)
 				_absolutePath = absolutePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 		}
 
 		/// <summary>
-		///    Indicates whether the current object represents the same path as another object.
-		/// </summary>
-		/// <param name="other">An object to compare with this object.</param>
-		/// <returns>
-		///    true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
-		/// </returns>
-		public bool Equals(FsPath other)
-		{
-			if (ReferenceEquals(null, other))
-				return false;
-			if (ReferenceEquals(this, other))
-				return true;
-			return Equals(other._absolutePath, _absolutePath);
-		}
-
-		/// <summary>
 		///    Gets the path for the temp folder.
 		/// </summary>
+		[PublicApi]
 		[NotNull]
 		public static FsPath TempFolder
 		{
@@ -67,6 +54,7 @@ namespace Simulated
 		/// <summary>
 		///    Gets a string containing the absolute path that this object represents.
 		/// </summary>
+		[PublicApi]
 		[NotNull]
 		public string Absolute
 		{
@@ -77,6 +65,7 @@ namespace Simulated
 		///    Gets the parent directory for this path.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">Thrown when you ask for the parent of a drive root.</exception>
+		[PublicApi]
 		[NotNull]
 		public FsPath Parent
 		{
@@ -95,6 +84,7 @@ namespace Simulated
 		/// <value>
 		///    <c>true</c> if this instance is a drive root; otherwise, <c>false</c>.
 		/// </value>
+		[PublicApi]
 		public bool IsRoot
 		{
 			get { return Path.GetPathRoot(_absolutePath) == _absolutePath; }
@@ -108,13 +98,15 @@ namespace Simulated
 		/// <returns>
 		///    An absolute path.
 		/// </returns>
+		[PublicApi]
 		[NotNull]
 		public static FsPath operator /([NotNull] FsPath self, [NotNull] string nextStep)
 		{
 			return new FsPath(Path.Combine(self._absolutePath, nextStep));
 		}
 
-		public bool IsAncestorOf(FsPath possibleDescendent, bool descendentIsDirectory)
+		[PublicApi]
+		public bool IsAncestorOf([NotNull] FsPath possibleDescendent, bool descendentIsDirectory)
 		{
 			var ancestorPath = _AllDirectoryNamesInOrder(true);
 			var descendentPath = possibleDescendent._AllDirectoryNamesInOrder(descendentIsDirectory);
@@ -122,13 +114,9 @@ namespace Simulated
 				.All(b => b);
 		}
 
-		private string[] _AllDirectoryNamesInOrder(bool descendentIsDirectory)
-		{
-			var deepestDirectory = descendentIsDirectory ? _absolutePath : Path.GetDirectoryName(_absolutePath);
-			return deepestDirectory.Split(new[] {Path.DirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
-		}
-
-		public FsPath ReplaceAncestor(FsPath currentAncestor, FsPath newAncestor, bool descendentIsDirectory)
+		[PublicApi]
+		[NotNull]
+		public FsPath ReplaceAncestor([NotNull] FsPath currentAncestor, [NotNull] FsPath newAncestor, bool descendentIsDirectory)
 		{
 			var myPath = _AllDirectoryNamesInOrder(descendentIsDirectory);
 			var rootElementsToTrim = currentAncestor._AllDirectoryNamesInOrder(true)
@@ -141,15 +129,12 @@ namespace Simulated
 			return newAncestor/Path.Combine(myUniquePathElements.ToArray());
 		}
 
-		/// <summary>
-		///    Returns a <see cref="System.String" /> that represents this instance.
-		/// </summary>
-		/// <returns>
-		///    A <see cref="System.String" /> that represents this instance.
-		/// </returns>
-		public override string ToString()
+		[NotNull]
+		private string[] _AllDirectoryNamesInOrder(bool descendentIsDirectory)
 		{
-			return _absolutePath;
+			var deepestDirectory = descendentIsDirectory ? _absolutePath : Path.GetDirectoryName(_absolutePath);
+			Debug.Assert(deepestDirectory != null, "deepestDirectory != null");
+			return deepestDirectory.Split(new[] {Path.DirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		/// <summary>
@@ -159,7 +144,37 @@ namespace Simulated
 		/// <returns>
 		///    true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
 		/// </returns>
-		public override bool Equals(object obj)
+		[PublicApi]
+		public bool Equals([CanBeNull] FsPath other)
+		{
+			if (ReferenceEquals(null, other))
+				return false;
+			if (ReferenceEquals(this, other))
+				return true;
+			return Equals(other._absolutePath, _absolutePath);
+		}
+
+		/// <summary>
+		///    Returns a <see cref="System.String" /> that represents this instance.
+		/// </summary>
+		/// <returns>
+		///    A <see cref="System.String" /> that represents this instance.
+		/// </returns>
+		[PublicApi]
+		public override string ToString()
+		{
+			return _absolutePath;
+		}
+
+		/// <summary>
+		///    Indicates whether the current object represents the same path as another object.
+		/// </summary>
+		/// <param name="obj">An object to compare with this object.</param>
+		/// <returns>
+		///    true if the current object is equal to the <paramref name="obj" /> parameter; otherwise, false.
+		/// </returns>
+		[PublicApi]
+		public override bool Equals([CanBeNull] object obj)
 		{
 			return Equals(obj as FsPath);
 		}
@@ -170,17 +185,19 @@ namespace Simulated
 		/// <returns>
 		///    A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
 		/// </returns>
+		[PublicApi]
 		public override int GetHashCode()
 		{
 			return _absolutePath.GetHashCode();
 		}
 
 		/// <summary>
-		///    Implements the operator ==. It is the same as <see cref="Equals" /> .
+		///    Implements the operator ==. It is the same as Equals /> .
 		/// </summary>
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
 		/// <returns> The result of the operator. </returns>
+		[PublicApi]
 		public static bool operator ==(FsPath left, FsPath right)
 		{
 			return Equals(left, right);
@@ -192,6 +209,7 @@ namespace Simulated
 		/// <param name="left"> The left. </param>
 		/// <param name="right"> The right. </param>
 		/// <returns> The result of the operator. </returns>
+		[PublicApi]
 		public static bool operator !=(FsPath left, FsPath right)
 		{
 			return !Equals(left, right);

@@ -16,6 +16,7 @@ namespace Simulated
 	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved.
 	///    Each FileSystem instance is its own view of the storage.
 	/// </summary>
+	[PublicApi]
 	public class FileSystem
 	{
 		private FileSystem([NotNull] _IFsDisk disk)
@@ -31,6 +32,7 @@ namespace Simulated
 		///    Gets the temp directory.
 		/// </summary>
 		[NotNull]
+		[PublicApi]
 		public FsDirectory TempDirectory
 		{
 			get { return Directory(Path.GetTempPath()); }
@@ -41,6 +43,7 @@ namespace Simulated
 		/// </summary>
 		/// <returns>an on-disk file system</returns>
 		[NotNull]
+		[PublicApi]
 		public static FileSystem Real()
 		{
 			return new FileSystem(new _DiskReal());
@@ -51,6 +54,7 @@ namespace Simulated
 		/// </summary>
 		/// <returns>an in-memory file system</returns>
 		[NotNull]
+		[PublicApi]
 		public static FileSystem Simulated()
 		{
 			return new FileSystem(new _DiskSimulated());
@@ -66,6 +70,7 @@ namespace Simulated
 		/// <exception cref="ArgumentNullException">if the path is null or empty</exception>
 		/// <returns>a non-null directory instance</returns>
 		[NotNull]
+		[PublicApi]
 		public FsDirectory Directory([NotNull] string absolutePath)
 		{
 			return Directory(new FsPath(absolutePath));
@@ -80,6 +85,7 @@ namespace Simulated
 		/// <exception cref="ArgumentNullException">if the path is null</exception>
 		/// <returns>a non-null directory instance</returns>
 		[NotNull]
+		[PublicApi]
 		public FsDirectory Directory([NotNull] FsPath path)
 		{
 			return new FsDirectory(this, path);
@@ -95,6 +101,7 @@ namespace Simulated
 		/// <exception cref="ArgumentNullException">if the path is null or empty</exception>
 		/// <returns>a non-null file instance</returns>
 		[NotNull]
+		[PublicApi]
 		public FsFile File([NotNull] string absoluteFilePath)
 		{
 			return File(new FsPath(absoluteFilePath));
@@ -109,6 +116,7 @@ namespace Simulated
 		/// <exception cref="ArgumentNullException">if the path is null</exception>
 		/// <returns>a non-null file instance</returns>
 		[NotNull]
+		[PublicApi]
 		public FsFile File([NotNull] FsPath fileName)
 		{
 			return new FsFile(this, fileName);
