@@ -60,6 +60,16 @@ namespace Simulated
 			get { return new FsPath(TempFolderRoot.Value, string.Empty); }
 		}
 
+		[PublicApi]
+		[NotNull]
+		public static FsPath PrimaryDrive
+		{
+			get
+			{
+				return new FsPath(PrimaryDriveRoot.Value, string.Empty);
+			}
+		}
+
 		/// <summary>
 		///    Gets a string containing the absolute path that this object represents.
 		/// </summary>

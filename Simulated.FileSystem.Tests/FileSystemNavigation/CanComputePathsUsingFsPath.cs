@@ -30,7 +30,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void PathsToDriveRootsShouldAlwaysEndInASlash()
 		{
-			new FsPath(@"C:\")._Absolute.Should()
+			FsPath.PrimaryDrive._Absolute.Should()
 				.Be(@"C:\");
 		}
 
