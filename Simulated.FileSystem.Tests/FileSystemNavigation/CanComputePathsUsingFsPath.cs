@@ -17,21 +17,14 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void ShouldRequirePathToBeNonEmpty()
 		{
-			_Throws<ArgumentNullException>(() => new FsPath(string.Empty), "Path must include a non-null root.\r\nParameter name: absolutePath");
-		}
-
-		[Test]
-		public void ShouldRequirePathToBeAbsolute()
-		{
-			_Throws<ArgumentException>(() => new FsPath(@"relative\path"),
-				"The path must be absolute. 'relative\\path' is not an absolute path.\r\nParameter name: absolutePath");
+			_Throws<ArgumentNullException>(() => new FsPath(null, string.Empty), "Path must include a non-null root.\r\nParameter name: root");
 		}
 
 		[Test]
 		public void PathsShouldBeTheSameWhetherOrNotTheyHaveATrailingSlash()
 		{
-			new FsPath(@"C:\Path\").Should()
-				.Be(new FsPath(@"C:\Path"));
+			(FsPath.TempFolder/@"thing\").Should()
+				.Be(FsPath.TempFolder/"thing");
 		}
 
 		[Test]
@@ -80,8 +73,8 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void ShouldBeAbleToFindParentFolder()
 		{
-			new FsPath(@"C:\something.txt").Parent.Should()
-				.Be(new FsPath(@"C:\"));
+			(FsPath.TempFolder/"something.txt").Parent.Should()
+				.Be(FsPath.TempFolder);
 		}
 
 		[Test]
@@ -91,41 +84,41 @@ namespace Simulated.Tests.FileSystemNavigation
 		}
 
 		[Test]
-		[TestCase(@"C:\foo", @"C:\foo\bar", true)]
-		[TestCase(@"C:\foo", @"C:\foo\bar", false)]
-		[TestCase(@"C:\foo", @"C:\foo\bar.txt", false)]
-		[TestCase(@"C:\foo", @"C:\foo", true)]
-		[TestCase(@"C:\foo", @"C:\foo\bar\baz", true)]
-		[TestCase(@"C:\foo", @"C:\foo\bar\baz.txt", false)]
-		[TestCase(@"C:\", @"C:\foo\bar\baz.txt", false)]
+		[TestCase(@"foo", @"foo\bar", true)]
+		[TestCase(@"foo", @"foo\bar", false)]
+		[TestCase(@"foo", @"foo\bar.txt", false)]
+		[TestCase(@"foo", @"foo", true)]
+		[TestCase(@"foo", @"foo\bar\baz", true)]
+		[TestCase(@"foo", @"foo\bar\baz.txt", false)]
+		[TestCase(@"", @"foo\bar\baz.txt", false)]
 		public void ShouldBeAncestors([NotNull] string ancestor, [NotNull] string descendent, bool descendentIsDirectory)
 		{
-			new FsPath(ancestor).IsAncestorOf(new FsPath(descendent), descendentIsDirectory)
+			(FsPath.TempFolder/ancestor).IsAncestorOf(FsPath.TempFolder/descendent, descendentIsDirectory)
 				.Should()
 				.BeTrue();
 		}
 
 		[Test]
-		[TestCase(@"C:\foo\bar", @"C:\foo\bar.txt", false)]
-		[TestCase(@"C:\foo\foo", @"C:\foo\bar", true)]
-		[TestCase(@"C:\bar\foo", @"C:\bar", true)]
-		[TestCase(@"C:\foo", @"C:\foo", false)]
+		[TestCase(@"foo\bar", @"foo\bar.txt", false)]
+		[TestCase(@"foo\foo", @"foo\bar", true)]
+		[TestCase(@"bar\foo", @"bar", true)]
+		[TestCase(@"foo", @"foo", false)]
 		public void ShouldNotBeAncestors([NotNull] string ancestor, [NotNull] string nonDescendent, bool descendentIsDirectory)
 		{
-			new FsPath(ancestor).IsAncestorOf(new FsPath(nonDescendent), descendentIsDirectory)
+			(FsPath.TempFolder/ancestor).IsAncestorOf(FsPath.TempFolder/nonDescendent, descendentIsDirectory)
 				.Should()
 				.BeFalse();
 		}
 
 		[Test]
-		[TestCase(@"C:\a\b", @"C:\e", true)]
-		[TestCase(@"C:\a\b\c", @"C:\e\c", true)]
-		[TestCase(@"C:\a\b\c.txt", @"C:\e\c.txt", false)]
+		[TestCase(@"a\b", @"e", true)]
+		[TestCase(@"a\b\c", @"e\c", true)]
+		[TestCase(@"a\b\c.txt", @"e\c.txt", false)]
 		public void ReplacingValidAncestorsShouldSubstituteTheCommonPathElements([NotNull] string original, [NotNull] string expected, bool descendentIsDirectory)
 		{
-			new FsPath(original)._ReplaceAncestor(new FsPath(@"C:\a\b"), new FsPath(@"C:\e"), descendentIsDirectory)
+			(FsPath.TempFolder/original)._ReplaceAncestor(FsPath.TempFolder/@"a\b", FsPath.TempFolder/"e", descendentIsDirectory)
 				.Should()
-				.Be(new FsPath(expected));
+				.Be(FsPath.TempFolder/expected);
 		}
 
 		private static void _Throws<TException>([NotNull] Action code, [NotNull] string message) where TException : Exception

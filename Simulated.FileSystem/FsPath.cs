@@ -42,7 +42,7 @@ namespace Simulated
 				throw new ArgumentException(string.Format(UserMessages.ErrorPathMustBeAbsolute, absolutePath), "absolutePath");
 		}
 
-		private FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
+		public FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
 		{
 			if (root == null)
 				throw new ArgumentNullException("root", UserMessages.ErrorPathMustHaveRoot);
