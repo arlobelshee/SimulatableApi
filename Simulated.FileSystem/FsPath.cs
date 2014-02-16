@@ -27,21 +27,6 @@ namespace Simulated
 		[NotNull] private static readonly Lazy<_PathRoot> TempFolderRoot = new Lazy<_PathRoot>(() => new _PathRoot("Temp folder", Path.GetTempPath()));
 		[NotNull] private static readonly Lazy<_PathRoot> PrimaryDriveRoot = new Lazy<_PathRoot>(() => new _PathRoot("Primary drive", "C:"));
 
-		/// <summary>
-		///    Initializes a new instance of the <see cref="FsPath" /> class.
-		/// </summary>
-		/// <param name="absolutePath">The path. It must be absolute.</param>
-		/// <exception cref="ArgumentNullException">Throws when absolute path is null or empty.</exception>
-		/// <exception cref="ArgumentException">Throws when absolute path is a relative path.</exception>
-		public FsPath([NotNull] string absolutePath) : this(PrimaryDriveRoot.Value, string.IsNullOrEmpty(absolutePath) ? absolutePath : absolutePath.Substring(3))
-		{
-			if (string.IsNullOrEmpty(absolutePath))
-				throw new ArgumentNullException("absolutePath", UserMessages.ErrorPathMustHaveRoot);
-			if (!absolutePath.Substring(1, 2)
-				.Equals(":\\"))
-				throw new ArgumentException(string.Format(UserMessages.ErrorPathMustBeAbsolute, absolutePath), "absolutePath");
-		}
-
 		public FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
 		{
 			if (root == null)
