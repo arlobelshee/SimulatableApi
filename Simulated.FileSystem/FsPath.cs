@@ -25,7 +25,6 @@ namespace Simulated
 		[NotNull] private readonly _PathRoot _root;
 		[NotNull] private readonly string _relativePath;
 		[NotNull] private static readonly Lazy<_PathRoot> TempFolderRoot = new Lazy<_PathRoot>(() => new _PathRoot("Temp folder", Path.GetTempPath()));
-		[NotNull] private static readonly Lazy<_PathRoot> PrimaryDriveRoot = new Lazy<_PathRoot>(() => new _PathRoot("Primary drive", "C:"));
 
 		public FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
 		{
@@ -43,16 +42,6 @@ namespace Simulated
 		public static FsPath TempFolder
 		{
 			get { return new FsPath(TempFolderRoot.Value, string.Empty); }
-		}
-
-		[PublicApi]
-		[NotNull]
-		public static FsPath PrimaryDrive
-		{
-			get
-			{
-				return new FsPath(PrimaryDriveRoot.Value, string.Empty);
-			}
 		}
 
 		/// <summary>

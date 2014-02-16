@@ -28,13 +28,6 @@ namespace Simulated.Tests.FileSystemNavigation
 		}
 
 		[Test]
-		public void PathsToDriveRootsShouldAlwaysEndInASlash()
-		{
-			FsPath.PrimaryDrive._Absolute.Should()
-				.Be(@"C:\");
-		}
-
-		[Test]
 		public void ShouldBeAbleToAppendRelativeFolderToRoot()
 		{
 			(FsPath.TempFolder/"folder")._Absolute.Should()
