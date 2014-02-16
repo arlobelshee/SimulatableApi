@@ -63,7 +63,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				}
 			};
 			move.ShouldThrow<BadStorageRequest>()
-				.WithMessage(string.Format(expectedError, src.Absolute, dest.Absolute));
+				.WithMessage(string.Format(expectedError, src._Absolute, dest._Absolute));
 		}
 
 		private const string DestBlockingDir = "dest_blocking_dir";

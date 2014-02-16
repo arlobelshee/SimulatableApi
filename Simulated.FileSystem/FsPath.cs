@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using Simulated._Fs;
 
 namespace Simulated
 {
@@ -21,7 +22,10 @@ namespace Simulated
 	[PublicApi]
 	public class FsPath : IEquatable<FsPath>
 	{
-		[NotNull] private readonly string _absolutePath;
+		[NotNull] private readonly _PathRoot _root;
+		[NotNull] private readonly string _relativePath;
+		[NotNull] private static readonly Lazy<_PathRoot> TempFolderRoot = new Lazy<_PathRoot>(() => new _PathRoot("Temp folder", Path.GetTempPath()));
+		[NotNull] private static readonly Lazy<_PathRoot> PrimaryDriveRoot = new Lazy<_PathRoot>(() => new _PathRoot("Primary drive", "C:"));
 
 		/// <summary>
 		///    Initializes a new instance of the <see cref="FsPath" /> class.
@@ -29,16 +33,21 @@ namespace Simulated
 		/// <param name="absolutePath">The path. It must be absolute.</param>
 		/// <exception cref="ArgumentNullException">Throws when absolute path is null or empty.</exception>
 		/// <exception cref="ArgumentException">Throws when absolute path is a relative path.</exception>
-		public FsPath([NotNull] string absolutePath)
+		public FsPath([NotNull] string absolutePath) : this(PrimaryDriveRoot.Value, string.IsNullOrEmpty(absolutePath) ? absolutePath : absolutePath.Substring(3))
 		{
 			if (string.IsNullOrEmpty(absolutePath))
-				throw new ArgumentNullException("absolutePath", UserMessages.ErrorPathCannotBeNullOrEmpty);
+				throw new ArgumentNullException("absolutePath", UserMessages.ErrorPathMustHaveRoot);
 			if (!absolutePath.Substring(1, 2)
 				.Equals(":\\"))
 				throw new ArgumentException(string.Format(UserMessages.ErrorPathMustBeAbsolute, absolutePath), "absolutePath");
-			_absolutePath = absolutePath;
-			if (absolutePath.Length > 3)
-				_absolutePath = absolutePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+		}
+
+		private FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
+		{
+			if (root == null)
+				throw new ArgumentNullException("root", UserMessages.ErrorPathMustHaveRoot);
+			_root = root;
+			_relativePath = (relativePath ?? string.Empty).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 		}
 
 		/// <summary>
@@ -48,46 +57,46 @@ namespace Simulated
 		[NotNull]
 		public static FsPath TempFolder
 		{
-			get { return new FsPath(Path.GetTempPath()); }
+			get { return new FsPath(TempFolderRoot.Value, string.Empty); }
 		}
 
 		/// <summary>
 		///    Gets a string containing the absolute path that this object represents.
 		/// </summary>
-		[PublicApi]
 		[NotNull]
-		public string Absolute
+		internal string _Absolute
 		{
-			get { return _absolutePath; }
+			get { return _root.ToInternalPathStringThatMightDiscloseInformation(_relativePath); }
 		}
 
 		/// <summary>
 		///    Gets the parent directory for this path.
 		/// </summary>
-		/// <exception cref="InvalidOperationException">Thrown when you ask for the parent of a drive root.</exception>
+		/// <exception cref="BadStorageRequest">Thrown when you ask for the parent of a root.</exception>
 		[PublicApi]
 		[NotNull]
 		public FsPath Parent
 		{
 			get
 			{
-				var parent = Path.GetDirectoryName(_absolutePath);
-				if (string.IsNullOrEmpty(parent))
-					throw new InvalidOperationException(string.Format("'{0}' is a drive root. It does not have a parent.", _absolutePath));
-				return new FsPath(parent);
+				if (string.IsNullOrEmpty(_relativePath))
+					throw new BadStorageRequest(string.Format(UserMessages.ErrorPathHasNoParent, ToString()));
+				var parent = Path.GetDirectoryName(_relativePath);
+				return new FsPath(_root, parent);
 			}
 		}
 
 		/// <summary>
-		///    Gets a value indicating whether this instance is a drive root.
+		///    Gets a value indicating whether this instance is a root. A root is any path for which there is no parent. For
+		///    example, the temp folder is a root because you are not allowed to ask for its parent.
 		/// </summary>
 		/// <value>
-		///    <c>true</c> if this instance is a drive root; otherwise, <c>false</c>.
+		///    <c>true</c> if this instance is a root; otherwise, <c>false</c>.
 		/// </value>
 		[PublicApi]
 		public bool IsRoot
 		{
-			get { return Path.GetPathRoot(_absolutePath) == _absolutePath; }
+			get { return string.IsNullOrEmpty(_relativePath); }
 		}
 
 		/// <summary>
@@ -102,7 +111,7 @@ namespace Simulated
 		[NotNull]
 		public static FsPath operator /([NotNull] FsPath self, [NotNull] string nextStep)
 		{
-			return new FsPath(Path.Combine(self._absolutePath, nextStep));
+			return new FsPath(self._root, Path.Combine(self._relativePath, nextStep));
 		}
 
 		[PublicApi]
@@ -114,9 +123,8 @@ namespace Simulated
 				.All(b => b);
 		}
 
-		[PublicApi]
 		[NotNull]
-		public FsPath ReplaceAncestor([NotNull] FsPath currentAncestor, [NotNull] FsPath newAncestor, bool descendentIsDirectory)
+		internal FsPath _ReplaceAncestor([NotNull] FsPath currentAncestor, [NotNull] FsPath newAncestor, bool descendentIsDirectory)
 		{
 			var myPath = _AllDirectoryNamesInOrder(descendentIsDirectory);
 			var rootElementsToTrim = currentAncestor._AllDirectoryNamesInOrder(true)
@@ -124,7 +132,7 @@ namespace Simulated
 			var myUniquePathElements = myPath.Skip(rootElementsToTrim);
 			if (!descendentIsDirectory)
 			{
-				myUniquePathElements = myUniquePathElements.Concat(new[] {Path.GetFileName(_absolutePath)});
+				myUniquePathElements = myUniquePathElements.Concat(new[] {Path.GetFileName(_relativePath)});
 			}
 			return newAncestor/Path.Combine(myUniquePathElements.ToArray());
 		}
@@ -132,7 +140,7 @@ namespace Simulated
 		[NotNull]
 		private string[] _AllDirectoryNamesInOrder(bool descendentIsDirectory)
 		{
-			var deepestDirectory = descendentIsDirectory ? _absolutePath : Path.GetDirectoryName(_absolutePath);
+			var deepestDirectory = descendentIsDirectory ? _relativePath : Path.GetDirectoryName(_relativePath);
 			Debug.Assert(deepestDirectory != null, "deepestDirectory != null");
 			return deepestDirectory.Split(new[] {Path.DirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
 		}
@@ -151,7 +159,7 @@ namespace Simulated
 				return false;
 			if (ReferenceEquals(this, other))
 				return true;
-			return Equals(other._absolutePath, _absolutePath);
+			return Equals(other._root, _root) && Equals(other._relativePath, _relativePath);
 		}
 
 		/// <summary>
@@ -163,7 +171,7 @@ namespace Simulated
 		[PublicApi]
 		public override string ToString()
 		{
-			return _absolutePath;
+			return _root.ToProgrammerVisibleString(_relativePath);
 		}
 
 		/// <summary>
@@ -188,7 +196,10 @@ namespace Simulated
 		[PublicApi]
 		public override int GetHashCode()
 		{
-			return _absolutePath.GetHashCode();
+			unchecked
+			{
+				return (_root.GetHashCode()*397) ^ _relativePath.GetHashCode();
+			}
 		}
 
 		/// <summary>

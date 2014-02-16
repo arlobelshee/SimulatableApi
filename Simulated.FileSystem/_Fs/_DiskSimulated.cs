@@ -100,12 +100,12 @@ namespace Simulated._Fs
 			var srcKind = _GetStorage(src)
 				.Kind;
 			if (srcKind == _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
 			if (srcKind == _StorageKind.Directory)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src._Absolute, dest._Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			CreateDir(dest.Parent);
 			_MoveItemImpl(src, dest);
 		}
@@ -115,14 +115,14 @@ namespace Simulated._Fs
 			var srcKind = _GetStorage(src)
 				.Kind;
 			if (srcKind == _StorageKind.File)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
 			if (srcKind == _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
-				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src.Absolute, dest.Absolute));
+				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
-			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key.ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
+			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key._ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));
 		}
 
 		[NotNull]
@@ -141,7 +141,7 @@ namespace Simulated._Fs
 			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
 			return _data.Where(
 				item =>
-					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key.Absolute)))
+					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key._Absolute)))
 				.Select(item => item.Key);
 		}
 

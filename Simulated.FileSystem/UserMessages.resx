@@ -122,10 +122,13 @@
 	<data name="DeleteErrorDeletedDirectoryAsFile" xml:space="preserve">
     <value>Failed to delete the file '{0}' because it is a directory.</value>
   </data>
-	<data name="ErrorPathCannotBeNullOrEmpty" xml:space="preserve">
-    <value>A path cannot be null or empty.</value>
-  </data>
 	<data name="ErrorPathMustBeAbsolute" xml:space="preserve">
     <value>The path must be absolute. '{0}' is not an absolute path.</value>
+  </data>
+	<data name="ErrorPathMustHaveRoot" xml:space="preserve">
+    <value>Path must include a non-null root.</value>
+  </data>
+	<data name="ErrorPathHasNoParent" xml:space="preserve">
+    <value>'{0}' is a root. It does not have a parent.</value>
   </data>
 </root>

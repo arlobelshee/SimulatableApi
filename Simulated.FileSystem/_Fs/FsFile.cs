@@ -61,7 +61,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public string FileName
 		{
-			get { return Path.GetFileName(_path.Absolute); }
+			get { return Path.GetFileName(_path._Absolute); }
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public string FileBaseName
 		{
-			get { return Path.GetFileNameWithoutExtension(_path.Absolute); }
+			get { return Path.GetFileNameWithoutExtension(_path._Absolute); }
 		}
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public string Extension
 		{
-			get { return Path.GetExtension(_path.Absolute); }
+			get { return Path.GetExtension(_path._Absolute); }
 		}
 
 		/// <summary>
