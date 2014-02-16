@@ -60,22 +60,6 @@ namespace Simulated
 		}
 
 		/// <summary>
-		///    Creates a directory instance for an absolute path on this file system.
-		///    The directory need not exist in the file system storage. Creating a directory object
-		///    will not create the directory.
-		///    The path argument must be a full, absolute path (including drive letter).
-		/// </summary>
-		/// <param name="absolutePath">The path this object should represent.</param>
-		/// <exception cref="ArgumentNullException">if the path is null or empty</exception>
-		/// <returns>a non-null directory instance</returns>
-		[NotNull]
-		[PublicApi]
-		public FsDirectory Directory([NotNull] string absolutePath)
-		{
-			return Directory(new FsPath(absolutePath));
-		}
-
-		/// <summary>
 		///    Creates a directory instance for a path on this file system.
 		///    The directory need not exist in the file system storage. Creating a directory object
 		///    will not create the directory.
@@ -88,22 +72,6 @@ namespace Simulated
 		public FsDirectory Directory([NotNull] FsPath path)
 		{
 			return new FsDirectory(this, path);
-		}
-
-		/// <summary>
-		///    Creates a file instance for a path on this file system.
-		///    The file need not exist in the file system storage. Creating a file object
-		///    will not create the file.
-		///    The path argument must be a full, absolute path (including drive letter).
-		/// </summary>
-		/// <param name="absoluteFilePath">The path this object should represent.</param>
-		/// <exception cref="ArgumentNullException">if the path is null or empty</exception>
-		/// <returns>a non-null file instance</returns>
-		[NotNull]
-		[PublicApi]
-		public FsFile File([NotNull] string absoluteFilePath)
-		{
-			return File(new FsPath(absoluteFilePath));
 		}
 
 		/// <summary>

@@ -39,15 +39,5 @@ namespace Simulated.Tests.FileSystemNavigation
 			TestSubject.TempDirectory.Exists.Should()
 				.BeTrue();
 		}
-
-		[Test]
-		public void ShouldBeAbleToMakeReferenceToAbsolutePath()
-		{
-			TestSubject.Directory(ArbitraryMissingFolder)
-				.Path._Absolute.Should()
-				.Be(ArbitraryMissingFolder);
-		}
-
-		private const string ArbitraryMissingFolder = @"C:\theroot\folder";
 	}
 }
