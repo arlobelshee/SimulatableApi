@@ -42,30 +42,30 @@ namespace Simulated.Tests.FileSystemNavigation
 		}
 
 		[Test]
-		public void ShouldBeAbleToAppendRelativeFolderToDriveRoot()
+		public void ShouldBeAbleToAppendRelativeFolderToRoot()
 		{
-			(new FsPath(@"C:\")/"folder").Should()
-				.Be(new FsPath(@"C:\folder"));
+			(FsPath.TempFolder/"folder")._Absolute.Should()
+				.Be(FsPath.TempFolder._Absolute + Path.DirectorySeparatorChar + "folder");
 		}
 
 		[Test]
 		public void ShouldBeAbleToAppendRelativeFolderToExistingPath()
 		{
-			(new FsPath(@"C:\something")/"folder").Should()
-				.Be(new FsPath(@"C:\something\folder"));
+			(FsPath.TempFolder/"folder"/"sub")._Absolute.Should()
+				.Be(FsPath.TempFolder._Absolute + Path.DirectorySeparatorChar + "folder" + Path.DirectorySeparatorChar + "sub");
 		}
 
 		[Test]
-		public void DriveRootsShouldBeKnownAsRoots()
+		public void AnyRootShouldBeKnownAsRoot()
 		{
-			new FsPath(@"C:\").IsRoot.Should()
+			FsPath.TempFolder.IsRoot.Should()
 				.BeTrue();
 		}
 
 		[Test]
 		public void NonRootPathsShouldBeKnownAsNotRoots()
 		{
-			new FsPath(@"C:\something.txt").IsRoot.Should()
+			(FsPath.TempFolder/"something.txt").IsRoot.Should()
 				.BeFalse();
 		}
 
@@ -73,7 +73,8 @@ namespace Simulated.Tests.FileSystemNavigation
 		public void TempFolderShouldBeSystemTempFolder()
 		{
 			FsPath.TempFolder._Absolute.Should()
-				.Be(Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+				.Be(Path.GetTempPath()
+					.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 		}
 
 		[Test]
@@ -86,7 +87,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void ShouldRejectAskingForParentOfRoot()
 		{
-			_Throws<BadStorageRequest>(() => { var foo = new FsPath(@"C:\").Parent; }, @"'{Primary drive}' is a root. It does not have a parent.");
+			_Throws<BadStorageRequest>(() => { var foo = FsPath.TempFolder.Parent; }, @"'{Temp folder}' is a root. It does not have a parent.");
 		}
 
 		[Test]
@@ -97,7 +98,7 @@ namespace Simulated.Tests.FileSystemNavigation
 		[TestCase(@"C:\foo", @"C:\foo\bar\baz", true)]
 		[TestCase(@"C:\foo", @"C:\foo\bar\baz.txt", false)]
 		[TestCase(@"C:\", @"C:\foo\bar\baz.txt", false)]
-		public void ShouldBeAncestors(string ancestor, string descendent, bool descendentIsDirectory)
+		public void ShouldBeAncestors([NotNull] string ancestor, [NotNull] string descendent, bool descendentIsDirectory)
 		{
 			new FsPath(ancestor).IsAncestorOf(new FsPath(descendent), descendentIsDirectory)
 				.Should()
@@ -120,14 +121,14 @@ namespace Simulated.Tests.FileSystemNavigation
 		[TestCase(@"C:\a\b", @"C:\e", true)]
 		[TestCase(@"C:\a\b\c", @"C:\e\c", true)]
 		[TestCase(@"C:\a\b\c.txt", @"C:\e\c.txt", false)]
-		public void ReplacingValidAncestorsShouldSubstituteTheCommonPathElements(string original, string expected, bool descendentIsDirectory)
+		public void ReplacingValidAncestorsShouldSubstituteTheCommonPathElements([NotNull] string original, [NotNull] string expected, bool descendentIsDirectory)
 		{
 			new FsPath(original)._ReplaceAncestor(new FsPath(@"C:\a\b"), new FsPath(@"C:\e"), descendentIsDirectory)
 				.Should()
 				.Be(new FsPath(expected));
 		}
 
-		private static void _Throws<TException>(Action code, string message) where TException : Exception
+		private static void _Throws<TException>([NotNull] Action code, [NotNull] string message) where TException : Exception
 		{
 			code.ShouldThrow<TException>()
 				.WithMessage(message);
