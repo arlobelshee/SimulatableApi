@@ -26,7 +26,7 @@ namespace Simulated
 		[NotNull] private readonly string _relativePath;
 		[NotNull] private static readonly Lazy<_PathRoot> TempFolderRoot = new Lazy<_PathRoot>(() => new _PathRoot("Temp folder", Path.GetTempPath()));
 
-		public FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
+		private FsPath([NotNull] _PathRoot root, [CanBeNull] string relativePath)
 		{
 			if (root == null)
 				throw new ArgumentNullException("root", UserMessages.ErrorPathMustHaveRoot);

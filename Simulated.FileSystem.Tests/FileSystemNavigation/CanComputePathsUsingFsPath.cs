@@ -15,12 +15,6 @@ namespace Simulated.Tests.FileSystemNavigation
 	public class CanComputePathsUsingFsPath
 	{
 		[Test]
-		public void ShouldRequirePathToBeNonEmpty()
-		{
-			_Throws<ArgumentNullException>(() => new FsPath(null, string.Empty), "Path must include a non-null root.\r\nParameter name: root");
-		}
-
-		[Test]
 		public void PathsShouldBeTheSameWhetherOrNotTheyHaveATrailingSlash()
 		{
 			(FsPath.TempFolder/@"thing\").Should()

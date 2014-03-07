@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	public class _PathRoot
+	internal class _PathRoot
 	{
 		private readonly string _logicalName;
 		private readonly string _absolutePath;
