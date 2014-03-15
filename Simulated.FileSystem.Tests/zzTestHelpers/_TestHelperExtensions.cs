@@ -3,6 +3,9 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
 using FluentAssertions;
 using JetBrains.Annotations;
 using Simulated._Fs;
@@ -21,8 +24,8 @@ namespace Simulated.Tests.zzTestHelpers
 		{
 			file.Exists.Should()
 				.BeTrue();
-			file.ReadAllText().Result
-				.Should()
+			file.ReadAllText()
+				.Result.Should()
 				.Be(contents);
 		}
 
@@ -61,8 +64,17 @@ namespace Simulated.Tests.zzTestHelpers
 				.Should()
 				.BeTrue();
 			disk.RawContents(file)
+				.CollectAllBytes()
 				.Should()
 				.Equal(contents);
+		}
+
+		[NotNull]
+		public static IEnumerable<byte> CollectAllBytes([NotNull] this IObservable<byte[]> rawContents)
+		{
+			var actual = rawContents.SelectMany(b => b)
+				.ToEnumerable();
+			return actual;
 		}
 
 		public static void ShouldNotExist([NotNull] this _IFsDisk disk, [NotNull] FsPath path)

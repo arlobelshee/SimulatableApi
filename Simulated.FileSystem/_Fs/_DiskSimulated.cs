@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -30,18 +31,33 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.File;
 		}
 
-		public Task<string> TextContents(FsPath path)
+		public async Task<string> TextContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-			return DefaultEncoding.GetString(storage.RawContents).AsTask();
+			return DefaultEncoding.GetString(storage.RawContents);
 		}
 
-		public byte[] RawContents(FsPath path)
+		public IObservable<byte[]> RawContents(FsPath path)
 		{
-			var storage = _GetStorage(path);
-			_ValidateStorage(path, storage);
-			return storage.RawContents;
+			return Observable.Create<byte[]>(obs =>
+			{
+				try
+				{
+					var storage = _GetStorage(path);
+					_ValidateStorage(path, storage);
+					obs.OnNext(storage.RawContents);
+				}
+				catch (Exception ex)
+				{
+					obs.OnError(ex);
+				}
+				finally
+				{
+					obs.OnCompleted();
+				}
+				return () => { };
+			});
 		}
 
 		public void CreateDir(FsPath path)

@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Reactive.Linq;
 using System.Text;
 using FluentAssertions;
 using JetBrains.Annotations;
@@ -74,7 +75,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var testFile = BaseFolder/"hello.txt";
 			TestSubject.Overwrite(testFile, UnicodeContents);
-			var asBytes = TestSubject.RawContents(testFile);
+			var asBytes = TestSubject.RawContents(testFile).CollectAllBytes();
 			asBytes.Should()
 				.Equal(Encoding.UTF8.GetBytes(UnicodeContents));
 		}
@@ -110,7 +111,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				case FileFormat.Text:
 					return () => TestSubject.TextContents(fileName).Wait();
 				case FileFormat.Binary:
-					return () => TestSubject.RawContents(fileName);
+					return () => TestSubject.RawContents(fileName).Wait();
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}

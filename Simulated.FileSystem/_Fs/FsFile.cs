@@ -145,7 +145,7 @@ namespace Simulated._Fs
 		[NotNull]
 		[PublicApi]
 		// ReSharper disable once ReturnTypeCanBeEnumerable.Global
-		public byte[] ReadAllBytes()
+		public IObservable<byte[]> ReadAllBytes()
 		{
 			return _allFiles._Disk.RawContents(_path);
 		}

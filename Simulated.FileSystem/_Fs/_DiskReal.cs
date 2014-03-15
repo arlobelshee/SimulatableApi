@@ -3,9 +3,11 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -32,10 +34,51 @@ namespace Simulated._Fs
 			}
 		}
 
-		public byte[] RawContents(FsPath path)
+		public IObservable<byte[]> RawContents(FsPath path)
 		{
-			_ValidatePathForReadingFile(path);
-			return File.ReadAllBytes(path._Absolute);
+			const int bufferSize = 1024 * 10;
+			return Observable.Create<byte[]>(obs =>
+			{
+				var isCancelled = false;
+				Action execution = async () =>
+				{
+					try
+					{
+						_ValidatePathForReadingFile(path);
+						using (var contents = File.OpenRead(path._Absolute))
+						{
+							var buffer = new byte[bufferSize];
+							int numRead;
+							while (0 != (numRead = await contents.ReadAsync(buffer, 0, buffer.Length)))
+							{
+								if (isCancelled)
+									return;
+								if (numRead < buffer.Length)
+								{
+									var toSend = new byte[numRead];
+									Buffer.BlockCopy(buffer, 0, toSend, 0, numRead);
+									obs.OnNext(toSend);
+								}
+								else
+								{
+									obs.OnNext(buffer);
+									buffer = new byte[bufferSize];
+								}
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						obs.OnError(ex);
+					}
+					finally
+					{
+						obs.OnCompleted();
+					}
+				};
+				execution();
+				return () => isCancelled = true;
+			});
 		}
 
 		public void CreateDir(FsPath path)

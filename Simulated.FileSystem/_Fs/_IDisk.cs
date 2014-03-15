@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -18,7 +19,7 @@ namespace Simulated._Fs
 		Task<string> TextContents([NotNull] FsPath path);
 
 		[NotNull]
-		byte[] RawContents([NotNull] FsPath path);
+		IObservable<byte[]> RawContents([NotNull] FsPath path);
 
 		void CreateDir([NotNull] FsPath path);
 		void Overwrite([NotNull] FsPath path, [NotNull] string newContents);
