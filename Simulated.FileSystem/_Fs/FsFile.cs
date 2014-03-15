@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -127,7 +128,7 @@ namespace Simulated._Fs
 		/// </exception>
 		[NotNull]
 		[PublicApi]
-		public string ReadAllText()
+		public Task<string> ReadAllText()
 		{
 			return _allFiles._Disk.TextContents(_path);
 		}

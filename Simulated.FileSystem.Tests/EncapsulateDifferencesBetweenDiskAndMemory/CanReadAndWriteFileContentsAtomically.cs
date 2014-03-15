@@ -25,27 +25,17 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			TestSubject.DirExists(fileName)
 				.Should()
 				.BeFalse();
-			TestSubject.FileExists(fileName)
-				.Should()
-				.BeTrue();
-			TestSubject.TextContents(fileName)
-				.Should()
-				.Be(ArbitraryFileContents);
+			TestSubject.ShouldBeFile(fileName, ArbitraryFileContents);
 		}
 
 		[Test]
 		public void CanCreateBinaryFileAndReadItsContents()
 		{
 			var fileName = BaseFolder/"file.txt";
-			TestSubject.ShouldNotExist(fileName);
 			var contents = Encoding.UTF8.GetBytes(ArbitraryFileContents);
+			TestSubject.ShouldNotExist(fileName);
 			TestSubject.Overwrite(fileName, contents);
-			TestSubject.FileExists(fileName)
-				.Should()
-				.BeTrue();
-			TestSubject.RawContents(fileName)
-				.Should()
-				.Equal(contents);
+			TestSubject.ShouldBeFile(fileName, contents);
 		}
 
 		[Test]
@@ -94,7 +84,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var testFile = BaseFolder/"hello.txt";
 			TestSubject.Overwrite(testFile, Encoding.UTF8.GetBytes(UnicodeContents));
-			var asString = TestSubject.TextContents(testFile);
+			var asString = TestSubject.TextContents(testFile)
+				.Result;
 			asString.Should()
 				.Be(UnicodeContents);
 		}
@@ -117,7 +108,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return () => TestSubject.TextContents(fileName);
+					return () => TestSubject.TextContents(fileName).Wait();
 				case FileFormat.Binary:
 					return () => TestSubject.RawContents(fileName);
 				default:

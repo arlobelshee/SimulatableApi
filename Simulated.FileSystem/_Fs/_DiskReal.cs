@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -22,10 +23,13 @@ namespace Simulated._Fs
 			return File.Exists(path._Absolute);
 		}
 
-		public string TextContents(FsPath path)
+		public async Task<string> TextContents(FsPath path)
 		{
 			_ValidatePathForReadingFile(path);
-			return File.ReadAllText(path._Absolute);
+			using (var contents = File.OpenText(path._Absolute))
+			{
+				return await contents.ReadToEndAsync();
+			}
 		}
 
 		public byte[] RawContents(FsPath path)

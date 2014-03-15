@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -29,11 +30,11 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.File;
 		}
 
-		public string TextContents(FsPath path)
+		public Task<string> TextContents(FsPath path)
 		{
 			var storage = _GetStorage(path);
 			_ValidateStorage(path, storage);
-			return DefaultEncoding.GetString(storage.RawContents);
+			return DefaultEncoding.GetString(storage.RawContents).AsTask();
 		}
 
 		public byte[] RawContents(FsPath path)

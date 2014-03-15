@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -14,7 +15,7 @@ namespace Simulated._Fs
 		bool FileExists([NotNull] FsPath path);
 
 		[NotNull]
-		string TextContents([NotNull] FsPath path);
+		Task<string> TextContents([NotNull] FsPath path);
 
 		[NotNull]
 		byte[] RawContents([NotNull] FsPath path);

@@ -21,7 +21,7 @@ namespace Simulated.Tests.zzTestHelpers
 		{
 			file.Exists.Should()
 				.BeTrue();
-			file.ReadAllText()
+			file.ReadAllText().Result
 				.Should()
 				.Be(contents);
 		}
@@ -51,8 +51,18 @@ namespace Simulated.Tests.zzTestHelpers
 				.Should()
 				.BeTrue();
 			disk.TextContents(file)
-				.Should()
+				.Result.Should()
 				.Be(contents);
+		}
+
+		public static void ShouldBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath file, [NotNull] byte[] contents)
+		{
+			disk.FileExists(file)
+				.Should()
+				.BeTrue();
+			disk.RawContents(file)
+				.Should()
+				.Equal(contents);
 		}
 
 		public static void ShouldNotExist([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
