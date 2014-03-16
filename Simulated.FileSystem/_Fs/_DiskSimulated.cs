@@ -31,32 +31,23 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.File;
 		}
 
-		public async Task<string> TextContents(FsPath path)
+		public Task<string> TextContents(FsPath path)
 		{
-			var storage = _GetStorage(path);
-			_ValidateStorage(path, storage);
-			return DefaultEncoding.GetString(storage.RawContents);
+			return Task.Run(() =>
+			{
+				var storage = _GetStorage(path);
+				_ValidateStorage(path, storage);
+				return DefaultEncoding.GetString(storage.RawContents);
+			});
 		}
 
 		public IObservable<byte[]> RawContents(FsPath path)
 		{
-			return Observable.Create<byte[]>(obs =>
+			return _Make.Observable<byte[]>(ctx =>
 			{
-				try
-				{
-					var storage = _GetStorage(path);
-					_ValidateStorage(path, storage);
-					obs.OnNext(storage.RawContents);
-				}
-				catch (Exception ex)
-				{
-					obs.OnError(ex);
-				}
-				finally
-				{
-					obs.OnCompleted();
-				}
-				return () => { };
+				var storage = _GetStorage(path);
+				_ValidateStorage(path, storage);
+				ctx.OnNext(storage.RawContents);
 			});
 		}
 
@@ -131,12 +122,13 @@ namespace Simulated._Fs
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;
+			var destKind = _GetStorage(dest)
+				.Kind;
 			if (srcKind == _StorageKind.File)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
 			if (srcKind == _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
-			if (_GetStorage(dest)
-				.Kind != _StorageKind.Missing)
+			if (destKind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			var itemsToMove = _ItemsInScopeOfDirectory(src);
 			itemsToMove.Each(item => _MoveItemImpl(item.Key, item.Key._ReplaceAncestor(src, dest, item.Value.Kind == _StorageKind.Directory)));

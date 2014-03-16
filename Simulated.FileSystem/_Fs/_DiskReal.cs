@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -36,48 +35,31 @@ namespace Simulated._Fs
 
 		public IObservable<byte[]> RawContents(FsPath path)
 		{
-			const int bufferSize = 1024 * 10;
-			return Observable.Create<byte[]>(obs =>
+			const int bufferSize = 1024*10;
+			return _Make.Observable<byte[]>(async ctx =>
 			{
-				var isCancelled = false;
-				Action execution = async () =>
+				_ValidatePathForReadingFile(path);
+				using (var contents = File.OpenRead(path._Absolute))
 				{
-					try
+					var buffer = new byte[bufferSize];
+					int bytesRead;
+					while (0 != (bytesRead = await contents.ReadAsync(buffer, 0, buffer.Length, ctx.CancelToken)))
 					{
-						_ValidatePathForReadingFile(path);
-						using (var contents = File.OpenRead(path._Absolute))
+						if (ctx.IsCancelled)
+							return;
+						if (bytesRead < buffer.Length)
 						{
-							var buffer = new byte[bufferSize];
-							int numRead;
-							while (0 != (numRead = await contents.ReadAsync(buffer, 0, buffer.Length)))
-							{
-								if (isCancelled)
-									return;
-								if (numRead < buffer.Length)
-								{
-									var toSend = new byte[numRead];
-									Buffer.BlockCopy(buffer, 0, toSend, 0, numRead);
-									obs.OnNext(toSend);
-								}
-								else
-								{
-									obs.OnNext(buffer);
-									buffer = new byte[bufferSize];
-								}
-							}
+							var toSend = new byte[bytesRead];
+							Buffer.BlockCopy(buffer, 0, toSend, 0, bytesRead);
+							ctx.OnNext(toSend);
+						}
+						else
+						{
+							ctx.OnNext(buffer);
+							buffer = new byte[bufferSize];
 						}
 					}
-					catch (Exception ex)
-					{
-						obs.OnError(ex);
-					}
-					finally
-					{
-						obs.OnCompleted();
-					}
-				};
-				execution();
-				return () => isCancelled = true;
+				}
 			});
 		}
 
