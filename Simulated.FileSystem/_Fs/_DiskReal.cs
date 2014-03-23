@@ -29,7 +29,7 @@ namespace Simulated._Fs
 			_ValidatePathForReadingFile(path);
 			using (var contents = File.OpenText(path._Absolute))
 			{
-				return await contents.ReadToEndAsync();
+				return await contents.ReadToEndAsync().ConfigureAwait(false);
 			}
 		}
 
@@ -43,7 +43,7 @@ namespace Simulated._Fs
 				{
 					var buffer = new byte[bufferSize];
 					int bytesRead;
-					while (0 != (bytesRead = await contents.ReadAsync(buffer, 0, buffer.Length, ctx.CancelToken)))
+					while (0 != (bytesRead = await contents.ReadAsync(buffer, 0, buffer.Length, ctx.CancelToken).ConfigureAwait(false)))
 					{
 						if (ctx.IsCancelled)
 							return;
