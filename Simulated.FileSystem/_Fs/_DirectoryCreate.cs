@@ -10,5 +10,10 @@ namespace Simulated._Fs
 	internal class _DirectoryCreate : _Op
 	{
 		public _DirectoryCreate([NotNull] FsPath target) : base(target) {}
+
+		protected override Kind OpKind
+		{
+			get { return Kind.DirCreate; }
+		}
 	}
 }

@@ -15,5 +15,10 @@ namespace Simulated._Fs
 		{
 			_contents = contents;
 		}
+
+		protected override Kind OpKind
+		{
+			get { return Kind.FileWrite; }
+		}
 	}
 }

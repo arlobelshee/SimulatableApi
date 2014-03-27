@@ -14,7 +14,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	[TestFixture]
 	public class DetectOperationsThatWouldConflictSoTheyCanRunSerially
 	{
-		private const string Contents = "";
+		private const string _ = "";
 		private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
 
@@ -40,12 +40,15 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		public static object[][] OperationConflictsSameTarget
 		{
 			get { return _ParseIntoCases(@"
- |DCRW
-------
-D|.XXX
-C|X..X
-R|X..X
-W|XXXX
+ |DCRWFeE
+---------
+D|.XXXXXX
+C|X..X..X
+R|X..X...
+W|XXXXXXX
+F|X..X...
+e|X..X...
+E|XX.X...
 ", ArbitraryPath, ArbitraryPath); }
 		}
 
@@ -53,13 +56,17 @@ W|XXXX
 		public static object[][] OperationConflictsDifferentTarget
 		{
 			get { return _ParseIntoCases(@"
- |DCRW
-------
-D|.XXX
-C|X...
-R|X...
-W|X...
-", ArbitraryPath, AnyOtherPath); }
+ |DCRWFeE
+---------
+D|.XXXXXX
+C|X.....X
+R|X......
+W|X...X.X
+F|X..X...
+e|X......
+E|XX.X...
+", ArbitraryPath, AnyOtherPath);
+			}
 		}
 
 		[NotNull]
@@ -76,14 +83,20 @@ W|X...
 				_Op.DeleteDirectory(firstTarget),
 				_Op.CreateDirectory(firstTarget),
 				_Op.ReadFile(firstTarget),
-				_Op.WriteFile(firstTarget, Contents)
+				_Op.WriteFile(firstTarget, _),
+				_Op.FindFiles(firstTarget, _),
+				_Op.FileExists(firstTarget),
+				_Op.DirectoryExists(firstTarget)
 			};
 			var rhsOps = new object[]
 			{
 				_Op.DeleteDirectory(secondTarget),
 				_Op.CreateDirectory(secondTarget),
 				_Op.ReadFile(secondTarget),
-				_Op.WriteFile(secondTarget, Contents)
+				_Op.WriteFile(secondTarget, _),
+				_Op.FindFiles(secondTarget, _),
+				_Op.FileExists(secondTarget),
+				_Op.DirectoryExists(secondTarget)
 			};
 			return (from first in Enumerable.Range(0, lhsOps.Length)
 				from second in Enumerable.Range(0, rhsOps.Length)

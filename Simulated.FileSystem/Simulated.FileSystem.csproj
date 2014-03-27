@@ -71,8 +71,11 @@
     <Compile Include="_Fs\FsFile.cs" />
     <Compile Include="_Fs\_DirectoryCreate.cs" />
     <Compile Include="_Fs\_DirectoryDelete.cs" />
+    <Compile Include="_Fs\_DirectoryExists.cs" />
+    <Compile Include="_Fs\_DirectoryFindFiles.cs" />
     <Compile Include="_Fs\_DiskReal.cs" />
     <Compile Include="_Fs\_DiskSimulated.cs" />
+    <Compile Include="_Fs\_FileExists.cs" />
     <Compile Include="_Fs\_FileRead.cs" />
     <Compile Include="_Fs\_FileWrite.cs" />
     <Compile Include="_Fs\_IDisk.cs" />
