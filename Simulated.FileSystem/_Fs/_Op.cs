@@ -8,14 +8,13 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal abstract class _Op
+	internal static class _Op
 	{
-		[NotNull] private readonly FsPath _target;
-		private static readonly Kind[] _kindsThatConflictWithDirExists = new[] {Kind.DirCreate, Kind.DirDelete, Kind.FileWrite};
+		private static readonly Kind[] KindsThatConflictWithDirExists = {Kind.DirCreate, Kind.DirDelete, Kind.FileWrite};
 
-		public bool ConflictsWith([NotNull] _Op other)
+		public static bool ConflictsWith([NotNull] _OverlappedOperation op1, [NotNull] _OverlappedOperation op2)
 		{
-			var kinds = new[] {OpKind, other.OpKind}.ToList();
+			var kinds = new[] {op1.OpKind, op2.OpKind}.ToList();
 			kinds.Sort();
 			var higherPriorityKind = kinds[0];
 			var otherKind = kinds[1];
@@ -25,8 +24,8 @@ namespace Simulated._Fs
 			if (higherPriorityKind == Kind.DirFindFiles)
 				return otherKind == Kind.FileWrite;
 			if (higherPriorityKind == Kind.DirExists)
-				return _kindsThatConflictWithDirExists.Contains(otherKind);
-			if (_target == other._target)
+				return KindsThatConflictWithDirExists.Contains(otherKind);
+			if (op1.HasSameTargetAs(op2))
 			{
 				if (higherPriorityKind == Kind.FileWrite || otherKind == Kind.FileWrite)
 					return true;
@@ -34,9 +33,7 @@ namespace Simulated._Fs
 			return false;
 		}
 
-		protected abstract Kind OpKind { get; }
-
-		protected enum Kind
+		public enum Kind
 		{
 			DirDelete = 1,
 			DirFindFiles = 2,
@@ -47,56 +44,46 @@ namespace Simulated._Fs
 			FileExists,
 		}
 
-		protected _Op([NotNull] FsPath target)
+		[NotNull]
+		public static _OverlappedOperation DeleteDirectory([NotNull] FsPath target)
 		{
-			_target = target;
-		}
-
-		public override string ToString()
-		{
-			return string.Format("{0} {1}", GetType()
-				.Name, _target);
+			return new _OverlappedOperation(target, Kind.DirDelete);
 		}
 
 		[NotNull]
-		public static _Op DeleteDirectory([NotNull] FsPath target)
+		public static _OverlappedOperation CreateDirectory([NotNull] FsPath target)
 		{
-			return new _DirectoryDelete(target);
+			return new _OverlappedOperation(target, Kind.DirCreate);
 		}
 
 		[NotNull]
-		public static _Op CreateDirectory([NotNull] FsPath target)
+		public static _OverlappedOperation WriteFile([NotNull] FsPath target, [NotNull] string contents)
 		{
-			return new _DirectoryCreate(target);
+			return new _OverlappedOperation(target, Kind.FileWrite);
 		}
 
 		[NotNull]
-		public static _Op WriteFile([NotNull] FsPath target, [NotNull] string contents)
+		public static _OverlappedOperation ReadFile([NotNull] FsPath target)
 		{
-			return new _FileWrite(target, contents);
+			return new _OverlappedOperation(target, Kind.FileRead);
 		}
 
 		[NotNull]
-		public static _Op ReadFile([NotNull] FsPath target)
+		public static _OverlappedOperation FindFiles([NotNull] FsPath target, [NotNull] string pattern)
 		{
-			return new _FileRead(target);
+			return new _OverlappedOperation(target, Kind.DirFindFiles);
 		}
 
 		[NotNull]
-		public static _Op FindFiles([NotNull] FsPath target, [NotNull] string pattern)
+		public static _OverlappedOperation FileExists([NotNull] FsPath target)
 		{
-			return new _DirectoryFindFiles(target, pattern);
+			return new _OverlappedOperation(target, Kind.FileExists);
 		}
 
 		[NotNull]
-		public static _Op FileExists([NotNull] FsPath target)
+		public static _OverlappedOperation DirectoryExists([NotNull] FsPath target)
 		{
-			return new _FileExists(target);
-		}
-
-		public static _Op DirectoryExists(FsPath target)
-		{
-			return new _DirectoryExists(target);
+			return new _OverlappedOperation(target, Kind.DirExists);
 		}
 	}
 }

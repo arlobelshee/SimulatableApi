@@ -22,7 +22,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsSameTarget")]
 		public void OpsWithSameTarget_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			((_Op) op1).ConflictsWith((_Op) op2)
+			_Op.ConflictsWith(((_OverlappedOperation) op1), (_OverlappedOperation) op2)
 				.Should()
 				.Be(expected);
 		}
@@ -31,7 +31,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsDifferentTarget")]
 		public void OpsWithDifferentTargets_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			((_Op) op1).ConflictsWith((_Op) op2)
+			_Op.ConflictsWith(((_OverlappedOperation) op1), (_OverlappedOperation) op2)
 				.Should()
 				.Be(expected);
 		}
