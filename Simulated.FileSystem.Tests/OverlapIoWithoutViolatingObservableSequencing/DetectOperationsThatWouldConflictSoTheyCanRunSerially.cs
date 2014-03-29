@@ -22,7 +22,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsSameTarget")]
 		public void OpsWithSameTarget_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			_Op.ConflictsWith(((_OverlappedOperation) op1), (_OverlappedOperation) op2)
+			((_OverlappedLambdaWithKind) op1).ConflictsWith((_OverlappedLambdaWithKind) op2)
 				.Should()
 				.Be(expected);
 		}
@@ -31,9 +31,22 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsDifferentTarget")]
 		public void OpsWithDifferentTargets_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			_Op.ConflictsWith(((_OverlappedOperation) op1), (_OverlappedOperation) op2)
+			((_OverlappedOperation) op1).ConflictsWith((_OverlappedOperation) op2)
 				.Should()
 				.Be(expected);
+		}
+
+		[Test]
+		public void OpsThatDoNotConflict_Should_BeScheduledTogetherInOrder()
+		{
+			var testSubject = new _OperationBacklog();
+			var first = new _TestOperation();
+			var second = new _TestOperation();
+			testSubject.Enqueue(first);
+			testSubject.Enqueue(second);
+			var result = testSubject.DequeueSchedulableWork(new _OverlappedOperation[]{});
+			result.Should()
+				.Equal(new[] {first, second});
 		}
 
 		[NotNull]
@@ -65,8 +78,7 @@ W|X...X.X
 F|X..X...
 e|X......
 E|XX.X...
-", ArbitraryPath, AnyOtherPath);
-			}
+", ArbitraryPath, AnyOtherPath); }
 		}
 
 		[NotNull]
@@ -101,6 +113,15 @@ E|XX.X...
 			return (from first in Enumerable.Range(0, lhsOps.Length)
 				from second in Enumerable.Range(0, rhsOps.Length)
 				select new[] {data[first][second] == 'X', lhsOps[first], rhsOps[second]}).ToArray();
+		}
+	}
+
+	internal class _TestOperation : _OverlappedOperation
+	{
+		public override bool ConflictsWith(_OverlappedOperation op2)
+		{
+			var other = op2 as _TestOperation;
+			return false;
 		}
 	}
 }
