@@ -27,13 +27,16 @@ namespace Simulated._Fs
 		{
 			var workToDo = new List<_OverlappedOperation>();
 			var workToWait = new List<_OverlappedOperation>();
+			var processedWork = workToWait.Concat(workToDo);
 			lock (_lock)
 			{
-				_pendingWork.Remove(completedWork);
 				foreach (var op in _pendingWork)
 				{
-					if (workToWait.Concat(workToDo)
-						.Any(w => w.ConflictsWith(op)))
+					if (op == completedWork)
+						continue;
+
+// ReSharper disable once PossibleMultipleEnumeration
+					if (processedWork.Any(w => w.ConflictsWith(op)))
 					{
 						workToWait.Add(op);
 					}
