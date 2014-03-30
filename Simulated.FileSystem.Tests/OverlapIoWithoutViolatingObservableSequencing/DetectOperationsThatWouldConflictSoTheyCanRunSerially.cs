@@ -7,6 +7,7 @@ using System.Linq;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using Simulated.Tests.zzTestHelpers;
 using Simulated._Fs;
 
 namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
@@ -17,6 +18,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		private const string _ = "";
 		private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
+		private static readonly _OverlappedOperation EmptySetOfWork = null;
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
@@ -40,13 +42,85 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		public void OpsThatDoNotConflict_Should_BeScheduledTogetherInOrder()
 		{
 			var testSubject = new _OperationBacklog();
-			var first = new _TestOperation();
-			var second = new _TestOperation();
-			testSubject.Enqueue(first);
-			testSubject.Enqueue(second);
-			var result = testSubject.DequeueSchedulableWork(new _OverlappedOperation[]{});
+			var work = _MakeWorkItems(3);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
 			result.Should()
-				.Equal(new[] {first, second});
+				.Equal(work);
+		}
+
+		[Test]
+		public void Work_Should_OnlyBeScheduledOnce()
+		{
+			var testSubject = new _OperationBacklog();
+			var first = new _TestOperation(1);
+			testSubject.Enqueue(first);
+			testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			result.Should()
+				.BeEmpty();
+		}
+
+		[Test]
+		public void WhenWorkItemsConflict_Should_ChooseFirstItem()
+		{
+			var testSubject = new _OperationBacklog();
+			var work = _MakeWorkItems(2);
+			work.CreateConflict(0, 1);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			result.Should()
+				.Equal(new object[] {work[0]});
+		}
+
+		[Test]
+		public void WhenFirstItemConflictsWithEverything_Should_ChooseFirstItem()
+		{
+			var testSubject = new _OperationBacklog();
+			var work = _MakeWorkItems(3);
+			work.CreateConflict(0, 1);
+			work.CreateConflict(0, 2);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			result.Should()
+				.Equal(new object[] {work[0]});
+		}
+
+		[Test]
+		public void WhenLaterItemsDoNotConflictWithAnything_Should_ChooseThem()
+		{
+			var testSubject = new _OperationBacklog();
+			var work = _MakeWorkItems(3);
+			work.CreateConflict(0, 1);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			result.Should()
+				.Equal(new object[] {work[0], work[2]});
+		}
+
+		[Test]
+		public void WhenLaterItemsConflictWithAnyPriorItem_Should_NotChooseThem()
+		{
+			var testSubject = new _OperationBacklog();
+			var work = _MakeWorkItems(3);
+			work.CreateConflict(0, 1);
+			work.CreateConflict(1, 2);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
+			result.Should()
+				.Equal(new object[] {work[0]});
+		}
+
+		[Test]
+		public void WhenWorkIsFinished_Should_ChooseFromRemainingWork()
+		{
+			var testSubject = new _OperationBacklog();
+			var work = _MakeWorkItems(3);
+			work.CreateConflict(0, 1);
+			testSubject.EnqueueAll(work);
+			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(work[0]);
+			result.Should()
+				.Equal(new object[] {work[1], work[2]});
 		}
 
 		[NotNull]
@@ -114,14 +188,14 @@ E|XX.X...
 				from second in Enumerable.Range(0, rhsOps.Length)
 				select new[] {data[first][second] == 'X', lhsOps[first], rhsOps[second]}).ToArray();
 		}
-	}
 
-	internal class _TestOperation : _OverlappedOperation
-	{
-		public override bool ConflictsWith(_OverlappedOperation op2)
+		[NotNull]
+		private static _TestOperation[] _MakeWorkItems(int howMany)
 		{
-			var other = op2 as _TestOperation;
-			return false;
+			var ops = Enumerable.Range(0, howMany)
+				.Select(name => new _TestOperation(name))
+				.ToArray();
+			return ops;
 		}
 	}
 }

@@ -77,6 +77,8 @@
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\LocateExistingStructures.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\FilesAndDirectoriesCanBeMoved.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\CanCreateAndDestroyEntries.cs" />
+    <Compile Include="zzTestHelpers\_TestOperation.cs" />
+    <Compile Include="zzTestHelpers\_BacklogTestExtensions.cs" />
     <Compile Include="OverlapIoWithoutViolatingObservableSequencing\DetectOperationsThatWouldConflictSoTheyCanRunSerially.cs" />
     <Compile Include="zzTestHelpers\DiskTestBase.cs" />
     <Compile Include="FileSystemModification\CanReadAndWriteFileContents.cs" />

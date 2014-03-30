@@ -3,32 +3,46 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
 	internal class _OperationBacklog
 	{
-		private readonly ConcurrentQueue<_OverlappedOperation> _pendingWork = new ConcurrentQueue<_OverlappedOperation>();
+		private List<_OverlappedOperation> _pendingWork = new List<_OverlappedOperation>();
 		private readonly object _lock = new object();
 
 		public void Enqueue([NotNull] _OverlappedOperation workToDo)
 		{
-			_pendingWork.Enqueue(workToDo);
+			lock (_lock)
+			{
+				_pendingWork.Add(workToDo);
+			}
 		}
 
 		[NotNull]
-		public List<_OverlappedOperation> DequeueSchedulableWork([NotNull] _OverlappedOperation[] operationsCurrentlyExecuting)
+		public List<_OverlappedOperation> FinishedSomeWorkWhatShouldIDoNext([CanBeNull] _OverlappedOperation completedWork)
 		{
 			var workToDo = new List<_OverlappedOperation>();
-			_OverlappedOperation nextItem;
-			while (_pendingWork.TryPeek(out nextItem))
+			var workToWait = new List<_OverlappedOperation>();
+			lock (_lock)
 			{
-				if (!_pendingWork.TryDequeue(out nextItem))
-					break;
-				workToDo.Add(nextItem);
+				_pendingWork.Remove(completedWork);
+				foreach (var op in _pendingWork)
+				{
+					if (workToWait.Concat(workToDo)
+						.Any(w => w.ConflictsWith(op)))
+					{
+						workToWait.Add(op);
+					}
+					else
+					{
+						workToDo.Add(op);
+					}
+				}
+				_pendingWork = workToWait;
 			}
 			return workToDo;
 		}
