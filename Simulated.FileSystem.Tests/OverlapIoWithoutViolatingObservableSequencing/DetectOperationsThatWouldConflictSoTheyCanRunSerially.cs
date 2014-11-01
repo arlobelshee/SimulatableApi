@@ -42,85 +42,99 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		public void OpsThatDoNotConflict_Should_BeScheduledTogetherInOrder()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.Equal(work);
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new _ParallelSafeWorkSet(work));
 		}
 
 		[Test]
 		public void Work_Should_OnlyBeScheduledOnce()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var first = new _TestOperation(1);
 			testSubject.Enqueue(first);
-			testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.BeEmpty();
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {first})});
 		}
 
 		[Test]
 		public void WhenWorkItemsConflict_Should_ChooseFirstItem()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(2);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.Equal(new object[] {work[0]});
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
 		}
 
 		[Test]
 		public void WhenFirstItemConflictsWithEverything_Should_ChooseFirstItem()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			work.CreateConflict(0, 2);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.Equal(new object[] {work[0]});
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
 		}
 
 		[Test]
 		public void WhenLaterItemsDoNotConflictWithAnything_Should_ChooseThem()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.Equal(new object[] {work[0], work[2]});
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0], work[2]})});
 		}
 
 		[Test]
 		public void WhenLaterItemsConflictWithAnyPriorItem_Should_NotChooseThem()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			work.CreateConflict(1, 2);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(EmptySetOfWork);
-			result.Should()
-				.Equal(new object[] {work[0]});
+			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new []{work[0]})});
 		}
 
 		[Test]
 		public void WhenWorkIsFinished_Should_ChooseFromRemainingWork()
 		{
 			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
-			var result = testSubject.FinishedSomeWorkWhatShouldIDoNext(work[0]);
-			result.Should()
-				.Equal(new object[] {work[1], work[2]});
+			testSubject.FinishedSomeWork(work[0]);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(new object[] {new _ParallelSafeWorkSet(new []{work[1], work[2]})});
 		}
 
 		[NotNull]

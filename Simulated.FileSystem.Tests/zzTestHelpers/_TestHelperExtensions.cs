@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using FluentAssertions;
 using JetBrains.Annotations;
@@ -85,6 +86,16 @@ namespace Simulated.Tests.zzTestHelpers
 			disk.FileExists(path)
 				.Should()
 				.BeFalse();
+		}
+
+		[NotNull]
+		public static List<_ParallelSafeWorkSet> ScheduledWork([NotNull] this _OperationBacklog testSubject)
+		{
+			return testSubject.ShouldRaise("WorkIsReadyToExecute")
+				.Select(evt => evt.Parameters.Skip(1)
+					.Cast<_ParallelSafeWorkSet>()
+					.Single())
+				.ToList();
 		}
 	}
 }

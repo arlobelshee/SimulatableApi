@@ -80,6 +80,7 @@
     <Compile Include="_Fs\_OperationBacklog.cs" />
     <Compile Include="_Fs\_OverlappedLambdaWithKind.cs" />
     <Compile Include="_Fs\_OverlappedOperation.cs" />
+    <Compile Include="_Fs\_ParallelSafeWorkSet.cs" />
     <Compile Include="_Fs\_PathRoot.cs" />
   </ItemGroup>
   <ItemGroup>

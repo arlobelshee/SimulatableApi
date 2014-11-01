@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -14,6 +15,8 @@ namespace Simulated._Fs
 		private List<_OverlappedOperation> _pendingWork = new List<_OverlappedOperation>();
 		private readonly object _lock = new object();
 
+		public event Action<object, _ParallelSafeWorkSet> WorkIsReadyToExecute;
+
 		public void Enqueue([NotNull] _OverlappedOperation workToDo)
 		{
 			lock (_lock)
@@ -23,18 +26,15 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public List<_OverlappedOperation> FinishedSomeWorkWhatShouldIDoNext([CanBeNull] _OverlappedOperation completedWork)
+		public void FinishedSomeWork([CanBeNull] _OverlappedOperation completedWork)
 		{
 			var workToDo = new List<_OverlappedOperation>();
 			var workToWait = new List<_OverlappedOperation>();
 			var processedWork = workToWait.Concat(workToDo);
 			lock (_lock)
 			{
-				foreach (var op in _pendingWork)
+				foreach (var op in _pendingWork.Where(op => op != completedWork))
 				{
-					if (op == completedWork)
-						continue;
-
 // ReSharper disable once PossibleMultipleEnumeration
 					if (processedWork.Any(w => w.ConflictsWith(op)))
 					{
@@ -47,7 +47,10 @@ namespace Simulated._Fs
 				}
 				_pendingWork = workToWait;
 			}
-			return workToDo;
+			if (WorkIsReadyToExecute != null && workToDo.Count > 0)
+			{
+				WorkIsReadyToExecute(this, new _ParallelSafeWorkSet(workToDo));
+			}
 		}
 	}
 }

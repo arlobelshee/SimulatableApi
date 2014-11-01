@@ -12,7 +12,10 @@ namespace Simulated
 	/// <summary>
 	///    Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory)
 	///    one. In either case, FileSystem and its helpers allow a user to interact with an abstraction of this storage.
-	///    Changes are written to the disk as they occcur. In case of an application crash changes will be saved.
+	/// 
+	///    All oprations are performed asynchronously. The library overlapps operations that do not
+	///    impact each other. No guarantees are made in case of an application crash.
+	/// 
 	///    Each FileSystem instance is its own view of the storage.
 	/// </summary>
 	[PublicApi]
