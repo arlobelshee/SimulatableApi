@@ -12,17 +12,11 @@ namespace Simulated._Fs
 {
 	internal class _ParallelSafeWorkSet : IEquatable<_ParallelSafeWorkSet>
 	{
-		[NotNull] private readonly List<_DiskChangeKind> _workToDo;
+		[NotNull] private readonly List<_DiskChange> _workToDo;
 
-		public _ParallelSafeWorkSet([NotNull] IEnumerable<_DiskChangeKind> workToDo)
+		public _ParallelSafeWorkSet([NotNull] IEnumerable<_DiskChange> workToDo)
 		{
 			_workToDo = workToDo.ToList();
-		}
-
-		[NotNull]
-		public List<_DiskChangeKind> WorkToDo
-		{
-			get { return _workToDo; }
 		}
 
 		public bool Equals([CanBeNull] _ParallelSafeWorkSet other)
@@ -54,7 +48,6 @@ namespace Simulated._Fs
 			return !Equals(left, right);
 		}
 
-		[NotNull]
 		public override string ToString()
 		{
 			return string.Format("Parallel work chunk: {0}", string.Join(", ", _workToDo));

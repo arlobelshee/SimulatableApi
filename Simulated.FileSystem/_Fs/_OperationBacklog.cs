@@ -12,12 +12,12 @@ namespace Simulated._Fs
 {
 	internal class _OperationBacklog
 	{
-		[NotNull] private List<_DiskChangeKind> _pendingWork = new List<_DiskChangeKind>();
+		[NotNull] private List<_DiskChange> _pendingWork = new List<_DiskChange>();
 		[NotNull] private readonly object _lock = new object();
 
 		public event Action<object, _ParallelSafeWorkSet> WorkIsReadyToExecute;
 
-		public void Enqueue([NotNull] _DiskChangeKind workToDo)
+		public void Enqueue([NotNull] _DiskChange workToDo)
 		{
 			lock (_lock)
 			{
@@ -25,10 +25,10 @@ namespace Simulated._Fs
 			}
 		}
 
-		public void FinishedSomeWork([CanBeNull] _DiskChangeKind completedWork)
+		public void FinishedSomeWork([CanBeNull] _DiskChange completedWork)
 		{
-			var workToDo = new List<_DiskChangeKind>();
-			var workToWait = new List<_DiskChangeKind>();
+			var workToDo = new List<_DiskChange>();
+			var workToWait = new List<_DiskChange>();
 			var processedWork = workToWait.Concat(workToDo);
 			lock (_lock)
 			{

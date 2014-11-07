@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Linq;
 using JetBrains.Annotations;
 using Simulated._Fs;
 
@@ -10,17 +11,14 @@ namespace Simulated.Tests.zzTestHelpers
 {
 	internal static class _BacklogTestExtensions
 	{
-		public static void EnqueueAll([NotNull] this _OperationBacklog testSubject, [NotNull] _TestOperation[] ops)
+		public static void EnqueueAll([NotNull] this _OperationBacklog testSubject, [NotNull] _DiskChange[] ops)
 		{
-			foreach (var op in ops)
-			{
-				testSubject.Enqueue(op);
-			}
+			ops.Each(testSubject.Enqueue);
 		}
 
-		public static void CreateConflict([NotNull] this _TestOperation[] work, int first, int second)
+		public static void CreateConflict([NotNull] this _DiskChange[] work, int first, int second)
 		{
-			work[first].MakeConflictWith(work[second]);
+			((_TestOperation) work[first].Kind).MakeConflictWith((_TestOperation) work[second].Kind);
 		}
 	}
 }

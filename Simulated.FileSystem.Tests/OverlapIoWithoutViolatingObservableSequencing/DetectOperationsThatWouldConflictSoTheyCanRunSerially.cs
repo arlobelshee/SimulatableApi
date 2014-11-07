@@ -17,7 +17,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	{
 		[NotNull] private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		[NotNull] private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
-		[NotNull] private static readonly _DiskChangeKind EmptySetOfWork = null;
+		[NotNull] private static readonly _DiskChange EmptySetOfWork = null;
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
@@ -55,7 +55,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
-			var first = new _TestOperation(1);
+			var first = _MakeWorkItems(1).First();
 			testSubject.Enqueue(first);
 			testSubject.FinishedSomeWork(EmptySetOfWork);
 			testSubject.FinishedSomeWork(EmptySetOfWork);
@@ -278,10 +278,10 @@ E|XX.X...
 		}
 
 		[NotNull]
-		private static _TestOperation[] _MakeWorkItems(int howMany)
+		private static _DiskChange[] _MakeWorkItems(int howMany)
 		{
 			var ops = Enumerable.Range(0, howMany)
-				.Select(name => new _TestOperation(name))
+				.Select(name => new _DiskChange(new _TestOperation(name)))
 				.ToArray();
 			return ops;
 		}
