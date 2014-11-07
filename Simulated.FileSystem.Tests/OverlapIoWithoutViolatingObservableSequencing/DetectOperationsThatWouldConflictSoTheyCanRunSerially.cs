@@ -15,15 +15,13 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	[TestFixture]
 	public class DetectOperationsThatWouldConflictSoTheyCanRunSerially
 	{
-		[NotNull] private const string _ = "";
 		[NotNull] private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		[NotNull] private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
-		[NotNull] private static readonly FsPath AThirdPath = FsPath.TempFolder/"C";
 		[NotNull] private static readonly _DiskChange EmptySetOfWork = null;
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
-		public void OpsWithSameTarget_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
+		public void OpsWithSameTargetShouldConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
 			((_SingleDiskChange) op1).ConflictsWith((_SingleDiskChange) op2)
 				.Should()
@@ -32,7 +30,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 
 		[Test]
 		[TestCaseSource("OperationConflictsDifferentTarget")]
-		public void OpsWithDifferentTargets_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
+		public void OpsWithDifferentTargetsShouldConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
 			((_DiskChange) op1).ConflictsWith((_DiskChange) op2)
 				.Should()
@@ -40,7 +38,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void OpsThatDoNotConflict_Should_BeScheduledTogetherInOrder()
+		public void OpsThatDoNotConflictShouldBeScheduledTogetherInOrder()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -53,7 +51,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void Work_Should_OnlyBeScheduledOnce()
+		public void WorkShouldOnlyBeScheduledOnce()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -67,7 +65,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void WhenWorkItemsConflict_Should_ChooseFirstItem()
+		public void WhenWorkItemsConflictShouldChooseFirstItem()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -81,7 +79,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void WhenFirstItemConflictsWithEverything_Should_ChooseFirstItem()
+		public void WhenFirstItemConflictsWithEverythingShouldChooseFirstItem()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -96,7 +94,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void WhenLaterItemsDoNotConflictWithAnything_Should_ChooseThem()
+		public void WhenLaterItemsDoNotConflictWithAnythingShouldChooseThem()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -110,7 +108,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void WhenLaterItemsConflictWithAnyPriorItem_Should_NotChooseThem()
+		public void WhenLaterItemsConflictWithAnyPriorItemShouldNotChooseThem()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -125,7 +123,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		}
 
 		[Test]
-		public void WhenWorkIsFinished_Should_ChooseFromRemainingWork()
+		public void WhenWorkIsFinishedShouldChooseFromRemainingWork()
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
@@ -136,6 +134,14 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			testSubject.ScheduledWork()
 				.Should()
 				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[1], work[2]})});
+		}
+
+		[Test]
+		public void FileDeleteShouldConflictTheSameAsFileWrite()
+		{
+			_Op.DeleteFile(ArbitraryPath)
+				.Should()
+				.Be(_Op.WriteFile(ArbitraryPath));
 		}
 
 		[Test]
@@ -164,6 +170,45 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			firstChange.ConflictsWith(secondChange)
 				.Should()
 				.Be(false);
+		}
+
+		[Test]
+		public void CanCheckSingleOpAgainstMultipleForConflictsInEitherOrder()
+		{
+			var benignChange = _Op.FileExists(ArbitraryPath);
+			var someChange = _Op.DirectoryExists(ArbitraryPath);
+			var changeWhichDoesNotConflict = _Op.DirectoryExists(ArbitraryPath);
+			var changeWhichConflicts = _Op.CreateDirectory(ArbitraryPath);
+			var combinedChange = new _MultipleDiskChanges(benignChange, someChange);
+
+			combinedChange.ConflictsWith(changeWhichConflicts)
+				.Should()
+				.Be(true);
+			combinedChange.ConflictsWith(changeWhichDoesNotConflict)
+				.Should()
+				.Be(false);
+			changeWhichConflicts.ConflictsWith(combinedChange)
+				.Should()
+				.Be(true);
+			changeWhichDoesNotConflict.ConflictsWith(combinedChange)
+				.Should()
+				.Be(false);
+		}
+
+		[Test]
+		public void DirectoryMoveShouldBeACreatePlusADelete()
+		{
+			var moveDirectory = (_MultipleDiskChanges) _Op.MoveDirectory(ArbitraryPath, AnyOtherPath);
+			moveDirectory.Changes.Should()
+				.BeEquivalentTo(_Op.DeleteDirectory(ArbitraryPath), _Op.CreateDirectory(AnyOtherPath));
+		}
+
+		[Test]
+		public void FileMoveShouldBeACreatePlusADelete()
+		{
+			var moveDirectory = (_MultipleDiskChanges) _Op.MoveFile(ArbitraryPath, AnyOtherPath);
+			moveDirectory.Changes.Should()
+				.BeEquivalentTo(_Op.DeleteFile(ArbitraryPath), _Op.WriteFile(AnyOtherPath));
 		}
 
 		[NotNull]
@@ -212,18 +257,18 @@ E|XX.X...
 				_Op.DeleteDirectory(firstTarget),
 				_Op.CreateDirectory(firstTarget),
 				_Op.ReadFile(firstTarget),
-				_Op.WriteFile(firstTarget, _),
-				_Op.FindFiles(firstTarget, _),
+				_Op.WriteFile(firstTarget),
+				_Op.FindFiles(firstTarget),
 				_Op.FileExists(firstTarget),
-				_Op.DirectoryExists(firstTarget),
+				_Op.DirectoryExists(firstTarget)
 			};
 			var rhsOps = new object[]
 			{
 				_Op.DeleteDirectory(secondTarget),
 				_Op.CreateDirectory(secondTarget),
 				_Op.ReadFile(secondTarget),
-				_Op.WriteFile(secondTarget, _),
-				_Op.FindFiles(secondTarget, _),
+				_Op.WriteFile(secondTarget),
+				_Op.FindFiles(secondTarget),
 				_Op.FileExists(secondTarget),
 				_Op.DirectoryExists(secondTarget)
 			};

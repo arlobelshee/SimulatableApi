@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: _OverlappedOperation.cs
+// File: _SingleDiskChange.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -9,9 +9,9 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _SingleDiskChange : _DiskChange
+	internal class _SingleDiskChange : _DiskChange, IEquatable<_SingleDiskChange>
 	{
-		private readonly FsPath _target;
+		[NotNull] private readonly FsPath _target;
 		private readonly Kind _kind;
 
 		public _SingleDiskChange([NotNull] FsPath target, Kind kind)
@@ -32,15 +32,46 @@ namespace Simulated._Fs
 
 		public override string ToString()
 		{
-			return String.Format("{0} {1}", GetType()
-				.Name, _target);
+			return String.Format("{0} {1}", _kind, _target);
+		}
+
+		public bool Equals([CanBeNull] _SingleDiskChange other)
+		{
+			if (ReferenceEquals(null, other))
+				return false;
+			if (ReferenceEquals(this, other))
+				return true;
+			return _target.Equals(other._target) && _kind == other._kind;
+		}
+
+		public override bool Equals([CanBeNull] object obj)
+		{
+			return Equals(obj as _SingleDiskChange);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return (_target.GetHashCode()*397) ^ (int) _kind;
+			}
+		}
+
+		public static bool operator ==(_SingleDiskChange left, _SingleDiskChange right)
+		{
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(_SingleDiskChange left, _SingleDiskChange right)
+		{
+			return !Equals(left, right);
 		}
 
 		public override bool ConflictsWith(_DiskChange op2)
 		{
 			var other = op2 as _SingleDiskChange;
 			if (other == null)
-				return false;
+				return op2.ConflictsWith(this);
 			var kinds = new[] {OpKind, other.OpKind}.ToList();
 			kinds.Sort();
 			var higherPriorityKind = kinds[0];

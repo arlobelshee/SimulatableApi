@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -10,6 +11,12 @@ namespace Simulated._Fs
 		public _MultipleDiskChanges([NotNull] params _DiskChange[] changes)
 		{
 			_changes = changes;
+		}
+
+		[NotNull]
+		public ReadOnlyCollection<_DiskChange> Changes
+		{
+			get { return _changes.ToList().AsReadOnly(); }
 		}
 
 		public override bool ConflictsWith(_DiskChange op2)

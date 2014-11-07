@@ -22,7 +22,13 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public static _DiskChange WriteFile([NotNull] FsPath target, [NotNull] string contents)
+		public static _DiskChange WriteFile([NotNull] FsPath target)
+		{
+			return new _SingleDiskChange(target, _SingleDiskChange.Kind.FileWrite);
+		}
+
+		[NotNull]
+		public static _DiskChange DeleteFile([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.FileWrite);
 		}
@@ -34,7 +40,7 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public static _DiskChange FindFiles([NotNull] FsPath target, [NotNull] string pattern)
+		public static _DiskChange FindFiles([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.DirFindFiles);
 		}
@@ -54,7 +60,13 @@ namespace Simulated._Fs
 		[NotNull]
 		public static _DiskChange MoveDirectory([NotNull] FsPath src, [NotNull] FsPath dest)
 		{
-			return new _MultipleDiskChanges(new _SingleDiskChange(src, _SingleDiskChange.Kind.DirDelete), new _SingleDiskChange(dest, _SingleDiskChange.Kind.DirCreate));
+			return new _MultipleDiskChanges(DeleteDirectory(src), CreateDirectory(dest));
+		}
+
+		[NotNull]
+		public static _DiskChange MoveFile([NotNull] FsPath src, [NotNull] FsPath dest)
+		{
+			return new _MultipleDiskChanges(DeleteFile(src), WriteFile(dest));
 		}
 	}
 }
