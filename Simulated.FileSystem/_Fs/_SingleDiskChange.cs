@@ -9,12 +9,12 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _OverlappedLambdaWithKind : _OverlappedOperation
+	internal class _SingleDiskChange : _DiskChange
 	{
 		private readonly FsPath _target;
 		private readonly Kind _kind;
 
-		public _OverlappedLambdaWithKind([NotNull] FsPath target, Kind kind)
+		public _SingleDiskChange([NotNull] FsPath target, Kind kind)
 		{
 			_target = target;
 			_kind = kind;
@@ -25,7 +25,7 @@ namespace Simulated._Fs
 			get { return _kind; }
 		}
 
-		public bool HasSameTargetAs([NotNull] _OverlappedLambdaWithKind op2)
+		public bool HasSameTargetAs([NotNull] _SingleDiskChange op2)
 		{
 			return _target == op2._target;
 		}
@@ -36,9 +36,9 @@ namespace Simulated._Fs
 				.Name, _target);
 		}
 
-		public override bool ConflictsWith(_OverlappedOperation op2)
+		public override bool ConflictsWith(_DiskChange op2)
 		{
-			var other = op2 as _OverlappedLambdaWithKind;
+			var other = op2 as _SingleDiskChange;
 			if (other == null)
 				return false;
 			var kinds = new[] {OpKind, other.OpKind}.ToList();

@@ -9,17 +9,17 @@ using Simulated._Fs;
 
 namespace Simulated.Tests.zzTestHelpers
 {
-	internal class _TestOperation : _OverlappedOperation
+	internal class _TestOperation : _DiskChange
 	{
 		private readonly int _name;
-		private readonly List<_OverlappedOperation> _enemies = new List<_OverlappedOperation>();
+		private readonly List<_DiskChange> _enemies = new List<_DiskChange>();
 
 		public _TestOperation(int name)
 		{
 			_name = name;
 		}
 
-		public override bool ConflictsWith(_OverlappedOperation op2)
+		public override bool ConflictsWith(_DiskChange op2)
 		{
 			return _enemies.Contains(op2);
 		}

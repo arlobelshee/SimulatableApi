@@ -75,11 +75,12 @@
     <Compile Include="_Fs\_LinqExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="_Fs\_Make.cs" />
+    <Compile Include="_Fs\_MultipleDiskChanges.cs" />
     <Compile Include="_Fs\_ObservableContext.cs" />
     <Compile Include="_Fs\_Op.cs" />
     <Compile Include="_Fs\_OperationBacklog.cs" />
-    <Compile Include="_Fs\_OverlappedLambdaWithKind.cs" />
-    <Compile Include="_Fs\_OverlappedOperation.cs" />
+    <Compile Include="_Fs\_SingleDiskChange.cs" />
+    <Compile Include="_Fs\_DiskChange.cs" />
     <Compile Include="_Fs\_ParallelSafeWorkSet.cs" />
     <Compile Include="_Fs\_PathRoot.cs" />
   </ItemGroup>

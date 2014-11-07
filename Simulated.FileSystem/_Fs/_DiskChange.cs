@@ -7,8 +7,8 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal abstract class _OverlappedOperation
+	internal abstract class _DiskChange
 	{
-		public abstract bool ConflictsWith([NotNull] _OverlappedOperation op2);
+		public abstract bool ConflictsWith([NotNull] _DiskChange op2);
 	}
 }

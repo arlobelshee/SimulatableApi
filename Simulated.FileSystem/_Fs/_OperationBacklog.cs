@@ -12,12 +12,12 @@ namespace Simulated._Fs
 {
 	internal class _OperationBacklog
 	{
-		private List<_OverlappedOperation> _pendingWork = new List<_OverlappedOperation>();
-		private readonly object _lock = new object();
+		[NotNull] private List<_DiskChange> _pendingWork = new List<_DiskChange>();
+		[NotNull] private readonly object _lock = new object();
 
 		public event Action<object, _ParallelSafeWorkSet> WorkIsReadyToExecute;
 
-		public void Enqueue([NotNull] _OverlappedOperation workToDo)
+		public void Enqueue([NotNull] _DiskChange workToDo)
 		{
 			lock (_lock)
 			{
@@ -25,11 +25,10 @@ namespace Simulated._Fs
 			}
 		}
 
-		[NotNull]
-		public void FinishedSomeWork([CanBeNull] _OverlappedOperation completedWork)
+		public void FinishedSomeWork([CanBeNull] _DiskChange completedWork)
 		{
-			var workToDo = new List<_OverlappedOperation>();
-			var workToWait = new List<_OverlappedOperation>();
+			var workToDo = new List<_DiskChange>();
+			var workToWait = new List<_DiskChange>();
 			var processedWork = workToWait.Concat(workToDo);
 			lock (_lock)
 			{

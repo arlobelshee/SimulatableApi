@@ -15,16 +15,17 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	[TestFixture]
 	public class DetectOperationsThatWouldConflictSoTheyCanRunSerially
 	{
-		private const string _ = "";
-		private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
-		private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
-		private static readonly _OverlappedOperation EmptySetOfWork = null;
+		[NotNull] private const string _ = "";
+		[NotNull] private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
+		[NotNull] private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
+		[NotNull] private static readonly FsPath AThirdPath = FsPath.TempFolder/"C";
+		[NotNull] private static readonly _DiskChange EmptySetOfWork = null;
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
 		public void OpsWithSameTarget_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			((_OverlappedLambdaWithKind) op1).ConflictsWith((_OverlappedLambdaWithKind) op2)
+			((_SingleDiskChange) op1).ConflictsWith((_SingleDiskChange) op2)
 				.Should()
 				.Be(expected);
 		}
@@ -33,7 +34,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsDifferentTarget")]
 		public void OpsWithDifferentTargets_Should_ConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			((_OverlappedOperation) op1).ConflictsWith((_OverlappedOperation) op2)
+			((_DiskChange) op1).ConflictsWith((_DiskChange) op2)
 				.Should()
 				.Be(expected);
 		}
@@ -120,7 +121,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			testSubject.FinishedSomeWork(EmptySetOfWork);
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new []{work[0]})});
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
 		}
 
 		[Test]
@@ -134,7 +135,35 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			testSubject.FinishedSomeWork(work[0]);
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new []{work[1], work[2]})});
+				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[1], work[2]})});
+		}
+
+		[Test]
+		public void MultipleChangesShouldConflictIfAnyOneIncludedChangeConflicts()
+		{
+			var benignChange = _Op.FileExists(ArbitraryPath);
+			var someChange = _Op.DirectoryExists(ArbitraryPath);
+			var changeWhichConflicts = _Op.CreateDirectory(ArbitraryPath);
+			var firstChange = new _MultipleDiskChanges(benignChange, someChange);
+			var secondChange = new _MultipleDiskChanges(benignChange, changeWhichConflicts);
+
+			firstChange.ConflictsWith(secondChange)
+				.Should()
+				.Be(true);
+		}
+
+		[Test]
+		public void MultipleChangesShouldNotConflictIfAllIncludedChangesDontConflict()
+		{
+			var benignChange = _Op.FileExists(ArbitraryPath);
+			var someChange = _Op.DirectoryExists(ArbitraryPath);
+			var changeWhichDoesNotConflict = _Op.DirectoryExists(ArbitraryPath);
+			var firstChange = new _MultipleDiskChanges(benignChange, someChange);
+			var secondChange = new _MultipleDiskChanges(benignChange, changeWhichDoesNotConflict);
+
+			firstChange.ConflictsWith(secondChange)
+				.Should()
+				.Be(false);
 		}
 
 		[NotNull]
@@ -186,7 +215,7 @@ E|XX.X...
 				_Op.WriteFile(firstTarget, _),
 				_Op.FindFiles(firstTarget, _),
 				_Op.FileExists(firstTarget),
-				_Op.DirectoryExists(firstTarget)
+				_Op.DirectoryExists(firstTarget),
 			};
 			var rhsOps = new object[]
 			{
