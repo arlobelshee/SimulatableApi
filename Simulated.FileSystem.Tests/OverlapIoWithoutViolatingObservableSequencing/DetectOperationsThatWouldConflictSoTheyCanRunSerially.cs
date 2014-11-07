@@ -17,7 +17,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	{
 		[NotNull] private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		[NotNull] private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
-		[NotNull] private static readonly _DiskChange EmptySetOfWork = null;
+		[NotNull] private static readonly _DiskChangeKind EmptySetOfWork = null;
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
@@ -32,7 +32,7 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		[TestCaseSource("OperationConflictsDifferentTarget")]
 		public void OpsWithDifferentTargetsShouldConflictCorrectly(bool expected, [NotNull] object op1, [NotNull] object op2)
 		{
-			((_DiskChange) op1).ConflictsWith((_DiskChange) op2)
+			((_DiskChangeKind) op1).ConflictsWith((_DiskChangeKind) op2)
 				.Should()
 				.Be(expected);
 		}

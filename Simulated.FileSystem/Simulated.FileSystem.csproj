@@ -80,7 +80,7 @@
     <Compile Include="_Fs\_Op.cs" />
     <Compile Include="_Fs\_OperationBacklog.cs" />
     <Compile Include="_Fs\_SingleDiskChange.cs" />
-    <Compile Include="_Fs\_DiskChange.cs" />
+    <Compile Include="_Fs\_DiskChangeKind.cs" />
     <Compile Include="_Fs\_ParallelSafeWorkSet.cs" />
     <Compile Include="_Fs\_PathRoot.cs" />
   </ItemGroup>

@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _SingleDiskChange : _DiskChange, IEquatable<_SingleDiskChange>
+	internal class _SingleDiskChange : _DiskChangeKind, IEquatable<_SingleDiskChange>
 	{
 		[NotNull] private readonly FsPath _target;
 		private readonly Kind _kind;
@@ -67,7 +67,7 @@ namespace Simulated._Fs
 			return !Equals(left, right);
 		}
 
-		public override bool ConflictsWith(_DiskChange op2)
+		public override bool ConflictsWith(_DiskChangeKind op2)
 		{
 			var other = op2 as _SingleDiskChange;
 			if (other == null)

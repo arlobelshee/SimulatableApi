@@ -10,61 +10,61 @@ namespace Simulated._Fs
 	internal static class _Op
 	{
 		[NotNull]
-		public static _DiskChange DeleteDirectory([NotNull] FsPath target)
+		public static _DiskChangeKind DeleteDirectory([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.DirDelete);
 		}
 
 		[NotNull]
-		public static _DiskChange CreateDirectory([NotNull] FsPath target)
+		public static _DiskChangeKind CreateDirectory([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.DirCreate);
 		}
 
 		[NotNull]
-		public static _DiskChange WriteFile([NotNull] FsPath target)
+		public static _DiskChangeKind WriteFile([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.FileWrite);
 		}
 
 		[NotNull]
-		public static _DiskChange DeleteFile([NotNull] FsPath target)
+		public static _DiskChangeKind DeleteFile([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.FileWrite);
 		}
 
 		[NotNull]
-		public static _DiskChange ReadFile([NotNull] FsPath target)
+		public static _DiskChangeKind ReadFile([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.ReadOnlyFileOp);
 		}
 
 		[NotNull]
-		public static _DiskChange FindFiles([NotNull] FsPath target)
+		public static _DiskChangeKind FindFiles([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.DirFindFiles);
 		}
 
 		[NotNull]
-		public static _DiskChange FileExists([NotNull] FsPath target)
+		public static _DiskChangeKind FileExists([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.ReadOnlyFileOp);
 		}
 
 		[NotNull]
-		public static _DiskChange DirectoryExists([NotNull] FsPath target)
+		public static _DiskChangeKind DirectoryExists([NotNull] FsPath target)
 		{
 			return new _SingleDiskChange(target, _SingleDiskChange.Kind.DirExists);
 		}
 
 		[NotNull]
-		public static _DiskChange MoveDirectory([NotNull] FsPath src, [NotNull] FsPath dest)
+		public static _DiskChangeKind MoveDirectory([NotNull] FsPath src, [NotNull] FsPath dest)
 		{
 			return new _MultipleDiskChanges(DeleteDirectory(src), CreateDirectory(dest));
 		}
 
 		[NotNull]
-		public static _DiskChange MoveFile([NotNull] FsPath src, [NotNull] FsPath dest)
+		public static _DiskChangeKind MoveFile([NotNull] FsPath src, [NotNull] FsPath dest)
 		{
 			return new _MultipleDiskChanges(DeleteFile(src), WriteFile(dest));
 		}

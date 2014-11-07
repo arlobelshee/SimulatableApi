@@ -12,15 +12,15 @@ namespace Simulated._Fs
 {
 	internal class _ParallelSafeWorkSet : IEquatable<_ParallelSafeWorkSet>
 	{
-		[NotNull] private readonly List<_DiskChange> _workToDo;
+		[NotNull] private readonly List<_DiskChangeKind> _workToDo;
 
-		public _ParallelSafeWorkSet([NotNull] IEnumerable<_DiskChange> workToDo)
+		public _ParallelSafeWorkSet([NotNull] IEnumerable<_DiskChangeKind> workToDo)
 		{
 			_workToDo = workToDo.ToList();
 		}
 
 		[NotNull]
-		public List<_DiskChange> WorkToDo
+		public List<_DiskChangeKind> WorkToDo
 		{
 			get { return _workToDo; }
 		}
