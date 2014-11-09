@@ -3,6 +3,7 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
@@ -12,11 +13,12 @@ namespace Simulated.Tests.FileSystemModification
 {
 	public class CanReadAndWriteFileContents : FileSystemTestBase
 	{
+		[NotNull]
 		[Test]
-		public void AllFileObjectsWithTheSamePathShouldReferToSameStorage()
+		public async Task AllFileObjectsWithTheSamePathShouldReferToSameStorage()
 		{
-			_testFile.Overwrite(OriginalContents);
-			TestSubject.File(_testFile.FullPath)
+			await _testFile.Overwrite(OriginalContents);
+			await TestSubject.File(_testFile.FullPath)
 				.Overwrite(NewContents);
 			_testFile.ShouldContain(NewContents);
 		}
@@ -28,11 +30,6 @@ namespace Simulated.Tests.FileSystemModification
 		protected override void FinishSetup()
 		{
 			_testFile = BaseFolder.File("CreatedByTest.txt");
-		}
-
-		protected virtual FileSystem MakeTestSubject()
-		{
-			return FileSystem.Simulated();
 		}
 	}
 }

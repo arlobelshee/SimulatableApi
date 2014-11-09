@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -16,16 +17,16 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class LocateExistingStructures : DiskTestBase
 	{
-		[Test]
+		[NotNull,Test]
 		[TestCase("matches.*", new[] {"matches.txt", "matches.jpg"})]
 		[TestCase("*.*", new[] {"matches.txt", "matches.jpg", "no_match.txt"})]
 		[TestCase("*.txt", new[] {"matches.txt", "no_match.txt"})]
 		[TestCase("matches.txt", new[] {"matches.txt"})]
-		public void FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
+		public async Task FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
 		{
-			TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents);
-			TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents);
-			TestSubject.Overwrite(BaseFolder/"no_match.txt", ArbitraryFileContents);
+			await TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents);
+			await TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents);
+			await TestSubject.Overwrite(BaseFolder/"no_match.txt", ArbitraryFileContents);
 			TestSubject.FindFiles(BaseFolder, searchPattern)
 				.Should()
 				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));

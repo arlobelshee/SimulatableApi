@@ -68,10 +68,13 @@ namespace Simulated._Fs
 			Directory.CreateDirectory(path._Absolute);
 		}
 
-		public void Overwrite(FsPath path, string newContents)
+		public async Task Overwrite(FsPath path, string newContents)
 		{
 			CreateDir(path.Parent);
-			File.WriteAllText(path._Absolute, newContents);
+			using (var contents = File.CreateText(path._Absolute))
+			{
+				await contents.WriteAsync(newContents).ConfigureAwait(false);
+			}
 		}
 
 		public void Overwrite(FsPath path, byte[] newContents)

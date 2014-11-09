@@ -22,7 +22,10 @@ namespace Simulated._Fs
 		IObservable<byte[]> RawContents([NotNull] FsPath path);
 
 		void CreateDir([NotNull] FsPath path);
-		void Overwrite([NotNull] FsPath path, [NotNull] string newContents);
+
+		[NotNull]
+		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
+
 		void Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
 		void DeleteDir([NotNull] FsPath path);
 		void DeleteFile([NotNull] FsPath path);

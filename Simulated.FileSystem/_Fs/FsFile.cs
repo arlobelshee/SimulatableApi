@@ -100,10 +100,11 @@ namespace Simulated._Fs
 		///    contents given. This operation is revertable.
 		/// </summary>
 		/// <param name="newContents"> The new contents for the file </param>
+		[NotNull]
 		[PublicApi]
-		public void Overwrite([NotNull] string newContents)
+		public Task Overwrite([NotNull] string newContents)
 		{
-			_allFiles._Disk.Overwrite(_path, newContents);
+			return _allFiles._Disk.Overwrite(_path, newContents);
 		}
 
 		/// <summary>

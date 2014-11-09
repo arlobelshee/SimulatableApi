@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -62,13 +61,16 @@ namespace Simulated._Fs
 			}
 		}
 
-		public void Overwrite(FsPath path, string newContents)
+		public Task Overwrite(FsPath path, string newContents)
 		{
-			CreateDir(path.Parent);
-			_data[path] = new _Node(_StorageKind.File)
+			return Task.Run(() =>
 			{
-				RawContents = DefaultEncoding.GetBytes(newContents)
-			};
+				CreateDir(path.Parent);
+				_data[path] = new _Node(_StorageKind.File)
+				{
+					RawContents = DefaultEncoding.GetBytes(newContents)
+				};
+			});
 		}
 
 		public void Overwrite(FsPath path, byte[] newContents)

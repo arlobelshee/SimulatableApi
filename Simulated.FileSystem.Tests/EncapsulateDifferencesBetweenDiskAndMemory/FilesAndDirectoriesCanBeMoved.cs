@@ -5,6 +5,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -16,25 +17,25 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class FilesAndDirectoriesCanBeMoved : DiskTestBase
 	{
-		[Test]
-		public void MovingDirectoryShouldMoveAllContents()
+		[NotNull,Test]
+		public async Task MovingDirectoryShouldMoveAllContents()
 		{
 			var originalRoot = BaseFolder/"original";
 			var newRoot = BaseFolder/"new";
 			var filePath = originalRoot/"something"/"file.txt";
-			TestSubject.Overwrite(filePath, ArbitraryFileContents);
+			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
 			TestSubject.MoveDir(originalRoot, newRoot);
 			TestSubject.ShouldBeDir(newRoot);
 			TestSubject.ShouldNotExist(originalRoot);
 			TestSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
 		}
 
-		[Test]
-		public void MovingFileShouldChangeItsLocation()
+		[NotNull,Test]
+		public async Task MovingFileShouldChangeItsLocation()
 		{
 			var originalFile = BaseFolder/"something"/"file.txt";
 			var dest = BaseFolder/"new_path"/"file_new.txt";
-			TestSubject.Overwrite(originalFile, ArbitraryFileContents);
+			await TestSubject.Overwrite(originalFile, ArbitraryFileContents);
 			TestSubject.MoveFile(originalFile, dest);
 			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
@@ -91,10 +92,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		protected override void FinishSetup()
 		{
-			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents);
+			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
 			TestSubject.CreateDir(BaseFolder/SrcDir);
 
-			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents);
+			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
 			TestSubject.CreateDir(BaseFolder/DestBlockingDir);
 		}
 

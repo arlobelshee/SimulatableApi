@@ -12,10 +12,10 @@ namespace Simulated.Tests.zzTestHelpers
 {
 	public abstract class DiskTestBase
 	{
-		protected const string ArbitraryFileContents = "contents";
-		protected const string UnicodeContents = "helȽo ﺷ";
-		protected FsPath BaseFolder;
-		internal _IFsDisk TestSubject;
+		[NotNull] protected const string ArbitraryFileContents = "contents";
+		[NotNull] protected const string UnicodeContents = "helȽo ﺷ";
+		[NotNull] protected FsPath BaseFolder;
+		[NotNull] internal _IFsDisk TestSubject;
 
 		[SetUp]
 		public void Setup()

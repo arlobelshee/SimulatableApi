@@ -4,7 +4,9 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 using Simulated._Fs;
@@ -40,12 +42,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void CreatingDirectoryWhichExistsShouldNoop()
+		public async Task CreatingDirectoryWhichExistsShouldNoop()
 		{
 			var newPath = BaseFolder/"sub";
 			var filePath = newPath/"file.txt";
 			TestSubject.CreateDir(newPath);
-			TestSubject.Overwrite(filePath, ArbitraryFileContents);
+			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
 			TestSubject.CreateDir(newPath);
 			TestSubject.DirExists(newPath)
 				.Should()
@@ -63,11 +65,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			TestSubject.ShouldNotExist(newPath);
 		}
 
+		[NotNull]
 		[Test]
-		public void DeletedFileShouldNotExist()
+		public async Task DeletedFileShouldNotExist()
 		{
 			var newPath = BaseFolder/"sub.txt";
-			TestSubject.Overwrite(newPath, ArbitraryFileContents);
+			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
 			TestSubject.DeleteFile(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
@@ -91,10 +94,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[Test]
-		public void UsingDeleteDirectoryOnAFileShouldFail()
+		public async Task UsingDeleteDirectoryOnAFileShouldFail()
 		{
 			var newPath = BaseFolder/"sub.txt";
-			TestSubject.Overwrite(newPath, ArbitraryFileContents);
+			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
 			Action delete = () => TestSubject.DeleteDir(newPath);
 			delete.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, newPath));

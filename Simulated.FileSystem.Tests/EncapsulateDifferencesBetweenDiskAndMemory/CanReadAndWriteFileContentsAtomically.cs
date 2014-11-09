@@ -6,6 +6,7 @@
 using System;
 using System.Reactive.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -17,12 +18,12 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class CanReadAndWriteFileContentsAtomically : DiskTestBase
 	{
-		[Test]
-		public void CanCreateFileAndReadItsContents()
+		[NotNull,Test]
+		public async Task CanCreateFileAndReadItsContents()
 		{
 			var fileName = BaseFolder/"file.txt";
 			TestSubject.ShouldNotExist(fileName);
-			TestSubject.Overwrite(fileName, ArbitraryFileContents);
+			await TestSubject.Overwrite(fileName, ArbitraryFileContents);
 			TestSubject.DirExists(fileName)
 				.Should()
 				.BeFalse();
@@ -70,12 +71,13 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				.WithMessage(string.Format(UserMessages.ReadErrorPathIsDirectory, dirName));
 		}
 
-		[Test]
-		public void StringsShouldBeEncodedInUtf8ByDefault()
+		[NotNull,Test]
+		public async Task StringsShouldBeEncodedInUtf8ByDefault()
 		{
 			var testFile = BaseFolder/"hello.txt";
-			TestSubject.Overwrite(testFile, UnicodeContents);
-			var asBytes = TestSubject.RawContents(testFile).CollectAllBytes();
+			await TestSubject.Overwrite(testFile, UnicodeContents);
+			var asBytes = TestSubject.RawContents(testFile)
+				.CollectAllBytes();
 			asBytes.Should()
 				.Equal(Encoding.UTF8.GetBytes(UnicodeContents));
 		}
@@ -123,7 +125,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return contents => TestSubject.Overwrite(fileName, contents);
+					return contents => TestSubject.Overwrite(fileName, contents).Wait();
 				case FileFormat.Binary:
 					return contents => TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(contents));
 				default:
