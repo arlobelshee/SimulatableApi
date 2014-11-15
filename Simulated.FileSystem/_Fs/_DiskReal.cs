@@ -19,9 +19,9 @@ namespace Simulated._Fs
 			return Directory.Exists(path._Absolute);
 		}
 
-		public bool FileExists(FsPath path)
+		public Task<bool> FileExists(FsPath path)
 		{
-			return File.Exists(path._Absolute);
+			return File.Exists(path._Absolute).AsTask();
 		}
 
 		public async Task<string> TextContents(FsPath path)
@@ -85,10 +85,15 @@ namespace Simulated._Fs
 
 		public void DeleteDir(FsPath path)
 		{
-			if (FileExists(path))
+			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(path)))
 				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
 			if (DirExists(path))
 				Directory.Delete(path._Absolute, true);
+		}
+
+		private bool _TemporaryUnwrapWhileIRefactorIncrementally(Task<bool> fileExists)
+		{
+			return fileExists.Result;
 		}
 
 		public void DeleteFile(FsPath path)
@@ -102,9 +107,9 @@ namespace Simulated._Fs
 		{
 			if (DirExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src._Absolute, dest._Absolute));
-			if (!FileExists(src))
+			if (!_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(src)))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
-			if (FileExists(dest) || DirExists(dest))
+			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(dest)) || DirExists(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			CreateDir(dest.Parent);
 			File.Move(src._Absolute, dest._Absolute);
@@ -112,11 +117,11 @@ namespace Simulated._Fs
 
 		public void MoveDir(FsPath src, FsPath dest)
 		{
-			if (FileExists(src))
+			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(src)))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
 			if (!DirExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
-			if (FileExists(dest) || DirExists(dest))
+			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(dest)) || DirExists(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			Directory.Move(src._Absolute, dest._Absolute);
 		}
@@ -133,7 +138,7 @@ namespace Simulated._Fs
 		{
 			if (DirExists(path))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
-			if (!FileExists(path))
+			if (!_TemporaryUnwrapWhileIRefactorIncrementally(FileExists(path)))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}

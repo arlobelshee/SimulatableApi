@@ -19,6 +19,11 @@ namespace Simulated._Fs
 			_workToDo = workToDo.ToList();
 		}
 
+		public void StartAll()
+		{
+			_workToDo.Each(w=>w.Execute());
+		}
+
 		public bool Equals([CanBeNull] _ParallelSafeWorkSet other)
 		{
 			if (ReferenceEquals(null, other))

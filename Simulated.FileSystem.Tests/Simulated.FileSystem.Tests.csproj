@@ -78,6 +78,9 @@
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\FilesAndDirectoriesCanBeMoved.cs" />
     <Compile Include="EncapsulateDifferencesBetweenDiskAndMemory\CanCreateAndDestroyEntries.cs" />
     <Compile Include="OverlapIoWithoutViolatingObservableSequencing\ProvideLowLevelOperationsThatWillDelayIfNecessary.cs" />
+    <Compile Include="zzTestHelpers\_BlockingDiskInMemory.cs" />
+    <Compile Include="zzTestHelpers\_AsyncManualResetEvent.cs" />
+    <Compile Include="zzTestHelpers\_Categories.cs" />
     <Compile Include="zzTestHelpers\_TestOperation.cs" />
     <Compile Include="zzTestHelpers\_BacklogTestExtensions.cs" />
     <Compile Include="OverlapIoWithoutViolatingObservableSequencing\DetectOperationsThatWouldConflictSoTheyCanRunSerially.cs" />

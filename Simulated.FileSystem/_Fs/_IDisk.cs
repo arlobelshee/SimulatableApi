@@ -13,7 +13,9 @@ namespace Simulated._Fs
 	internal interface _IFsDisk
 	{
 		bool DirExists([NotNull] FsPath path);
-		bool FileExists([NotNull] FsPath path);
+
+		[NotNull]
+		Task<bool> FileExists([NotNull] FsPath path);
 
 		[NotNull]
 		Task<string> TextContents([NotNull] FsPath path);

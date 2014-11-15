@@ -15,8 +15,8 @@ namespace Simulated._Fs
 {
 	internal class _DiskSimulated : _IFsDisk
 	{
-		private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
-		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+		[NotNull] private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
+		[NotNull] private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
 		public bool DirExists(FsPath path)
 		{
@@ -24,10 +24,10 @@ namespace Simulated._Fs
 				.Kind == _StorageKind.Directory;
 		}
 
-		public bool FileExists(FsPath path)
+		public Task<bool> FileExists(FsPath path)
 		{
-			return _GetStorage(path)
-				.Kind == _StorageKind.File;
+			return (_GetStorage(path)
+				.Kind == _StorageKind.File).AsTask();
 		}
 
 		public Task<string> TextContents(FsPath path)

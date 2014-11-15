@@ -12,8 +12,10 @@ namespace Simulated._Fs
 {
 	internal class _OperationBacklog
 	{
-		[NotNull] private List<_DiskChange> _pendingWork = new List<_DiskChange>();
+		[NotNull] private readonly List<_DiskChange> _pendingWork = new List<_DiskChange>();
+		[NotNull] private readonly List<_DiskChange> _workInProgress = new List<_DiskChange>();
 		[NotNull] private readonly object _lock = new object();
+		private bool _started;
 
 		public event Action<object, _ParallelSafeWorkSet> WorkIsReadyToExecute;
 
@@ -23,16 +25,28 @@ namespace Simulated._Fs
 			{
 				_pendingWork.Add(workToDo);
 			}
+			if (_started)
+// ReSharper disable once AssignNullToNotNullAttribute
+				FinishedSomeWork(null);
 		}
 
-		public void FinishedSomeWork([CanBeNull] _DiskChange completedWork)
+		public void Start()
+		{
+			_started = true;
+// ReSharper disable once AssignNullToNotNullAttribute
+			FinishedSomeWork(null);
+		}
+
+		public void FinishedSomeWork([NotNull] _DiskChange completedWork)
 		{
 			var workToDo = new List<_DiskChange>();
 			var workToWait = new List<_DiskChange>();
-			var processedWork = workToWait.Concat(workToDo);
+			var processedWork = _workInProgress.Concat(workToWait)
+				.Concat(workToDo);
 			lock (_lock)
 			{
-				foreach (var op in _pendingWork.Where(op => op != completedWork))
+				_workInProgress.Remove(completedWork);
+				foreach (var op in _pendingWork)
 				{
 // ReSharper disable once PossibleMultipleEnumeration
 					if (processedWork.Any(w => w.ConflictsWith(op)))
@@ -44,7 +58,8 @@ namespace Simulated._Fs
 						workToDo.Add(op);
 					}
 				}
-				_pendingWork = workToWait;
+				_workInProgress.AddRange(workToDo);
+				workToDo.Each(op => _pendingWork.Remove(op));
 			}
 			if (WorkIsReadyToExecute != null && workToDo.Count > 0)
 			{

@@ -20,16 +20,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void NewDirectoryShouldExistWhenCreated()
 		{
 			var newPath = BaseFolder/"sub";
-			TestSubject.DirExists(newPath)
-				.Should()
-				.BeFalse();
+			TestSubject.ShouldNotExist(newPath);
 			TestSubject.CreateDir(newPath);
-			TestSubject.DirExists(newPath)
-				.Should()
-				.BeTrue();
-			TestSubject.FileExists(newPath)
-				.Should()
-				.BeFalse();
+			TestSubject.ShouldBeDir(newPath);
+			TestSubject.ShouldNotBeFile(newPath);
 		}
 
 		[Test]

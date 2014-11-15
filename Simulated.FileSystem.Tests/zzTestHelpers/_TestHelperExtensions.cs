@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using Simulated._Fs;
@@ -21,9 +22,15 @@ namespace Simulated.Tests.zzTestHelpers
 				.BeTrue();
 		}
 
+		public static void ShouldExist([NotNull] this FsFile file)
+		{
+			file.Exists.Result.Should()
+				.BeTrue();
+		}
+
 		public static void ShouldContain([NotNull] this FsFile file, [NotNull] string contents)
 		{
-			file.Exists.Should()
+			file.Exists.Result.Should()
 				.BeTrue();
 			file.ReadAllText()
 				.Result.Should()
@@ -38,7 +45,7 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldNotExist([NotNull] this FsFile file)
 		{
-			file.Exists.Should()
+			file.Exists.Result.Should()
 				.BeFalse();
 		}
 
@@ -52,7 +59,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public static void ShouldBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath file, [NotNull] string contents)
 		{
 			disk.FileExists(file)
-				.Should()
+				.Result.Should()
 				.BeTrue();
 			disk.TextContents(file)
 				.Result.Should()
@@ -62,12 +69,32 @@ namespace Simulated.Tests.zzTestHelpers
 		public static void ShouldBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath file, [NotNull] byte[] contents)
 		{
 			disk.FileExists(file)
-				.Should()
+				.Result.Should()
 				.BeTrue();
 			disk.RawContents(file)
 				.CollectAllBytes()
 				.Should()
 				.Equal(contents);
+		}
+
+		public static void ShouldNotExist([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
+		{
+			disk.ShouldNotBeDir(path);
+			disk.ShouldNotBeFile(path);
+		}
+
+		public static void ShouldNotBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
+		{
+			disk.FileExists(path)
+				.Result.Should()
+				.BeFalse();
+		}
+
+		public static void ShouldNotBeDir([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
+		{
+			disk.DirExists(path)
+				.Should()
+				.BeFalse();
 		}
 
 		[NotNull]
@@ -78,16 +105,6 @@ namespace Simulated.Tests.zzTestHelpers
 			return actual;
 		}
 
-		public static void ShouldNotExist([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
-		{
-			disk.DirExists(path)
-				.Should()
-				.BeFalse();
-			disk.FileExists(path)
-				.Should()
-				.BeFalse();
-		}
-
 		[NotNull]
 		public static List<_ParallelSafeWorkSet> ScheduledWork([NotNull] this _OperationBacklog testSubject)
 		{
@@ -96,6 +113,18 @@ namespace Simulated.Tests.zzTestHelpers
 					.Cast<_ParallelSafeWorkSet>()
 					.Single())
 				.ToList();
+		}
+
+		public static void ShouldHaveRun([NotNull] this Task<bool> existsResult)
+		{
+			existsResult.IsCompleted.Should()
+				.BeTrue();
+		}
+
+		public static void ShouldNotHaveRun(this Task<bool> existsResult)
+		{
+			existsResult.IsCompleted.Should()
+				.BeFalse();
 		}
 	}
 }

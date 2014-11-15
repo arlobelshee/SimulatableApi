@@ -43,11 +43,9 @@ namespace Simulated.Tests.QueryBasicProperties
 		public async Task FilesKnowWhetherTheyExist()
 		{
 			var testSubject = BaseFolder.File(ArbitraryFileName);
-			testSubject.Exists.Should()
-				.BeFalse();
+			testSubject.ShouldNotExist();
 			await testSubject.Overwrite("anything");
-			testSubject.Exists.Should()
-				.BeTrue();
+			testSubject.ShouldExist();
 		}
 	}
 }

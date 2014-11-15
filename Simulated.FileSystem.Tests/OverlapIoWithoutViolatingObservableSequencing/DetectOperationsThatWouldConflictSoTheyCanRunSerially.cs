@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NUnit.Framework;
@@ -17,7 +18,9 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 	{
 		[NotNull] private static readonly FsPath ArbitraryPath = FsPath.TempFolder/"A";
 		[NotNull] private static readonly FsPath AnyOtherPath = FsPath.TempFolder/"B";
-		[NotNull] private static readonly _DiskChange EmptySetOfWork = null;
+
+		[NotNull] private static readonly _DiskChange OneArbitraryWorkItem = _MakeWorkItems(1)
+			.First();
 
 		[Test]
 		[TestCaseSource("OperationConflictsSameTarget")]
@@ -44,10 +47,10 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			testSubject.MonitorEvents();
 			var work = _MakeWorkItems(3);
 			testSubject.EnqueueAll(work);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new _ParallelSafeWorkSet(work));
+				.Equal(_EventSequence(_WorkSet(work)));
 		}
 
 		[Test]
@@ -55,13 +58,24 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 		{
 			var testSubject = new _OperationBacklog();
 			testSubject.MonitorEvents();
-			var first = _MakeWorkItems(1).First();
-			testSubject.Enqueue(first);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Enqueue(OneArbitraryWorkItem);
+			testSubject.Start();
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {first})});
+				.Equal(_EventSequence(_WorkSet(OneArbitraryWorkItem)));
+		}
+
+		[Test]
+		public void FirstWorkItemShouldBeStartedImmediatelyIfBacklogIsAlreadyStarted()
+		{
+			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
+			testSubject.Start();
+			testSubject.Enqueue(OneArbitraryWorkItem);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(_EventSequence(_WorkSet(OneArbitraryWorkItem)));
 		}
 
 		[Test]
@@ -72,10 +86,25 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			var work = _MakeWorkItems(2);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
+				.Equal(_EventSequence(_WorkSet(work[0])));
+		}
+
+		[Test]
+		public void WhenWorkItemConflictsWithOneAlreadyRunningItShouldNotBeScheduled()
+		{
+			var testSubject = new _OperationBacklog();
+			testSubject.MonitorEvents();
+			var work = _MakeWorkItems(2);
+			work.CreateConflict(0, 1);
+			testSubject.Start();
+			testSubject.Enqueue(work[0]);
+			testSubject.Enqueue(work[1]);
+			testSubject.ScheduledWork()
+				.Should()
+				.Equal(_EventSequence(_WorkSet(work[0])));
 		}
 
 		[Test]
@@ -87,10 +116,10 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			work.CreateConflict(0, 1);
 			work.CreateConflict(0, 2);
 			testSubject.EnqueueAll(work);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
+				.Equal(_EventSequence(_WorkSet(work[0])));
 		}
 
 		[Test]
@@ -101,10 +130,10 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0], work[2]})});
+				.Equal(_EventSequence(_WorkSet(work[0], work[2])));
 		}
 
 		[Test]
@@ -116,10 +145,10 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			work.CreateConflict(0, 1);
 			work.CreateConflict(1, 2);
 			testSubject.EnqueueAll(work);
-			testSubject.FinishedSomeWork(EmptySetOfWork);
+			testSubject.Start();
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[0]})});
+				.Equal(_EventSequence(_WorkSet(work[0])));
 		}
 
 		[Test]
@@ -130,10 +159,11 @@ namespace Simulated.Tests.OverlapIoWithoutViolatingObservableSequencing
 			var work = _MakeWorkItems(3);
 			work.CreateConflict(0, 1);
 			testSubject.EnqueueAll(work);
+			testSubject.Start();
 			testSubject.FinishedSomeWork(work[0]);
 			testSubject.ScheduledWork()
 				.Should()
-				.Equal(new object[] {new _ParallelSafeWorkSet(new[] {work[1], work[2]})});
+				.Equal(_EventSequence(_WorkSet(work[0], work[2]), _WorkSet(work[1])));
 		}
 
 		[Test]
@@ -281,9 +311,21 @@ E|XX.X...
 		private static _DiskChange[] _MakeWorkItems(int howMany)
 		{
 			var ops = Enumerable.Range(0, howMany)
-				.Select(name => new _DiskChange(new _TestOperation(name)))
+				.Select(name => new _DiskChange(new _TestOperation(name), Task.Run(() => { })))
 				.ToArray();
 			return ops;
+		}
+
+		[NotNull]
+		private static _ParallelSafeWorkSet _WorkSet([NotNull] params _DiskChange[] workToDo)
+		{
+			return new _ParallelSafeWorkSet(workToDo);
+		}
+
+		[CanBeNull]
+		private static object[] _EventSequence([NotNull] params object[] events)
+		{
+			return events;
 		}
 	}
 }
