@@ -311,7 +311,7 @@ E|XX.X...
 		private static _DiskChange[] _MakeWorkItems(int howMany)
 		{
 			var ops = Enumerable.Range(0, howMany)
-				.Select(name => new _DiskChange(new _TestOperation(name), Task.Run(() => { })))
+				.Select(name => _DiskChange.Make(new _TestOperation(name), true.AsTask().AsTask()))
 				.ToArray();
 			return ops;
 		}

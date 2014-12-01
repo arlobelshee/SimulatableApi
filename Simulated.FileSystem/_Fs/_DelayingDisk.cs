@@ -25,20 +25,19 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<bool> FileExists([NotNull] FsPath location)
 		{
-			var work = new Task<Task>(() => _storage.FileExists(location));
-			_EnqueueChange(_Op.FileExists(location), work);
+			var work = new Task<Task<bool>>(() => _storage.FileExists(location));
+			_Schedule(_DiskChange.Make(_Op.FileExists(location), work));
 			return work.Unwrap();
 		}
 
 		public void Overwrite([NotNull] FsPath location, [NotNull] string contents)
 		{
 			var work = new Task<Task>(() => _storage.Overwrite(location, contents));
-			_EnqueueChange(_Op.WriteFile(location), work);
+			_Schedule(_DiskChange.Make(_Op.WriteFile(location), work));
 		}
 
-		private void _EnqueueChange([NotNull] _DiskChangeKind kind, [NotNull] Task<Task> work)
+		private void _Schedule([NotNull] _DiskChange workToDo)
 		{
-			var workToDo = new _DiskChange(kind, work);
 			workToDo.Completed += _workSchedule.FinishedSomeWork;
 			_workSchedule.Enqueue(workToDo);
 		}

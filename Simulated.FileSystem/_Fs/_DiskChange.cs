@@ -12,11 +12,11 @@ namespace Simulated._Fs
 	internal class _DiskChange
 	{
 		[NotNull] private readonly _DiskChangeKind _kind;
-		[NotNull] private readonly Task<Task> _work;
+		[NotNull] private readonly Task _work;
 
 		public event Action<_DiskChange> Completed;
 
-		public _DiskChange([NotNull] _DiskChangeKind kind, [NotNull] Task<Task> work)
+		public _DiskChange([NotNull] _DiskChangeKind kind, [NotNull] Task work)
 		{
 			_kind = kind;
 			_work = work;
@@ -48,7 +48,19 @@ namespace Simulated._Fs
 
 		public override string ToString()
 		{
-			return string.Format("Work({0})", _kind);
+			return String.Format("Work({0})", _kind);
+		}
+
+		[NotNull]
+		public static _DiskChange Make([NotNull] _DiskChangeKind kind, [NotNull] Task<Task> work)
+		{
+			return new _DiskChange(kind, work);
+		}
+
+		[NotNull]
+		public static _DiskChange Make<T>([NotNull] _DiskChangeKind kind, [NotNull] Task<Task<T>> work)
+		{
+			return new _DiskChange(kind, work);
 		}
 	}
 }
