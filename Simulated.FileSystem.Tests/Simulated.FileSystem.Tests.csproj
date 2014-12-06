@@ -65,6 +65,7 @@
     <Compile Include="FileSystemModification\CanCreateDirectories.cs" />
     <Compile Include="FileSystemModification\CanDeleteThings.cs" />
     <Compile Include="FileSystemModification\CanReadAndWriteFileContents.cs" />
+    <Compile Include="QueryBasicProperties\PublicApisCheckForValidInput.cs" />
     <Compile Include="zzTestHelpers\FileSystemTestBase.cs" />
     <Compile Include="FileSystemNavigation\CanComputePathsUsingFsPath.cs" />
     <Compile Include="FileSystemNavigation\CanFindEntryPoints.cs" />

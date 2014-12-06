@@ -16,20 +16,19 @@ namespace Simulated._Fs
 	/// </summary>
 	public class FsDirectory : IEquatable<FsDirectory>
 	{
-		[NotNull] private readonly FileSystem _allFiles;
+		[NotNull]
+		public FileSystem AllFiles { get; private set; }
+
 		[NotNull] private readonly FsPath _path;
 		[NotNull] private readonly _Storage _underlyingStorage;
 
 		internal FsDirectory([NotNull] FileSystem allFiles, [NotNull] FsPath path, [NotNull] _Storage underlyingStorage)
 		{
-			if (path == null)
-				throw new ArgumentNullException("path");
-			if (allFiles == null)
-				throw new ArgumentNullException("allFiles");
-			if (underlyingStorage == null)
-				throw new ArgumentNullException("underlyingStorage");
+			path.RequireNotNull("path");
+			allFiles.RequireNotNull("allFiles");
+			underlyingStorage.RequireNotNull("underlyingStorage");
 			_path = path;
-			_allFiles = allFiles;
+			AllFiles = allFiles;
 			_underlyingStorage = underlyingStorage;
 		}
 
@@ -58,7 +57,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory Parent
 		{
-			get { return new FsDirectory(_allFiles, _path.Parent, _underlyingStorage); }
+			get { return new FsDirectory(AllFiles, _path.Parent, _underlyingStorage); }
 		}
 
 		/// <summary>
@@ -67,7 +66,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FileSystem FileSystem
 		{
-			get { return _allFiles; }
+			get { return AllFiles; }
 		}
 
 		/// <summary>
@@ -78,7 +77,7 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsDirectory Dir([NotNull] string subdirName)
 		{
-			return new FsDirectory(_allFiles, _path/subdirName, _underlyingStorage);
+			return new FsDirectory(AllFiles, _path/subdirName, _underlyingStorage);
 		}
 
 		/// <summary>
@@ -124,7 +123,8 @@ namespace Simulated._Fs
 		[NotNull]
 		public FsFile File([NotNull] string fileName)
 		{
-			return new FsFile(_allFiles, _path/fileName, _underlyingStorage);
+			fileName.RequireNotNull("fileName");
+			return new FsFile(AllFiles, _path/fileName, _underlyingStorage);
 		}
 
 		/// <summary>

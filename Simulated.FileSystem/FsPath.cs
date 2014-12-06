@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using Simulated._Fs;
 
 namespace Simulated
 {
@@ -111,10 +112,11 @@ namespace Simulated
 		[NotNull]
 		public static FsPath operator /([NotNull] FsPath self, [NotNull] string nextStep)
 		{
+			nextStep.RequireNotNull("nextStep");
 			return new FsPath(Path.Combine(self._absolutePath, nextStep));
 		}
 
-		public bool IsAncestorOf(FsPath possibleDescendent, bool descendentIsDirectory)
+		public bool IsAncestorOf([NotNull] FsPath possibleDescendent, bool descendentIsDirectory)
 		{
 			var ancestorPath = _AllDirectoryNamesInOrder(true);
 			var descendentPath = possibleDescendent._AllDirectoryNamesInOrder(descendentIsDirectory);
@@ -122,13 +124,15 @@ namespace Simulated
 				.All(b => b);
 		}
 
+		[NotNull]
 		private string[] _AllDirectoryNamesInOrder(bool descendentIsDirectory)
 		{
 			var deepestDirectory = descendentIsDirectory ? _absolutePath : Path.GetDirectoryName(_absolutePath);
 			return deepestDirectory.Split(new[] {Path.DirectorySeparatorChar}, StringSplitOptions.RemoveEmptyEntries);
 		}
 
-		public FsPath ReplaceAncestor(FsPath currentAncestor, FsPath newAncestor, bool descendentIsDirectory)
+		[NotNull]
+		public FsPath ReplaceAncestor([NotNull] FsPath currentAncestor, [NotNull] FsPath newAncestor, bool descendentIsDirectory)
 		{
 			var myPath = _AllDirectoryNamesInOrder(descendentIsDirectory);
 			var rootElementsToTrim = currentAncestor._AllDirectoryNamesInOrder(true)

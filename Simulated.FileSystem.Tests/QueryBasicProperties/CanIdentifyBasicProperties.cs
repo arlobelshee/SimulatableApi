@@ -6,7 +6,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
-using Simulated.Tests.FileSystemNavigation;
 using Simulated.Tests.zzTestHelpers;
 
 namespace Simulated.Tests.QueryBasicProperties

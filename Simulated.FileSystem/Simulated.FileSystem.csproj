@@ -52,6 +52,8 @@
     <Compile Include="_Fs\FsDirectory.cs" />
     <Compile Include="_Fs\FsFile.cs" />
     <Compile Include="_Fs\AsyncLazy.cs" />
+    <Compile Include="_Fs\Require.cs" />
+    <Compile Include="_Fs\_CallerVariableNameAttribute.cs" />
     <Compile Include="_Fs\_DiskReal.cs" />
     <Compile Include="_Fs\_DiskSimulated.cs" />
     <Compile Include="_Fs\_Storage.cs" />
