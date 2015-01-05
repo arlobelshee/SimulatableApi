@@ -24,10 +24,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[TestCase("matches.txt", new[] {"matches.txt"})]
 		public async Task FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
 		{
-			await TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents);
-			await TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents);
-			await TestSubject.Overwrite(BaseFolder/"no_match.txt", ArbitraryFileContents);
-			TestSubject.FindFiles(BaseFolder, searchPattern)
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"matches.txt", ArbitraryFileContents);
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"matches.jpg", ArbitraryFileContents);
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"no_match.txt", ArbitraryFileContents);
+			TestSubject.FindFilesNeedsToBeMadeDelayStart(BaseFolder, searchPattern)
 				.Should()
 				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));
 		}

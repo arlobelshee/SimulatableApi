@@ -37,7 +37,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public bool Exists
 		{
-			get { return _allFiles._Disk.DirExists(_path); }
+			get { return _allFiles._Disk.DirExistsNeedsToBeMadeDelayStart(_path); }
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public void EnsureExists()
 		{
-			_allFiles._Disk.CreateDir(_path);
+			_allFiles._Disk.CreateDirNeedsToBeMadeDelayStart(_path);
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public void EnsureDoesNotExist()
 		{
-			_allFiles._Disk.DeleteDir(_path);
+			_allFiles._Disk.DeleteDirNeedsToBeMadeDelayStart(_path);
 		}
 
 		/// <summary>
@@ -132,7 +132,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public IEnumerable<FsFile> Files([NotNull] string searchPattern)
 		{
-			return _allFiles._Disk.FindFiles(_path, searchPattern)
+			return _allFiles._Disk.FindFilesNeedsToBeMadeDelayStart(_path, searchPattern)
 				.Select(p => new FsFile(_allFiles, p));
 		}
 

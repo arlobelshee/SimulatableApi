@@ -23,8 +23,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var fileName = BaseFolder/"file.txt";
 			TestSubject.ShouldNotExist(fileName);
-			await TestSubject.Overwrite(fileName, ArbitraryFileContents);
-			TestSubject.DirExists(fileName)
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(fileName, ArbitraryFileContents);
+			TestSubject.DirExistsNeedsToBeMadeDelayStart(fileName)
 				.Should()
 				.BeFalse();
 			TestSubject.ShouldBeFile(fileName, ArbitraryFileContents);
@@ -36,7 +36,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var fileName = BaseFolder/"file.txt";
 			var contents = Encoding.UTF8.GetBytes(ArbitraryFileContents);
 			TestSubject.ShouldNotExist(fileName);
-			TestSubject.Overwrite(fileName, contents);
+			TestSubject.OverwriteNeedsToBeMadeDelayStart(fileName, contents);
 			TestSubject.ShouldBeFile(fileName, contents);
 		}
 
@@ -65,7 +65,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void CannotReadContentsOfFolder(FileFormat fileFormat)
 		{
 			var dirName = BaseFolder/"directory.git";
-			TestSubject.CreateDir(dirName);
+			TestSubject.CreateDirNeedsToBeMadeDelayStart(dirName);
 			var readMissingFile = _PickFileReader(fileFormat, dirName);
 			readMissingFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.ReadErrorPathIsDirectory, dirName));
@@ -75,8 +75,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public async Task StringsShouldBeEncodedInUtf8ByDefault()
 		{
 			var testFile = BaseFolder/"hello.txt";
-			await TestSubject.Overwrite(testFile, UnicodeContents);
-			var asBytes = TestSubject.RawContents(testFile)
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(testFile, UnicodeContents);
+			var asBytes = TestSubject.RawContentsNeedsToBeMadeDelayStart(testFile)
 				.CollectAllBytes();
 			asBytes.Should()
 				.Equal(Encoding.UTF8.GetBytes(UnicodeContents));
@@ -86,8 +86,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void BinaryFilesWithValidStringDataShouldBeReadableAsText()
 		{
 			var testFile = BaseFolder/"hello.txt";
-			TestSubject.Overwrite(testFile, Encoding.UTF8.GetBytes(UnicodeContents));
-			var asString = TestSubject.TextContents(testFile)
+			TestSubject.OverwriteNeedsToBeMadeDelayStart(testFile, Encoding.UTF8.GetBytes(UnicodeContents));
+			var asString = TestSubject.TextContentsNeedsToBeMadeDelayStart(testFile)
 				.Result;
 			asString.Should()
 				.Be(UnicodeContents);
@@ -111,9 +111,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return () => TestSubject.TextContents(fileName).Wait();
+					return () => TestSubject.TextContentsNeedsToBeMadeDelayStart(fileName).Wait();
 				case FileFormat.Binary:
-					return () => TestSubject.RawContents(fileName).Wait();
+					return () => TestSubject.RawContentsNeedsToBeMadeDelayStart(fileName).Wait();
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}
@@ -125,9 +125,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return contents => TestSubject.Overwrite(fileName, contents).Wait();
+					return contents => TestSubject.OverwriteNeedsToBeMadeDelayStart(fileName, contents).Wait();
 				case FileFormat.Binary:
-					return contents => TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(contents));
+					return contents => TestSubject.OverwriteNeedsToBeMadeDelayStart(fileName, Encoding.UTF8.GetBytes(contents));
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}

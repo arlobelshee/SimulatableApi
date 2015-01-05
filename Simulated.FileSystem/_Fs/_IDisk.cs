@@ -10,31 +10,35 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
+	/// <summary>
+	///    Disks expose low-level operations. Each method takes no action when called. Instead, it returns a task which may be
+	///    started at any time the caller desires.
+	/// </summary>
 	internal interface _IFsDisk
 	{
-		bool DirExists([NotNull] FsPath path);
+		bool DirExistsNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
 		[NotNull]
-		Task<bool> FileExists([NotNull] FsPath path);
+		Task<bool> FileExistsNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
 		[NotNull]
-		Task<string> TextContents([NotNull] FsPath path);
+		Task<string> TextContentsNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
 		[NotNull]
-		IObservable<byte[]> RawContents([NotNull] FsPath path);
+		IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
-		void CreateDir([NotNull] FsPath path);
-
-		[NotNull]
-		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
-
-		void Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
-		void DeleteDir([NotNull] FsPath path);
-		void DeleteFile([NotNull] FsPath path);
-		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
-		void MoveDir([NotNull] FsPath src, [NotNull] FsPath dest);
+		void CreateDirNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
 		[NotNull]
-		IEnumerable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
+		Task OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] string newContents);
+
+		void OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] byte[] newContents);
+		void DeleteDirNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		void DeleteFileNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		void MoveFileNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
+		void MoveDirNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
+
+		[NotNull]
+		IEnumerable<FsPath> FindFilesNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }

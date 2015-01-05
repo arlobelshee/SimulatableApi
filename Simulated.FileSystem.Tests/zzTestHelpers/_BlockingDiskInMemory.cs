@@ -22,87 +22,87 @@ namespace Simulated.Tests.zzTestHelpers
 		[NotNull] private _BlockedWork _timeslice = new _BlockedWork();
 		[NotNull] private readonly List<string> _log = new List<string>();
 
-		public bool DirExists(FsPath path)
+		public bool DirExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
-			return Impl.DirExists(path);
+			return Impl.DirExistsNeedsToBeMadeDelayStart(path);
 		}
 
-		public async Task<bool> FileExists(FsPath path)
+		public async Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			const string operation = "check if file exists";
 			var myTimeslice = _timeslice;
 			_Log(myTimeslice, Wait, operation, path);
 			await myTimeslice;
 			_Log(myTimeslice, Starting, operation, path);
-			var result = await myTimeslice.Executing(Impl.FileExists(path));
+			var result = await myTimeslice.Executing(Impl.FileExistsNeedsToBeMadeDelayStart(path));
 			_Log(myTimeslice, Finished, operation, path);
 			return result;
 		}
 
-		public async Task<string> TextContents(FsPath path)
+		public async Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			const string operation = "read text contents";
 			var myTimeslice = _timeslice;
 			_Log(myTimeslice, Wait, operation, path);
 			await myTimeslice;
 			_Log(myTimeslice, Starting, operation, path);
-			var result = await myTimeslice.Executing(Impl.TextContents(path));
+			var result = await myTimeslice.Executing(Impl.TextContentsNeedsToBeMadeDelayStart(path));
 			_Log(myTimeslice, Finished, operation, path);
 			return result;
 		}
 
-		public IObservable<byte[]> RawContents(FsPath path)
+		public IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart(FsPath path)
 		{
-			return Impl.RawContents(path);
+			return Impl.RawContentsNeedsToBeMadeDelayStart(path);
 		}
 
-		public void CreateDir(FsPath path)
+		public void CreateDirNeedsToBeMadeDelayStart(FsPath path)
 		{
-			Impl.CreateDir(path);
+			Impl.CreateDirNeedsToBeMadeDelayStart(path);
 		}
 
-		public async Task Overwrite(FsPath path, string newContents)
+		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
 		{
 			const string operation = "write text contents";
 			var myTimeslice = _timeslice;
 			_Log(myTimeslice, Wait, operation, path);
 			await myTimeslice;
 			_Log(myTimeslice, Starting, operation, path);
-			await myTimeslice.Executing(Impl.Overwrite(path, newContents));
+			await myTimeslice.Executing(Impl.OverwriteNeedsToBeMadeDelayStart(path, newContents));
 			_Log(myTimeslice, Finished, operation, path);
 		}
 
-		public void Overwrite(FsPath path, byte[] newContents)
+		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			Impl.Overwrite(path, newContents);
+			Impl.OverwriteNeedsToBeMadeDelayStart(path, newContents);
 		}
 
-		public void DeleteDir(FsPath path)
+		public void DeleteDirNeedsToBeMadeDelayStart(FsPath path)
 		{
-			Impl.DeleteDir(path);
+			Impl.DeleteDirNeedsToBeMadeDelayStart(path);
 		}
 
-		public void DeleteFile(FsPath path)
+		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)
 		{
-			Impl.DeleteFile(path);
+			Impl.DeleteFileNeedsToBeMadeDelayStart(path);
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public void MoveFileNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
 		{
-			Impl.MoveFile(src, dest);
+			Impl.MoveFileNeedsToBeMadeDelayStart(src, dest);
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+		public void MoveDirNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
 		{
-			Impl.MoveDir(src, dest);
+			Impl.MoveDirNeedsToBeMadeDelayStart(src, dest);
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public IEnumerable<FsPath> FindFilesNeedsToBeMadeDelayStart(FsPath path, string searchPattern)
 		{
-			return Impl.FindFiles(path, searchPattern);
+			return Impl.FindFilesNeedsToBeMadeDelayStart(path, searchPattern);
 		}
 
-		public void ExecuteAllPendingActionsSynchronously()
+		public void ExecuteAllRequestedActionsSynchronously()
 		{
 			var lastSlice = _timeslice;
 			_timeslice = new _BlockedWork();

@@ -23,8 +23,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var originalRoot = BaseFolder/"original";
 			var newRoot = BaseFolder/"new";
 			var filePath = originalRoot/"something"/"file.txt";
-			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
-			TestSubject.MoveDir(originalRoot, newRoot);
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(filePath, ArbitraryFileContents);
+			TestSubject.MoveDirNeedsToBeMadeDelayStart(originalRoot, newRoot);
 			TestSubject.ShouldBeDir(newRoot);
 			TestSubject.ShouldNotExist(originalRoot);
 			TestSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
@@ -35,8 +35,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var originalFile = BaseFolder/"something"/"file.txt";
 			var dest = BaseFolder/"new_path"/"file_new.txt";
-			await TestSubject.Overwrite(originalFile, ArbitraryFileContents);
-			TestSubject.MoveFile(originalFile, dest);
+			await TestSubject.OverwriteNeedsToBeMadeDelayStart(originalFile, ArbitraryFileContents);
+			TestSubject.MoveFileNeedsToBeMadeDelayStart(originalFile, dest);
 			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
 			TestSubject.ShouldBeFile(dest, ArbitraryFileContents);
@@ -54,10 +54,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				switch (operationToAttempt)
 				{
 					case MoveKind.Directory:
-						TestSubject.MoveDir(src, dest);
+						TestSubject.MoveDirNeedsToBeMadeDelayStart(src, dest);
 						break;
 					case MoveKind.File:
-						TestSubject.MoveFile(src, dest);
+						TestSubject.MoveFileNeedsToBeMadeDelayStart(src, dest);
 						break;
 					default:
 						throw new NotImplementedException(string.Format("Test not yet written for operation {0}.", operationToAttempt));
@@ -92,11 +92,11 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		protected override void FinishSetup()
 		{
-			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDir(BaseFolder/SrcDir);
+			TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
+			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder/SrcDir);
 
-			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDir(BaseFolder/DestBlockingDir);
+			TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
+			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder/DestBlockingDir);
 		}
 
 		public enum MoveKind

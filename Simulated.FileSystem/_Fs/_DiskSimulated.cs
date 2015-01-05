@@ -18,19 +18,19 @@ namespace Simulated._Fs
 		[NotNull] private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		[NotNull] private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		public bool DirExists(FsPath path)
+		public bool DirExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			return _GetStorage(path)
 				.Kind == _StorageKind.Directory;
 		}
 
-		public Task<bool> FileExists(FsPath path)
+		public Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			return (_GetStorage(path)
 				.Kind == _StorageKind.File).AsTask();
 		}
 
-		public Task<string> TextContents(FsPath path)
+		public Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			return Task.Run(() =>
 			{
@@ -40,7 +40,7 @@ namespace Simulated._Fs
 			});
 		}
 
-		public IObservable<byte[]> RawContents(FsPath path)
+		public IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			return _Make.Observable<byte[]>(ctx =>
 			{
@@ -50,7 +50,7 @@ namespace Simulated._Fs
 			});
 		}
 
-		public void CreateDir(FsPath path)
+		public void CreateDirNeedsToBeMadeDelayStart(FsPath path)
 		{
 			while (true)
 			{
@@ -61,11 +61,11 @@ namespace Simulated._Fs
 			}
 		}
 
-		public Task Overwrite(FsPath path, string newContents)
+		public Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
 		{
 			return Task.Run(() =>
 			{
-				CreateDir(path.Parent);
+				CreateDirNeedsToBeMadeDelayStart(path.Parent);
 				_data[path] = new _Node(_StorageKind.File)
 				{
 					RawContents = DefaultEncoding.GetBytes(newContents)
@@ -73,16 +73,16 @@ namespace Simulated._Fs
 			});
 		}
 
-		public void Overwrite(FsPath path, byte[] newContents)
+		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			CreateDir(path.Parent);
+			CreateDirNeedsToBeMadeDelayStart(path.Parent);
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = newContents
 			};
 		}
 
-		public void DeleteDir(FsPath path)
+		public void DeleteDirNeedsToBeMadeDelayStart(FsPath path)
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
@@ -94,7 +94,7 @@ namespace Simulated._Fs
 			toDelete.Each(p => _data.Remove(p.Key));
 		}
 
-		public void DeleteFile(FsPath path)
+		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;
@@ -105,7 +105,7 @@ namespace Simulated._Fs
 			_data.Remove(path);
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public void MoveFileNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;
@@ -116,11 +116,11 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent);
+			CreateDirNeedsToBeMadeDelayStart(dest.Parent);
 			_MoveItemImpl(src, dest);
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+		public void MoveDirNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;
@@ -143,7 +143,7 @@ namespace Simulated._Fs
 				.ToList();
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public IEnumerable<FsPath> FindFilesNeedsToBeMadeDelayStart(FsPath path, string searchPattern)
 		{
 			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
 			if (patternExtensionDelimiter < 0)

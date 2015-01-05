@@ -25,14 +25,14 @@ namespace Simulated._Fs
 		[NotNull]
 		public Task<bool> FileExists([NotNull] FsPath location)
 		{
-			var work = new Task<Task<bool>>(() => _storage.FileExists(location));
+			var work = new Task<Task<bool>>(() => _storage.FileExistsNeedsToBeMadeDelayStart(location));
 			_Schedule(_DiskChange.Make(_Op.FileExists(location), work));
 			return work.Unwrap();
 		}
 
 		public void Overwrite([NotNull] FsPath location, [NotNull] string contents)
 		{
-			var work = new Task<Task>(() => _storage.Overwrite(location, contents));
+			var work = new Task<Task>(() => _storage.OverwriteNeedsToBeMadeDelayStart(location, contents));
 			_Schedule(_DiskChange.Make(_Op.WriteFile(location), work));
 		}
 

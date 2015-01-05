@@ -24,7 +24,7 @@ namespace Simulated.Tests.zzTestHelpers
 			var runName = "TestRun-" + Guid.NewGuid()
 				.ToString("N");
 			BaseFolder = FsPath.TempFolder/runName;
-			TestSubject.CreateDir(BaseFolder);
+			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder);
 			FinishSetup();
 		}
 
@@ -32,7 +32,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Teardown()
 		{
 			BeginTeardown();
-			TestSubject.DeleteDir(BaseFolder);
+			TestSubject.DeleteDirNeedsToBeMadeDelayStart(BaseFolder);
 		}
 
 		protected virtual void BeginTeardown() {}
