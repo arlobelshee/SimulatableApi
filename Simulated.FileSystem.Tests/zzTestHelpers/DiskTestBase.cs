@@ -24,7 +24,7 @@ namespace Simulated.Tests.zzTestHelpers
 			var runName = "TestRun-" + Guid.NewGuid()
 				.ToString("N");
 			BaseFolder = FsPath.TempFolder/runName;
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder);
+			TestSubject.CreateDir(BaseFolder).RunSynchronously();
 			FinishSetup();
 		}
 

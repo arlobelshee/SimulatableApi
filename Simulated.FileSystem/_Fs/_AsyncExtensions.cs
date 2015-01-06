@@ -16,5 +16,10 @@ namespace Simulated._Fs
 		{
 			return Task.FromResult(result);
 		}
+
+		public static void RunSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)
+		{
+			job.RunSynchronously();
+		}
 	}
 }

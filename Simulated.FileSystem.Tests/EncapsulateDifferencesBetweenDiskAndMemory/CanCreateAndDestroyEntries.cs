@@ -21,7 +21,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub";
 			TestSubject.ShouldNotExist(newPath);
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(newPath);
+			TestSubject.CreateDir(newPath).RunSynchronously();
 			TestSubject.ShouldBeDir(newPath);
 			TestSubject.ShouldNotBeFile(newPath);
 		}
@@ -29,7 +29,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		[Test]
 		public void CreatingNewDirectoryShouldCreateAllParents()
 		{
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder/"one"/"two"/"three");
+			TestSubject.CreateDir(BaseFolder / "one" / "two" / "three").RunSynchronously();
 			TestSubject.ShouldBeDir(BaseFolder/"one");
 			TestSubject.ShouldBeDir(BaseFolder/"one"/"two");
 			TestSubject.ShouldBeDir(BaseFolder/"one"/"two"/"three");
@@ -40,9 +40,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub";
 			var filePath = newPath/"file.txt";
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(newPath);
+			TestSubject.CreateDir(newPath).RunSynchronously();
 			await TestSubject.OverwriteNeedsToBeMadeDelayStart(filePath, ArbitraryFileContents);
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(newPath);
+			TestSubject.CreateDir(newPath).RunSynchronously();
 			TestSubject.DirExistsNeedsToBeMadeDelayStart(newPath)
 				.Should()
 				.BeTrue();
@@ -53,7 +53,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void DeletedDirectoryShouldNotExist()
 		{
 			var newPath = BaseFolder/"sub";
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(newPath);
+			TestSubject.CreateDir(newPath).RunSynchronously();
 			TestSubject.ShouldBeDir(newPath);
 			TestSubject.DeleteDirNeedsToBeMadeDelayStart(newPath);
 			TestSubject.ShouldNotExist(newPath);
@@ -101,7 +101,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void UsingDeleteFileOnADirectoryShouldFail()
 		{
 			var dirName = BaseFolder/"sub";
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(dirName);
+			TestSubject.CreateDir(dirName).RunSynchronously();
 			Action deleteFile = () => TestSubject.DeleteFileNeedsToBeMadeDelayStart(dirName);
 			deleteFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format("Failed to delete the file '{0}' because it is a directory.", dirName));

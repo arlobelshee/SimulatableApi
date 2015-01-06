@@ -65,7 +65,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void CannotReadContentsOfFolder(FileFormat fileFormat)
 		{
 			var dirName = BaseFolder/"directory.git";
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(dirName);
+			TestSubject.CreateDir(dirName).RunSynchronously();
 			var readMissingFile = _PickFileReader(fileFormat, dirName);
 			readMissingFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.ReadErrorPathIsDirectory, dirName));

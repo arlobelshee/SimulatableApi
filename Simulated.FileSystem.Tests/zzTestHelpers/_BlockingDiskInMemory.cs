@@ -56,9 +56,9 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.RawContentsNeedsToBeMadeDelayStart(path);
 		}
 
-		public void CreateDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task CreateDir(FsPath path)
 		{
-			Impl.CreateDirNeedsToBeMadeDelayStart(path);
+			return Impl.CreateDir(path);
 		}
 
 		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)

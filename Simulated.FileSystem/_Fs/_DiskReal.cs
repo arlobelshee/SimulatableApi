@@ -63,14 +63,15 @@ namespace Simulated._Fs
 			});
 		}
 
-		public void CreateDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task CreateDir(FsPath path)
 		{
-			Directory.CreateDirectory(path._Absolute);
+			return new Task(()=>
+			Directory.CreateDirectory(path._Absolute));
 		}
 
 		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
 		{
-			CreateDirNeedsToBeMadeDelayStart(path.Parent);
+			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			using (var contents = File.CreateText(path._Absolute))
 			{
 				await contents.WriteAsync(newContents).ConfigureAwait(false);
@@ -79,7 +80,7 @@ namespace Simulated._Fs
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			CreateDirNeedsToBeMadeDelayStart(path.Parent);
+			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.WriteAllBytes(path._Absolute, newContents);
 		}
 
@@ -111,7 +112,7 @@ namespace Simulated._Fs
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
 			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(dest)) || DirExistsNeedsToBeMadeDelayStart(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDirNeedsToBeMadeDelayStart(dest.Parent);
+			CreateDir(dest.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.Move(src._Absolute, dest._Absolute);
 		}
 

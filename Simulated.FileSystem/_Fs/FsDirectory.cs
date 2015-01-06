@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Simulated._Fs
@@ -74,7 +75,7 @@ namespace Simulated._Fs
 
 		/// <summary>
 		///    Gets a directory instance that represents a sub-directory of this directory.
-		///    Identical to <see cref="Dir"/>.
+		///    Identical to <see cref="Dir" />.
 		/// </summary>
 		/// <param name="self">The absolute path.</param>
 		/// <param name="subdirName"> Name of the subdir. </param>
@@ -102,10 +103,11 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory existing at this object's Path. This
 		///    operation is revertable.
 		/// </summary>
+		[NotNull]
 		[PublicApi]
-		public void EnsureExists()
+		public Task EnsureExists()
 		{
-			_allFiles._Disk.CreateDirNeedsToBeMadeDelayStart(_path);
+			return _allFiles._Disk.CreateDir(_path);
 		}
 
 		/// <summary>

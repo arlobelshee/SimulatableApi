@@ -93,10 +93,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		protected override void FinishSetup()
 		{
 			TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder/SrcDir);
+			TestSubject.CreateDir(BaseFolder/SrcDir).RunSynchronously();
 
 			TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDirNeedsToBeMadeDelayStart(BaseFolder/DestBlockingDir);
+			TestSubject.CreateDir(BaseFolder/DestBlockingDir).RunSynchronously();
 		}
 
 		public enum MoveKind

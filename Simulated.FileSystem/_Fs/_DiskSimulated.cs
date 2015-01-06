@@ -50,22 +50,25 @@ namespace Simulated._Fs
 			});
 		}
 
-		public void CreateDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task CreateDir(FsPath path)
 		{
-			while (true)
+			return new Task(() =>
 			{
-				_data[path] = new _Node(_StorageKind.Directory);
-				if (path.IsRoot)
-					return;
-				path = path.Parent;
-			}
+				while (true)
+				{
+					_data[path] = new _Node(_StorageKind.Directory);
+					if (path.IsRoot)
+						return;
+					path = path.Parent;
+				}
+			});
 		}
 
 		public Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
 		{
 			return Task.Run(() =>
 			{
-				CreateDirNeedsToBeMadeDelayStart(path.Parent);
+				CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 				_data[path] = new _Node(_StorageKind.File)
 				{
 					RawContents = DefaultEncoding.GetBytes(newContents)
@@ -75,7 +78,7 @@ namespace Simulated._Fs
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			CreateDirNeedsToBeMadeDelayStart(path.Parent);
+			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = newContents
@@ -116,7 +119,7 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDirNeedsToBeMadeDelayStart(dest.Parent);
+			CreateDir(dest.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_MoveItemImpl(src, dest);
 		}
 

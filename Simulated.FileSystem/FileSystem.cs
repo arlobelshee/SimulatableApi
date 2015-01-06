@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Simulated._Fs;
 
@@ -12,10 +13,8 @@ namespace Simulated
 	/// <summary>
 	///    Represents a view on the file system. The underlying store could be a real file system or a simulated (in-memory)
 	///    one. In either case, FileSystem and its helpers allow a user to interact with an abstraction of this storage.
-	/// 
 	///    All oprations are performed asynchronously. The library overlapps operations that do not
 	///    impact each other. No guarantees are made in case of an application crash.
-	/// 
 	///    Each FileSystem instance is its own view of the storage.
 	/// </summary>
 	[PublicApi]
@@ -24,7 +23,7 @@ namespace Simulated
 		private FileSystem([NotNull] _IFsDisk disk)
 		{
 			_Disk = disk;
-			TempDirectory.EnsureExists();
+			TempDirectory.EnsureExists().RunSynchronouslyAsCheapHackUntilIFixScheduling();
 		}
 
 		[NotNull]
