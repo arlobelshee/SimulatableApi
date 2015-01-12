@@ -32,7 +32,7 @@ namespace Simulated.Tests.zzTestHelpers
 		public void Teardown()
 		{
 			BeginTeardown();
-			TestSubject.DeleteDirNeedsToBeMadeDelayStart(BaseFolder);
+			TestSubject.DeleteDir(BaseFolder).RunSynchronously();
 		}
 
 		protected virtual void BeginTeardown() {}

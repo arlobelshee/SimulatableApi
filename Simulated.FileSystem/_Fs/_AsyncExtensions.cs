@@ -17,9 +17,21 @@ namespace Simulated._Fs
 			return Task.FromResult(result);
 		}
 
+		public static void RunAndWait([NotNull] this Task job)
+		{
+			job.RunSynchronously();
+			job.Wait();
+		}
+
 		public static void RunSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)
 		{
 			job.RunSynchronously();
+			job.Wait();
+		}
+
+		public static bool TemporaryUnwrapWhileIRefactorIncrementally([NotNull] this Task<bool> fileExists)
+		{
+			return fileExists.Result;
 		}
 	}
 }

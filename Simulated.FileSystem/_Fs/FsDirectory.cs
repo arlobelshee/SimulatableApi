@@ -117,7 +117,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public void EnsureDoesNotExist()
 		{
-			_allFiles._Disk.DeleteDirNeedsToBeMadeDelayStart(_path);
+			_allFiles._Disk.DeleteDir(_path).RunSynchronouslyAsCheapHackUntilIFixScheduling();
 		}
 
 		/// <summary>

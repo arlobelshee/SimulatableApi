@@ -54,12 +54,14 @@ namespace Simulated._Fs
 		{
 			return new Task(() =>
 			{
-				while (true)
+				var storage = _GetStorage(path);
+				while (storage.Kind != _StorageKind.Directory)
 				{
+					if (storage.Kind == _StorageKind.File)
+						throw new BadStorageRequest(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, path));
 					_data[path] = new _Node(_StorageKind.Directory);
-					if (path.IsRoot)
-						return;
 					path = path.Parent;
+					storage = _GetStorage(path);
 				}
 			});
 		}
@@ -68,7 +70,8 @@ namespace Simulated._Fs
 		{
 			return Task.Run(() =>
 			{
-				CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+				CreateDir(path.Parent)
+					.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 				_data[path] = new _Node(_StorageKind.File)
 				{
 					RawContents = DefaultEncoding.GetBytes(newContents)
@@ -78,23 +81,27 @@ namespace Simulated._Fs
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			CreateDir(path.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_data[path] = new _Node(_StorageKind.File)
 			{
 				RawContents = newContents
 			};
 		}
 
-		public void DeleteDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task DeleteDir(FsPath path)
 		{
-			var storageKind = _GetStorage(path)
-				.Kind;
-			if (storageKind == _StorageKind.Missing)
-				return;
-			if (storageKind == _StorageKind.File)
-				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
-			var toDelete = _ItemsInScopeOfDirectory(path);
-			toDelete.Each(p => _data.Remove(p.Key));
+			return new Task(() =>
+			{
+				var storageKind = _GetStorage(path)
+					.Kind;
+				if (storageKind == _StorageKind.Missing)
+					return;
+				if (storageKind == _StorageKind.File)
+					throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
+				var toDelete = _ItemsInScopeOfDirectory(path);
+				toDelete.Each(p => _data.Remove(p.Key));
+			});
 		}
 
 		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)
@@ -119,7 +126,8 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			CreateDir(dest.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_MoveItemImpl(src, dest);
 		}
 

@@ -77,9 +77,9 @@ namespace Simulated.Tests.zzTestHelpers
 			Impl.OverwriteNeedsToBeMadeDelayStart(path, newContents);
 		}
 
-		public void DeleteDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task DeleteDir(FsPath path)
 		{
-			Impl.DeleteDirNeedsToBeMadeDelayStart(path);
+			return Impl.DeleteDir(path);
 		}
 
 		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)

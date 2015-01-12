@@ -21,7 +21,8 @@ namespace Simulated._Fs
 
 		public Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
-			return File.Exists(path._Absolute).AsTask();
+			return File.Exists(path._Absolute)
+				.AsTask();
 		}
 
 		public async Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
@@ -29,7 +30,8 @@ namespace Simulated._Fs
 			_ValidatePathForReadingFile(path);
 			using (var contents = File.OpenText(path._Absolute))
 			{
-				return await contents.ReadToEndAsync().ConfigureAwait(false);
+				return await contents.ReadToEndAsync()
+					.ConfigureAwait(false);
 			}
 		}
 
@@ -43,7 +45,8 @@ namespace Simulated._Fs
 				{
 					var buffer = new byte[bufferSize];
 					int bytesRead;
-					while (0 != (bytesRead = await contents.ReadAsync(buffer, 0, buffer.Length, ctx.CancelToken).ConfigureAwait(false)))
+					while (0 != (bytesRead = await contents.ReadAsync(buffer, 0, buffer.Length, ctx.CancelToken)
+						.ConfigureAwait(false)))
 					{
 						if (ctx.IsCancelled)
 							return;
@@ -65,36 +68,42 @@ namespace Simulated._Fs
 
 		public Task CreateDir(FsPath path)
 		{
-			return new Task(()=>
-			Directory.CreateDirectory(path._Absolute));
+			return new Task(() =>
+			{
+				if (File.Exists(path._Absolute))
+					throw new BadStorageRequest(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, path));
+				Directory.CreateDirectory(path._Absolute);
+			});
 		}
 
 		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
 		{
-			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			CreateDir(path.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			using (var contents = File.CreateText(path._Absolute))
 			{
-				await contents.WriteAsync(newContents).ConfigureAwait(false);
+				await contents.WriteAsync(newContents)
+					.ConfigureAwait(false);
 			}
 		}
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
-			CreateDir(path.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			CreateDir(path.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.WriteAllBytes(path._Absolute, newContents);
 		}
 
-		public void DeleteDirNeedsToBeMadeDelayStart(FsPath path)
+		public Task DeleteDir(FsPath path)
 		{
-			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(path)))
-				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
-			if (DirExistsNeedsToBeMadeDelayStart(path))
-				Directory.Delete(path._Absolute, true);
-		}
-
-		private bool _TemporaryUnwrapWhileIRefactorIncrementally(Task<bool> fileExists)
-		{
-			return fileExists.Result;
+			return new Task(() =>
+			{
+				if (FileExistsNeedsToBeMadeDelayStart(path)
+					.TemporaryUnwrapWhileIRefactorIncrementally())
+					throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
+				if (DirExistsNeedsToBeMadeDelayStart(path))
+					Directory.Delete(path._Absolute, true);
+			});
 		}
 
 		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)
@@ -108,21 +117,26 @@ namespace Simulated._Fs
 		{
 			if (DirExistsNeedsToBeMadeDelayStart(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src._Absolute, dest._Absolute));
-			if (!_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(src)))
+			if (!FileExistsNeedsToBeMadeDelayStart(src)
+				.TemporaryUnwrapWhileIRefactorIncrementally())
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
-			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(dest)) || DirExistsNeedsToBeMadeDelayStart(dest))
+			if (FileExistsNeedsToBeMadeDelayStart(dest)
+				.TemporaryUnwrapWhileIRefactorIncrementally() || DirExistsNeedsToBeMadeDelayStart(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			CreateDir(dest.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.Move(src._Absolute, dest._Absolute);
 		}
 
 		public void MoveDirNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
 		{
-			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(src)))
+			if (FileExistsNeedsToBeMadeDelayStart(src)
+				.TemporaryUnwrapWhileIRefactorIncrementally())
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
 			if (!DirExistsNeedsToBeMadeDelayStart(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
-			if (_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(dest)) || DirExistsNeedsToBeMadeDelayStart(dest))
+			if (FileExistsNeedsToBeMadeDelayStart(dest)
+				.TemporaryUnwrapWhileIRefactorIncrementally() || DirExistsNeedsToBeMadeDelayStart(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			Directory.Move(src._Absolute, dest._Absolute);
 		}
@@ -139,7 +153,8 @@ namespace Simulated._Fs
 		{
 			if (DirExistsNeedsToBeMadeDelayStart(path))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
-			if (!_TemporaryUnwrapWhileIRefactorIncrementally(FileExistsNeedsToBeMadeDelayStart(path)))
+			if (!FileExistsNeedsToBeMadeDelayStart(path)
+				.TemporaryUnwrapWhileIRefactorIncrementally())
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}

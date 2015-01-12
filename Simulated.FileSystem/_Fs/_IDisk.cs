@@ -34,7 +34,8 @@ namespace Simulated._Fs
 		Task OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] string newContents);
 
 		void OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] byte[] newContents);
-		void DeleteDirNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		[NotNull]
+		Task DeleteDir([NotNull] FsPath path);
 		void DeleteFileNeedsToBeMadeDelayStart([NotNull] FsPath path);
 		void MoveFileNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
 		void MoveDirNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
