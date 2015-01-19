@@ -52,7 +52,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public Task<bool> Exists
 		{
-			get { return _allFiles._Disk.FileExistsNeedsToBeMadeDelayStart(_path); }
+			get { return _allFiles._Disk.FileExists(_path); }
 		}
 
 		/// <summary>
@@ -116,7 +116,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public void OverwriteBinary([NotNull] byte[] newContents)
 		{
-			_allFiles._Disk.OverwriteNeedsToBeMadeDelayStart(_path, newContents);
+			_allFiles._Disk.Overwrite(_path, newContents);
 		}
 
 		/// <summary>
@@ -132,7 +132,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public Task<string> ReadAllText()
 		{
-			return _allFiles._Disk.TextContentsNeedsToBeMadeDelayStart(_path);
+			return _allFiles._Disk.TextContents(_path);
 		}
 
 		/// <summary>
@@ -149,7 +149,7 @@ namespace Simulated._Fs
 		// ReSharper disable once ReturnTypeCanBeEnumerable.Global
 		public IObservable<byte[]> ReadAllBytes()
 		{
-			return _allFiles._Disk.RawContentsNeedsToBeMadeDelayStart(_path);
+			return _allFiles._Disk.RawContents(_path);
 		}
 
 		/// <summary>

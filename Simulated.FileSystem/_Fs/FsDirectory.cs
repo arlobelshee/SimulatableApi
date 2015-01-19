@@ -38,7 +38,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public bool Exists
 		{
-			get { return _allFiles._Disk.DirExistsNeedsToBeMadeDelayStart(_path); }
+			get { return _allFiles._Disk.DirExists(_path); }
 		}
 
 		/// <summary>
@@ -107,17 +107,18 @@ namespace Simulated._Fs
 		[PublicApi]
 		public Task EnsureExists()
 		{
-			return _allFiles._Disk.CreateDirReturnsNonStartedTask(_path);
+			return _allFiles._Disk.CreateDir(_path);
 		}
 
 		/// <summary>
 		///    Regardless of the previous state of the file system, results in a directory no longer existing at this object's
-		///    Path. This operation is revertable.
+		///    Path.
 		/// </summary>
-		[PublicApi]
-		public void EnsureDoesNotExist()
+		[NotNull,PublicApi]
+		public Task EnsureDoesNotExist()
 		{
-			_allFiles._Disk.DeleteDir(_path).RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			return _allFiles._Disk.DeleteDir(_path)
+				.WrapAsNeededForApiUntilIfixTheInsides();
 		}
 
 		/// <summary>
@@ -134,7 +135,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public IEnumerable<FsFile> Files([NotNull] string searchPattern)
 		{
-			return _allFiles._Disk.FindFilesNeedsToBeMadeDelayStart(_path, searchPattern)
+			return _allFiles._Disk.FindFiles(_path, searchPattern)
 				.Select(p => new FsFile(_allFiles, p));
 		}
 

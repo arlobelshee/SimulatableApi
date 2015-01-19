@@ -1,5 +1,5 @@
 ﻿// SimulatableAPI
-// File: _IDisk.cs
+// File: _IFsDisk.cs
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
@@ -16,31 +16,34 @@ namespace Simulated._Fs
 	/// </summary>
 	internal interface _IFsDisk
 	{
-		bool DirExistsNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		bool DirExists([NotNull] FsPath path);
 
 		[NotNull]
-		Task<bool> FileExistsNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		Task<bool> FileExists([NotNull] FsPath path);
 
 		[NotNull]
-		Task<string> TextContentsNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		Task<string> TextContents([NotNull] FsPath path);
 
 		[NotNull]
-		IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart([NotNull] FsPath path);
+		IObservable<byte[]> RawContents([NotNull] FsPath path);
 
 		[NotNull]
-		Task CreateDirReturnsNonStartedTask([NotNull] FsPath path);
+		Task CreateDir([NotNull] FsPath path);
+
+		[NotNull]
+		Task DeleteDir([NotNull] FsPath path);
 
 		[NotNull]
 		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 
-		void OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] byte[] newContents);
 		[NotNull]
-		Task DeleteDir([NotNull] FsPath path);
-		void DeleteFileNeedsToBeMadeDelayStart([NotNull] FsPath path);
-		void MoveFileNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
-		void MoveDirNeedsToBeMadeDelayStart([NotNull] FsPath src, [NotNull] FsPath dest);
+		Task Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
+
+		void DeleteFile([NotNull] FsPath path);
+		void MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
+		void MoveDir([NotNull] FsPath src, [NotNull] FsPath dest);
 
 		[NotNull]
-		IEnumerable<FsPath> FindFilesNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] string searchPattern);
+		IEnumerable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }

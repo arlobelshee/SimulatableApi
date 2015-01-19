@@ -16,12 +16,6 @@ namespace Simulated._Fs
 			return Task.FromResult(result);
 		}
 
-		public static void RunAndWait([NotNull] this Task job)
-		{
-			job.RunSynchronously();
-			job.Wait();
-		}
-
 		[NotNull]
 		public static Task WrapAsNeededForApiUntilIfixTheInsides([NotNull] this Task job)
 		{
@@ -30,7 +24,6 @@ namespace Simulated._Fs
 
 		public static void RunSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)
 		{
-			job.RunSynchronously();
 			job.Wait();
 		}
 

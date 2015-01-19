@@ -26,7 +26,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var filesThatExist = new[] {"matches.txt", "matches.jpg", "no_match.txt"};
 			await Task.WhenAll(filesThatExist.Select(f => TestSubject.Overwrite(BaseFolder/f, ArbitraryFileContents))
 				.ToArray());
-			TestSubject.FindFilesNeedsToBeMadeDelayStart(BaseFolder, searchPattern)
+			TestSubject.FindFiles(BaseFolder, searchPattern)
 				.Should()
 				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));
 		}

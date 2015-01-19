@@ -16,22 +16,22 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class CanCreateAndDestroyEntries : DiskTestBase
 	{
+		[NotNull]
 		[Test]
-		public void NewDirectoryShouldExistWhenCreated()
+		public async Task NewDirectoryShouldExistWhenCreated()
 		{
 			var newPath = BaseFolder/"sub";
 			TestSubject.ShouldNotExist(newPath);
-			TestSubject.CreateDirReturnsNonStartedTask(newPath)
-				.RunAndWait();
+			await TestSubject.CreateDir(newPath);
 			TestSubject.ShouldBeDir(newPath);
 			TestSubject.ShouldNotBeFile(newPath);
 		}
 
+		[NotNull]
 		[Test]
-		public void CreatingNewDirectoryShouldCreateAllParents()
+		public async Task CreatingNewDirectoryShouldCreateAllParents()
 		{
-			TestSubject.CreateDirReturnsNonStartedTask(BaseFolder/"one"/"two"/"three")
-				.RunAndWait();
+			await TestSubject.CreateDir(BaseFolder/"one"/"two"/"three");
 			TestSubject.ShouldBeDir(BaseFolder/"one");
 			TestSubject.ShouldBeDir(BaseFolder/"one"/"two");
 			TestSubject.ShouldBeDir(BaseFolder/"one"/"two"/"three");
@@ -43,12 +43,9 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub";
 			var filePath = newPath/"file.txt";
-			TestSubject.CreateDirReturnsNonStartedTask(newPath)
-				.RunAndWait();
 			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
-			TestSubject.CreateDirReturnsNonStartedTask(newPath)
-				.RunAndWait();
-			TestSubject.DirExistsNeedsToBeMadeDelayStart(newPath)
+			await TestSubject.CreateDir(newPath);
+			TestSubject.DirExists(newPath)
 				.Should()
 				.BeTrue();
 			TestSubject.ShouldBeFile(filePath, ArbitraryFileContents);
@@ -60,21 +57,20 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub.txt";
 			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
-			Action create = () => TestSubject.CreateDirReturnsNonStartedTask(newPath)
-				.RunAndWait();
+			Action create = () => TestSubject.CreateDir(newPath)
+				.Wait();
 			create.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, newPath));
 		}
 
+		[NotNull]
 		[Test]
-		public void DeletedDirectoryShouldNotExist()
+		public async Task DeletedDirectoryShouldNotExist()
 		{
 			var newPath = BaseFolder/"sub";
-			TestSubject.CreateDirReturnsNonStartedTask(newPath)
-				.RunAndWait();
+			await TestSubject.CreateDir(newPath);
 			TestSubject.ShouldBeDir(newPath);
-			TestSubject.DeleteDir(newPath)
-				.RunAndWait();
+			await TestSubject.DeleteDir(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
 
@@ -84,17 +80,16 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub.txt";
 			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
-			TestSubject.DeleteFileNeedsToBeMadeDelayStart(newPath);
+			TestSubject.DeleteFile(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
 
-		[Test]
-		public void DeletingMissingDirectoryShouldNoop()
+		[NotNull,Test]
+		public async Task DeletingMissingDirectoryShouldNoop()
 		{
 			var newPath = BaseFolder/"sub";
 			TestSubject.ShouldNotExist(newPath);
-			TestSubject.DeleteDir(newPath)
-				.RunAndWait();
+			await TestSubject.DeleteDir(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
 
@@ -103,7 +98,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub.txt";
 			TestSubject.ShouldNotExist(newPath);
-			TestSubject.DeleteFileNeedsToBeMadeDelayStart(newPath);
+			TestSubject.DeleteFile(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
 
@@ -114,18 +109,17 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var newPath = BaseFolder/"sub.txt";
 			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
 			Action delete = () => TestSubject.DeleteDir(newPath)
-				.RunAndWait();
+				.Wait();
 			delete.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, newPath));
 		}
 
-		[Test]
-		public void UsingDeleteFileOnADirectoryShouldFail()
+		[NotNull,Test]
+		public async Task UsingDeleteFileOnADirectoryShouldFail()
 		{
 			var dirName = BaseFolder/"sub";
-			TestSubject.CreateDirReturnsNonStartedTask(dirName)
-				.RunAndWait();
-			Action deleteFile = () => TestSubject.DeleteFileNeedsToBeMadeDelayStart(dirName);
+			await TestSubject.CreateDir(dirName);
+			Action deleteFile = () => TestSubject.DeleteFile(dirName);
 			deleteFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format("Failed to delete the file '{0}' because it is a directory.", dirName));
 		}

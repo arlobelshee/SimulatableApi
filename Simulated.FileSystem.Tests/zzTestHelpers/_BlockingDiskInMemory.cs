@@ -22,21 +22,21 @@ namespace Simulated.Tests.zzTestHelpers
 		[NotNull] private _BlockedWork _timeslice = new _BlockedWork();
 		[NotNull] private readonly List<string> _log = new List<string>();
 
-		public bool DirExistsNeedsToBeMadeDelayStart(FsPath path)
+		public bool DirExists(FsPath path)
 		{
-			return Impl.DirExistsNeedsToBeMadeDelayStart(path);
+			return Impl.DirExists(path);
 		}
 
-		public Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
+		public Task<bool> FileExists(FsPath path)
 		{
 			const string operation = "check if file exists";
-			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.FileExistsNeedsToBeMadeDelayStart(path));
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.FileExists(path));
 		}
 
-		public Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
+		public Task<string> TextContents(FsPath path)
 		{
 			const string operation = "read text contents";
-			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.TextContentsNeedsToBeMadeDelayStart(path));
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.TextContents(path));
 		}
 
 		public Task Overwrite(FsPath path, string newContents)
@@ -45,19 +45,20 @@ namespace Simulated.Tests.zzTestHelpers
 			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.Overwrite(path, newContents));
 		}
 
-		public IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart(FsPath path)
+		public Task Overwrite(FsPath path, byte[] newContents)
 		{
-			return Impl.RawContentsNeedsToBeMadeDelayStart(path);
+			const string operation = "write binary contents";
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.Overwrite(path, newContents));
 		}
 
-		public Task CreateDirReturnsNonStartedTask(FsPath path)
+		public IObservable<byte[]> RawContents(FsPath path)
 		{
-			return Impl.CreateDirReturnsNonStartedTask(path);
+			return Impl.RawContents(path);
 		}
 
-		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
+		public Task CreateDir(FsPath path)
 		{
-			Impl.OverwriteNeedsToBeMadeDelayStart(path, newContents);
+			return Impl.CreateDir(path);
 		}
 
 		public Task DeleteDir(FsPath path)
@@ -65,24 +66,24 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.DeleteDir(path);
 		}
 
-		public void DeleteFileNeedsToBeMadeDelayStart(FsPath path)
+		public void DeleteFile(FsPath path)
 		{
-			Impl.DeleteFileNeedsToBeMadeDelayStart(path);
+			Impl.DeleteFile(path);
 		}
 
-		public void MoveFileNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
+		public void MoveFile(FsPath src, FsPath dest)
 		{
-			Impl.MoveFileNeedsToBeMadeDelayStart(src, dest);
+			Impl.MoveFile(src, dest);
 		}
 
-		public void MoveDirNeedsToBeMadeDelayStart(FsPath src, FsPath dest)
+		public void MoveDir(FsPath src, FsPath dest)
 		{
-			Impl.MoveDirNeedsToBeMadeDelayStart(src, dest);
+			Impl.MoveDir(src, dest);
 		}
 
-		public IEnumerable<FsPath> FindFilesNeedsToBeMadeDelayStart(FsPath path, string searchPattern)
+		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
 		{
-			return Impl.FindFilesNeedsToBeMadeDelayStart(path, searchPattern);
+			return Impl.FindFiles(path, searchPattern);
 		}
 
 		public void ExecuteAllRequestedActionsSynchronously()
@@ -139,7 +140,7 @@ namespace Simulated.Tests.zzTestHelpers
 			_Log(myTimeslice, Wait, operation, path);
 			await myTimeslice;
 			_Log(myTimeslice, Starting, operation, path);
-			myTimeslice.Executing(work());
+			await myTimeslice.Executing(work());
 			_Log(myTimeslice, Finished, operation, path);
 		}
 

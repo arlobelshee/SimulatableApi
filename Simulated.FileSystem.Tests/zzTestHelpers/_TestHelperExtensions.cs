@@ -51,27 +51,27 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldBeDir([NotNull] this _IFsDisk disk, [NotNull] FsPath dir)
 		{
-			disk.DirExistsNeedsToBeMadeDelayStart(dir)
+			disk.DirExists(dir)
 				.Should()
 				.BeTrue();
 		}
 
 		public static void ShouldBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath file, [NotNull] string contents)
 		{
-			disk.FileExistsNeedsToBeMadeDelayStart(file)
+			disk.FileExists(file)
 				.Result.Should()
 				.BeTrue();
-			disk.TextContentsNeedsToBeMadeDelayStart(file)
+			disk.TextContents(file)
 				.Result.Should()
 				.Be(contents);
 		}
 
 		public static void ShouldBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath file, [NotNull] byte[] contents)
 		{
-			disk.FileExistsNeedsToBeMadeDelayStart(file)
+			disk.FileExists(file)
 				.Result.Should()
 				.BeTrue();
-			disk.RawContentsNeedsToBeMadeDelayStart(file)
+			disk.RawContents(file)
 				.CollectAllBytes()
 				.Should()
 				.Equal(contents);
@@ -85,14 +85,14 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldNotBeFile([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
 		{
-			disk.FileExistsNeedsToBeMadeDelayStart(path)
+			disk.FileExists(path)
 				.Result.Should()
 				.BeFalse();
 		}
 
 		public static void ShouldNotBeDir([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
 		{
-			disk.DirExistsNeedsToBeMadeDelayStart(path)
+			disk.DirExists(path)
 				.Should()
 				.BeFalse();
 		}

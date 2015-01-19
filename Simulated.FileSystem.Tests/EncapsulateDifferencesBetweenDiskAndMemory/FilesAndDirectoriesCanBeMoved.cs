@@ -4,7 +4,6 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
@@ -17,26 +16,28 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class FilesAndDirectoriesCanBeMoved : DiskTestBase
 	{
-		[NotNull,Test]
+		[NotNull]
+		[Test]
 		public async Task MovingDirectoryShouldMoveAllContents()
 		{
 			var originalRoot = BaseFolder/"original";
 			var newRoot = BaseFolder/"new";
 			var filePath = originalRoot/"something"/"file.txt";
 			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
-			TestSubject.MoveDirNeedsToBeMadeDelayStart(originalRoot, newRoot);
+			TestSubject.MoveDir(originalRoot, newRoot);
 			TestSubject.ShouldBeDir(newRoot);
 			TestSubject.ShouldNotExist(originalRoot);
 			TestSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
 		}
 
-		[NotNull,Test]
+		[NotNull]
+		[Test]
 		public async Task MovingFileShouldChangeItsLocation()
 		{
 			var originalFile = BaseFolder/"something"/"file.txt";
 			var dest = BaseFolder/"new_path"/"file_new.txt";
 			await TestSubject.Overwrite(originalFile, ArbitraryFileContents);
-			TestSubject.MoveFileNeedsToBeMadeDelayStart(originalFile, dest);
+			TestSubject.MoveFile(originalFile, dest);
 			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
 			TestSubject.ShouldBeFile(dest, ArbitraryFileContents);
@@ -54,10 +55,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 				switch (operationToAttempt)
 				{
 					case MoveKind.Directory:
-						TestSubject.MoveDirNeedsToBeMadeDelayStart(src, dest);
+						TestSubject.MoveDir(src, dest);
 						break;
 					case MoveKind.File:
-						TestSubject.MoveFileNeedsToBeMadeDelayStart(src, dest);
+						TestSubject.MoveFile(src, dest);
 						break;
 					default:
 						throw new NotImplementedException(string.Format("Test not yet written for operation {0}.", operationToAttempt));
@@ -92,11 +93,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		protected override void FinishSetup()
 		{
-			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDirReturnsNonStartedTask(BaseFolder/SrcDir).RunAndWait();
-
-			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
-			TestSubject.CreateDirReturnsNonStartedTask(BaseFolder/DestBlockingDir).RunAndWait();
+			Task.WaitAll(TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents), TestSubject.CreateDir(BaseFolder/SrcDir),
+				TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents), TestSubject.CreateDir(BaseFolder/DestBlockingDir));
 		}
 
 		public enum MoveKind
