@@ -81,7 +81,7 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.MoveDir(src, dest);
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public IObservable<FsPath> FindFiles(FsPath path, string searchPattern)
 		{
 			return Impl.FindFiles(path, searchPattern);
 		}

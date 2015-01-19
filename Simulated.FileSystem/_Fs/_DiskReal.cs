@@ -154,13 +154,19 @@ namespace Simulated._Fs
 			Directory.Move(src._Absolute, dest._Absolute);
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public IObservable<FsPath> FindFiles(FsPath path, string searchPattern)
 		{
-			if (!DirExists(path)
-				.WaitSynchronouslyUntilIFinishRefactoring())
-				return Enumerable.Empty<FsPath>();
-			return Directory.EnumerateFiles(path._Absolute, searchPattern)
-				.Select(p => path/Path.GetFileName(p));
+			return _Make.Observable<FsPath>(async ctx =>
+			{
+				if (!await DirExists(path).ConfigureAwait(false))
+					return;
+				foreach (var file in Directory.EnumerateFiles(path._Absolute, searchPattern))
+				{
+					if (ctx.IsCancelled)
+						return;
+					ctx.OnNext(path / Path.GetFileName(file));
+				}
+			});
 		}
 
 		[NotNull]

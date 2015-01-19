@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -135,7 +136,7 @@ namespace Simulated._Fs
 		/// <returns>An enumeration of all known files that match the pattern.</returns>
 		[NotNull]
 		[PublicApi]
-		public IEnumerable<FsFile> Files([NotNull] string searchPattern)
+		public IObservable<FsFile> Files([NotNull] string searchPattern)
 		{
 			return _allFiles._Disk.FindFiles(_path, searchPattern)
 				.Select(p => new FsFile(_allFiles, p));

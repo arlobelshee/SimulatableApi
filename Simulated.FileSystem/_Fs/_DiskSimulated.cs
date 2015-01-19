@@ -156,17 +156,22 @@ namespace Simulated._Fs
 				.ToList();
 		}
 
-		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
+		public IObservable<FsPath> FindFiles(FsPath path, string searchPattern)
 		{
-			var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
-			if (patternExtensionDelimiter < 0)
-				return Enumerable.Empty<FsPath>();
-			var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
-			var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
-			return _data.Where(
-				item =>
-					item.Value.Kind == _StorageKind.File && item.Key.Parent == path && _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key._Absolute)))
-				.Select(item => item.Key);
+			return _Make.Observable<FsPath>(ctx =>
+			{
+				var patternExtensionDelimiter = searchPattern.LastIndexOf('.');
+				if (patternExtensionDelimiter < 0)
+					return;
+				var patternBaseName = searchPattern.Substring(0, patternExtensionDelimiter);
+				var patternExtension = searchPattern.Substring(patternExtensionDelimiter + 1);
+				_data.Where(
+					item =>
+						item.Value.Kind == _StorageKind.File && item.Key.Parent == path
+							&& _PatternMatches(patternBaseName, patternExtension, Path.GetFileName(item.Key._Absolute)))
+					.Select(item => item.Key)
+					.Each(ctx.OnNext);
+			});
 		}
 
 		private void _MoveItemImpl([NotNull] FsPath src, [NotNull] FsPath dest)

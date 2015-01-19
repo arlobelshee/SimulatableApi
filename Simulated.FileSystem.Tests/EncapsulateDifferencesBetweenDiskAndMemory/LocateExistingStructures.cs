@@ -4,6 +4,7 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
@@ -26,7 +27,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var filesThatExist = new[] {"matches.txt", "matches.jpg", "no_match.txt"};
 			await Task.WhenAll(filesThatExist.Select(f => TestSubject.Overwrite(BaseFolder/f, ArbitraryFileContents))
 				.ToArray());
-			TestSubject.FindFiles(BaseFolder, searchPattern)
+			TestSubject.FindFiles(BaseFolder, searchPattern).ToEnumerable()
 				.Should()
 				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));
 		}

@@ -50,6 +50,6 @@ namespace Simulated._Fs
 		Task MoveDir([NotNull] FsPath src, [NotNull] FsPath dest);
 
 		[NotNull]
-		IEnumerable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
+		IObservable<FsPath> FindFiles([NotNull] FsPath path, [NotNull] string searchPattern);
 	}
 }
