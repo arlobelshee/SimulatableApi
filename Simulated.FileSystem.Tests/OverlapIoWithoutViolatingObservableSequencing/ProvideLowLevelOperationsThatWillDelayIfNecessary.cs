@@ -23,7 +23,7 @@ Current design makes this hard to do right.")]
 		public void DelayingDiskShouldEnsureEachOperationExecutesOnlyWhenSafeToDoSo()
 		{
 			var storage = new _BlockingDiskInMemory();
-			var testSubject = new _DelayingDisk(storage);
+			var testSubject = new _ConflictFreeDisk(storage);
 			var arbitraryPath = FsPath.TempFolder/"A";
 
 			testSubject.Overwrite(arbitraryPath, ArbitraryFileContents);

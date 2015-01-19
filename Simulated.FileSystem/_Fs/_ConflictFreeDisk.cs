@@ -8,12 +8,12 @@ using JetBrains.Annotations;
 
 namespace Simulated._Fs
 {
-	internal class _DelayingDisk
+	internal class _ConflictFreeDisk
 	{
 		[NotNull] private readonly _IFsDisk _storage;
 		[NotNull] private readonly _OperationBacklog _workSchedule;
 
-		public _DelayingDisk([NotNull] _IFsDisk storage)
+		public _ConflictFreeDisk([NotNull] _IFsDisk storage)
 		{
 			_storage = storage;
 			_workSchedule = new _OperationBacklog();
