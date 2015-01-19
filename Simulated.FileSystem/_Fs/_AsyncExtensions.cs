@@ -26,10 +26,5 @@ namespace Simulated._Fs
 		{
 			job.Wait();
 		}
-
-		public static bool TemporaryUnwrapWhileIRefactorIncrementally([NotNull] this Task<bool> fileExists)
-		{
-			return fileExists.Result;
-		}
 	}
 }
