@@ -50,7 +50,7 @@ namespace Simulated._Fs
 			});
 		}
 
-		public Task CreateDir(FsPath path)
+		public Task CreateDirReturnsNonStartedTask(FsPath path)
 		{
 			return new Task(() =>
 			{
@@ -68,18 +68,16 @@ namespace Simulated._Fs
 
 		public Task Overwrite(FsPath path, string newContents)
 		{
-			return new Task(() =>
+			if (_GetStorage(path)
+				.Kind == _StorageKind.Directory)
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
+			CreateDirReturnsNonStartedTask(path.Parent)
+				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			_data[path] = new _Node(_StorageKind.File)
 			{
-				if (_GetStorage(path)
-					.Kind == _StorageKind.Directory)
-					throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-				CreateDir(path.Parent)
-					.RunSynchronouslyAsCheapHackUntilIFixScheduling();
-				_data[path] = new _Node(_StorageKind.File)
-				{
-					RawContents = DefaultEncoding.GetBytes(newContents)
-				};
-			});
+				RawContents = DefaultEncoding.GetBytes(newContents)
+			};
+			return false.AsTask();
 		}
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
@@ -87,7 +85,7 @@ namespace Simulated._Fs
 			if (_GetStorage(path)
 				.Kind == _StorageKind.Directory)
 				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			CreateDir(path.Parent)
+			CreateDirReturnsNonStartedTask(path.Parent)
 				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_data[path] = new _Node(_StorageKind.File)
 			{
@@ -132,7 +130,7 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent)
+			CreateDirReturnsNonStartedTask(dest.Parent)
 				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_MoveItemImpl(src, dest);
 		}

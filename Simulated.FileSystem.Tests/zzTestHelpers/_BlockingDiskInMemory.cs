@@ -27,28 +27,22 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.DirExistsNeedsToBeMadeDelayStart(path);
 		}
 
-		public async Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
+		public Task<bool> FileExistsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			const string operation = "check if file exists";
-			var myTimeslice = _timeslice;
-			_Log(myTimeslice, Wait, operation, path);
-			await myTimeslice;
-			_Log(myTimeslice, Starting, operation, path);
-			var result = await myTimeslice.Executing(Impl.FileExistsNeedsToBeMadeDelayStart(path));
-			_Log(myTimeslice, Finished, operation, path);
-			return result;
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.FileExistsNeedsToBeMadeDelayStart(path));
 		}
 
-		public async Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
+		public Task<string> TextContentsNeedsToBeMadeDelayStart(FsPath path)
 		{
 			const string operation = "read text contents";
-			var myTimeslice = _timeslice;
-			_Log(myTimeslice, Wait, operation, path);
-			await myTimeslice;
-			_Log(myTimeslice, Starting, operation, path);
-			var result = await myTimeslice.Executing(Impl.TextContentsNeedsToBeMadeDelayStart(path));
-			_Log(myTimeslice, Finished, operation, path);
-			return result;
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.TextContentsNeedsToBeMadeDelayStart(path));
+		}
+
+		public Task Overwrite(FsPath path, string newContents)
+		{
+			const string operation = "write text contents";
+			return _ExecuteWhenTimesliceOpens(path, operation, () => Impl.Overwrite(path, newContents));
 		}
 
 		public IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart(FsPath path)
@@ -56,20 +50,9 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.RawContentsNeedsToBeMadeDelayStart(path);
 		}
 
-		public Task CreateDir(FsPath path)
+		public Task CreateDirReturnsNonStartedTask(FsPath path)
 		{
-			return Impl.CreateDir(path);
-		}
-
-		public async Task Overwrite(FsPath path, string newContents)
-		{
-			const string operation = "write text contents";
-			var myTimeslice = _timeslice;
-			_Log(myTimeslice, Wait, operation, path);
-			await myTimeslice;
-			_Log(myTimeslice, Starting, operation, path);
-			Impl.Overwrite(path, newContents).RunAndWait();
-			_Log(myTimeslice, Finished, operation, path);
+			return Impl.CreateDirReturnsNonStartedTask(path);
 		}
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
@@ -147,6 +130,29 @@ namespace Simulated.Tests.zzTestHelpers
 				_delay.TrySetResult(true);
 				Task.WaitAll(_workInProgress.ToArray());
 			}
+		}
+
+		[NotNull]
+		private async Task _ExecuteWhenTimesliceOpens([NotNull] FsPath path, [NotNull] string operation, [NotNull] Func<Task> work)
+		{
+			var myTimeslice = _timeslice;
+			_Log(myTimeslice, Wait, operation, path);
+			await myTimeslice;
+			_Log(myTimeslice, Starting, operation, path);
+			myTimeslice.Executing(work());
+			_Log(myTimeslice, Finished, operation, path);
+		}
+
+		[NotNull]
+		private async Task<T> _ExecuteWhenTimesliceOpens<T>([NotNull] FsPath path, [NotNull] string operation, [NotNull] Func<Task<T>> work)
+		{
+			var myTimeslice = _timeslice;
+			_Log(myTimeslice, Wait, operation, path);
+			await myTimeslice;
+			_Log(myTimeslice, Starting, operation, path);
+			var result = await myTimeslice.Executing(work());
+			_Log(myTimeslice, Finished, operation, path);
+			return result;
 		}
 	}
 }

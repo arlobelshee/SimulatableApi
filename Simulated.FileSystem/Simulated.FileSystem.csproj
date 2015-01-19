@@ -70,6 +70,7 @@
     <Compile Include="_Fs\FsDirectory.cs" />
     <Compile Include="_Fs\FsFile.cs" />
     <Compile Include="_Fs\_ConflictFreeDisk.cs" />
+    <Compile Include="_Fs\_DelayedStartDisk.cs" />
     <Compile Include="_Fs\_DiskChange.cs" />
     <Compile Include="_Fs\_DiskReal.cs" />
     <Compile Include="_Fs\_DiskSimulated.cs" />

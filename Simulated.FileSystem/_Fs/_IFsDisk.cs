@@ -28,7 +28,7 @@ namespace Simulated._Fs
 		IObservable<byte[]> RawContentsNeedsToBeMadeDelayStart([NotNull] FsPath path);
 
 		[NotNull]
-		Task CreateDir([NotNull] FsPath path);
+		Task CreateDirReturnsNonStartedTask([NotNull] FsPath path);
 
 		[NotNull]
 		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);

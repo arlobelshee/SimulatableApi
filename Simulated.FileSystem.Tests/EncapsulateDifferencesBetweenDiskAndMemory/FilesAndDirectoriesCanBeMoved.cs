@@ -17,25 +17,25 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class FilesAndDirectoriesCanBeMoved : DiskTestBase
 	{
-		[Test]
-		public void MovingDirectoryShouldMoveAllContents()
+		[NotNull,Test]
+		public async Task MovingDirectoryShouldMoveAllContents()
 		{
 			var originalRoot = BaseFolder/"original";
 			var newRoot = BaseFolder/"new";
 			var filePath = originalRoot/"something"/"file.txt";
-			TestSubject.Overwrite(filePath, ArbitraryFileContents).RunAndWait();
+			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
 			TestSubject.MoveDirNeedsToBeMadeDelayStart(originalRoot, newRoot);
 			TestSubject.ShouldBeDir(newRoot);
 			TestSubject.ShouldNotExist(originalRoot);
 			TestSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
 		}
 
-		[Test]
-		public void MovingFileShouldChangeItsLocation()
+		[NotNull,Test]
+		public async Task MovingFileShouldChangeItsLocation()
 		{
 			var originalFile = BaseFolder/"something"/"file.txt";
 			var dest = BaseFolder/"new_path"/"file_new.txt";
-			TestSubject.Overwrite(originalFile, ArbitraryFileContents).RunAndWait();
+			await TestSubject.Overwrite(originalFile, ArbitraryFileContents);
 			TestSubject.MoveFileNeedsToBeMadeDelayStart(originalFile, dest);
 			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
@@ -92,11 +92,11 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 
 		protected override void FinishSetup()
 		{
-			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents).RunAndWait();
-			TestSubject.CreateDir(BaseFolder/SrcDir).RunAndWait();
+			TestSubject.Overwrite(BaseFolder/SrcFile, ArbitraryFileContents).Wait();
+			TestSubject.CreateDirReturnsNonStartedTask(BaseFolder/SrcDir).RunAndWait();
 
-			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents).RunAndWait();
-			TestSubject.CreateDir(BaseFolder/DestBlockingDir).RunAndWait();
+			TestSubject.Overwrite(BaseFolder/DestBlockingFile, ArbitraryFileContents).Wait();
+			TestSubject.CreateDirReturnsNonStartedTask(BaseFolder/DestBlockingDir).RunAndWait();
 		}
 
 		public enum MoveKind

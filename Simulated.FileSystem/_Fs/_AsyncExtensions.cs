@@ -23,9 +23,8 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public static Task StartSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)
+		public static Task WrapAsNeededForApiUntilIfixTheInsides([NotNull] this Task job)
 		{
-			job.Start();
 			return job;
 		}
 

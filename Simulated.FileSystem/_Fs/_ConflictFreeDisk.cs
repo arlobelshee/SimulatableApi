@@ -10,10 +10,10 @@ namespace Simulated._Fs
 {
 	internal class _ConflictFreeDisk
 	{
-		[NotNull] private readonly _IFsDisk _storage;
+		[NotNull] private readonly _DelayedStartDisk _storage;
 		[NotNull] private readonly _OperationBacklog _workSchedule;
 
-		public _ConflictFreeDisk([NotNull] _IFsDisk storage)
+		public _ConflictFreeDisk([NotNull] _DelayedStartDisk storage)
 		{
 			_storage = storage;
 			_workSchedule = new _OperationBacklog();

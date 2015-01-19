@@ -107,7 +107,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public Task EnsureExists()
 		{
-			return _allFiles._Disk.CreateDir(_path);
+			return _allFiles._Disk.CreateDirReturnsNonStartedTask(_path);
 		}
 
 		/// <summary>

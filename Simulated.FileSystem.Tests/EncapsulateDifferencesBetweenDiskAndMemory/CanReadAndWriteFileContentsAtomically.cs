@@ -18,12 +18,13 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class CanReadAndWriteFileContentsAtomically : DiskTestBase
 	{
+		[NotNull]
 		[Test]
-		public void CanCreateFileAndReadItsContents()
+		public async Task CanCreateFileAndReadItsContents()
 		{
 			var fileName = BaseFolder/"file.txt";
 			TestSubject.ShouldNotExist(fileName);
-			TestSubject.Overwrite(fileName, ArbitraryFileContents).RunAndWait();
+			await TestSubject.Overwrite(fileName, ArbitraryFileContents);
 			TestSubject.DirExistsNeedsToBeMadeDelayStart(fileName)
 				.Should()
 				.BeFalse();
@@ -55,9 +56,10 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void WritingToFileWhereDirectoryExistsShouldFail(FileFormat fileFormat)
 		{
 			var fileName = BaseFolder/"parent"/"file.txt";
-			TestSubject.CreateDir(fileName).RunAndWait();
+			TestSubject.CreateDirReturnsNonStartedTask(fileName)
+				.RunAndWait();
 			var writeToFile = _PickFileWriter(fileFormat, fileName);
-			Action overwrite = ()=> writeToFile(ArbitraryFileContents);
+			Action overwrite = () => writeToFile(ArbitraryFileContents);
 			overwrite.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.WriteErrorPathIsDirectory, fileName._Absolute));
 		}
@@ -77,17 +79,19 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		public void CannotReadContentsOfFolder(FileFormat fileFormat)
 		{
 			var dirName = BaseFolder/"directory.git";
-			TestSubject.CreateDir(dirName).RunAndWait();
+			TestSubject.CreateDirReturnsNonStartedTask(dirName)
+				.RunAndWait();
 			var readMissingFile = _PickFileReader(fileFormat, dirName);
 			readMissingFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.ReadErrorPathIsDirectory, dirName));
 		}
 
+		[NotNull]
 		[Test]
-		public void StringsShouldBeEncodedInUtf8ByDefault()
+		public async Task StringsShouldBeEncodedInUtf8ByDefault()
 		{
 			var testFile = BaseFolder/"hello.txt";
-			TestSubject.Overwrite(testFile, UnicodeContents).RunAndWait();
+			await TestSubject.Overwrite(testFile, UnicodeContents);
 			var asBytes = TestSubject.RawContentsNeedsToBeMadeDelayStart(testFile)
 				.CollectAllBytes();
 			asBytes.Should()
@@ -123,9 +127,11 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return () => TestSubject.TextContentsNeedsToBeMadeDelayStart(fileName).Wait();
+					return () => TestSubject.TextContentsNeedsToBeMadeDelayStart(fileName)
+						.Wait();
 				case FileFormat.Binary:
-					return () => TestSubject.RawContentsNeedsToBeMadeDelayStart(fileName).Wait();
+					return () => TestSubject.RawContentsNeedsToBeMadeDelayStart(fileName)
+						.Wait();
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}
@@ -137,7 +143,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return contents => TestSubject.Overwrite(fileName, contents).RunAndWait();
+					return contents => TestSubject.Overwrite(fileName, contents)
+						.Wait();
 				case FileFormat.Binary:
 					return contents => TestSubject.OverwriteNeedsToBeMadeDelayStart(fileName, Encoding.UTF8.GetBytes(contents));
 				default:

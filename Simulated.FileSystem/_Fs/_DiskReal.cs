@@ -66,7 +66,7 @@ namespace Simulated._Fs
 			});
 		}
 
-		public Task CreateDir(FsPath path)
+		public Task CreateDirReturnsNonStartedTask(FsPath path)
 		{
 			return new Task(() => _CreateDir(path));
 		}
@@ -78,17 +78,23 @@ namespace Simulated._Fs
 			Directory.CreateDirectory(path._Absolute);
 		}
 
-		public Task Overwrite(FsPath path, string newContents)
+		public async Task Overwrite(FsPath path, string newContents)
 		{
-			return new Task(() => _Overwrite(path, newContents).Wait());
+			if (Directory.Exists(path._Absolute))
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
+			_CreateDir(path.Parent);
+			using (var contents = File.CreateText(path._Absolute))
+			{
+				await contents.WriteAsync(newContents)
+					.ConfigureAwait(false);
+			}
 		}
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
 			if (Directory.Exists(path._Absolute))
 				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			CreateDir(path.Parent)
-				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			_CreateDir(path.Parent);
 			File.WriteAllBytes(path._Absolute, newContents);
 		}
 
@@ -121,7 +127,7 @@ namespace Simulated._Fs
 			if (FileExistsNeedsToBeMadeDelayStart(dest)
 				.TemporaryUnwrapWhileIRefactorIncrementally() || DirExistsNeedsToBeMadeDelayStart(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent)
+			CreateDirReturnsNonStartedTask(dest.Parent)
 				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.Move(src._Absolute, dest._Absolute);
 		}
@@ -145,19 +151,6 @@ namespace Simulated._Fs
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path._Absolute, searchPattern)
 				.Select(p => path/Path.GetFileName(p));
-		}
-
-		[NotNull]
-		private static async Task _Overwrite([NotNull] FsPath path, [NotNull] string newContents)
-		{
-			if (Directory.Exists(path._Absolute))
-				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			_CreateDir(path.Parent);
-			using (var contents = File.CreateText(path._Absolute))
-			{
-				await contents.WriteAsync(newContents)
-					.ConfigureAwait(false);
-			}
 		}
 
 		private void _ValidatePathForReadingFile([NotNull] FsPath path)
