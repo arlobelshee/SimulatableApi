@@ -83,19 +83,6 @@ namespace Simulated._Fs
 			return new Task(() => _Overwrite(path, newContents).Wait());
 		}
 
-		[NotNull]
-		private static async Task _Overwrite([NotNull] FsPath path, [NotNull] string newContents)
-		{
-			if (Directory.Exists(path._Absolute))
-				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			_CreateDir(path.Parent);
-			using (var contents = File.CreateText(path._Absolute))
-			{
-				await contents.WriteAsync(newContents)
-					.ConfigureAwait(false);
-			}
-		}
-
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
 			if (Directory.Exists(path._Absolute))
@@ -158,6 +145,19 @@ namespace Simulated._Fs
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path._Absolute, searchPattern)
 				.Select(p => path/Path.GetFileName(p));
+		}
+
+		[NotNull]
+		private static async Task _Overwrite([NotNull] FsPath path, [NotNull] string newContents)
+		{
+			if (Directory.Exists(path._Absolute))
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
+			_CreateDir(path.Parent);
+			using (var contents = File.CreateText(path._Absolute))
+			{
+				await contents.WriteAsync(newContents)
+					.ConfigureAwait(false);
+			}
 		}
 
 		private void _ValidatePathForReadingFile([NotNull] FsPath path)
