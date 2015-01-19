@@ -14,9 +14,10 @@ namespace Simulated._Fs
 {
 	internal class _DiskReal : _IFsDisk
 	{
-		public bool DirExists(FsPath path)
+		public Task<bool> DirExists(FsPath path)
 		{
-			return Directory.Exists(path._Absolute);
+			return Directory.Exists(path._Absolute)
+				.AsTask();
 		}
 
 		public Task<bool> FileExists(FsPath path)
@@ -27,7 +28,8 @@ namespace Simulated._Fs
 
 		public async Task<string> TextContents(FsPath path)
 		{
-			await _ValidatePathForReadingFile(path).ConfigureAwait(false);
+			await _ValidatePathForReadingFile(path)
+				.ConfigureAwait(false);
 			using (var contents = File.OpenText(path._Absolute))
 			{
 				return await contents.ReadToEndAsync()
@@ -40,7 +42,8 @@ namespace Simulated._Fs
 			const int bufferSize = 1024*10;
 			return _Make.Observable<byte[]>(async ctx =>
 			{
-				await _ValidatePathForReadingFile(path).ConfigureAwait(false);
+				await _ValidatePathForReadingFile(path)
+					.ConfigureAwait(false);
 				using (var contents = File.OpenRead(path._Absolute))
 				{
 					var buffer = new byte[bufferSize];
@@ -70,7 +73,8 @@ namespace Simulated._Fs
 		public async Task CreateDir(FsPath path)
 #pragma warning restore 1998
 		{
-			if (File.Exists(path._Absolute))
+			if (await FileExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, path));
 			Directory.CreateDirectory(path._Absolute);
 		}
@@ -79,17 +83,21 @@ namespace Simulated._Fs
 		public async Task DeleteDir(FsPath path)
 #pragma warning restore 1998
 		{
-			if (await FileExists(path))
+			if (await FileExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
-			if (DirExists(path))
+			if (await DirExists(path)
+				.ConfigureAwait(false))
 				Directory.Delete(path._Absolute, true);
 		}
 
 		public async Task Overwrite(FsPath path, string newContents)
 		{
-			if (Directory.Exists(path._Absolute))
+			if (await DirExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			await CreateDir(path.Parent);
+			await CreateDir(path.Parent)
+				.ConfigureAwait(false);
 			using (var contents = File.CreateText(path._Absolute))
 			{
 				await contents.WriteAsync(newContents)
@@ -99,26 +107,33 @@ namespace Simulated._Fs
 
 		public async Task Overwrite(FsPath path, byte[] newContents)
 		{
-			if (Directory.Exists(path._Absolute))
+			if (await DirExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
-			await CreateDir(path.Parent);
+			await CreateDir(path.Parent)
+				.ConfigureAwait(false);
 			File.WriteAllBytes(path._Absolute, newContents);
 		}
 
-		public void DeleteFile(FsPath path)
+		public async Task DeleteFile(FsPath path)
 		{
-			if (DirExists(path))
+			if (await DirExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedDirectoryAsFile, path));
 			File.Delete(path._Absolute);
 		}
 
 		public async Task MoveFile(FsPath src, FsPath dest)
 		{
-			if (DirExists(src))
+			if (await DirExists(src)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src._Absolute, dest._Absolute));
-			if (!await FileExists(src))
+			if (!await FileExists(src)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
-			if (await FileExists(dest) || DirExists(dest))
+			if (await FileExists(dest)
+				.ConfigureAwait(false) || await DirExists(dest)
+					.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			await CreateDir(dest.Parent);
 			File.Move(src._Absolute, dest._Absolute);
@@ -126,18 +141,23 @@ namespace Simulated._Fs
 
 		public async Task MoveDir(FsPath src, FsPath dest)
 		{
-			if (await FileExists(src))
+			if (await FileExists(src)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
-			if (!DirExists(src))
+			if (!await DirExists(src)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
-			if (await FileExists(dest) || DirExists(dest))
+			if (await FileExists(dest)
+				.ConfigureAwait(false) || await DirExists(dest)
+					.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			Directory.Move(src._Absolute, dest._Absolute);
 		}
 
 		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
 		{
-			if (!DirExists(path))
+			if (!DirExists(path)
+				.WaitSynchronouslyUntilIFinishRefactoring())
 				return Enumerable.Empty<FsPath>();
 			return Directory.EnumerateFiles(path._Absolute, searchPattern)
 				.Select(p => path/Path.GetFileName(p));
@@ -146,9 +166,11 @@ namespace Simulated._Fs
 		[NotNull]
 		private async Task _ValidatePathForReadingFile([NotNull] FsPath path)
 		{
-			if (DirExists(path))
+			if (await DirExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
-			if (!await FileExists(path).ConfigureAwait(false))
+			if (!await FileExists(path)
+				.ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}

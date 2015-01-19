@@ -25,9 +25,6 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var fileName = BaseFolder/"file.txt";
 			TestSubject.ShouldNotExist(fileName);
 			await TestSubject.Overwrite(fileName, ArbitraryFileContents);
-			TestSubject.DirExists(fileName)
-				.Should()
-				.BeFalse();
 			TestSubject.ShouldBeFile(fileName, ArbitraryFileContents);
 		}
 

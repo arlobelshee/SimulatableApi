@@ -16,7 +16,8 @@ namespace Simulated._Fs
 	/// </summary>
 	internal interface _IFsDisk
 	{
-		bool DirExists([NotNull] FsPath path);
+		[NotNull]
+		Task<bool> DirExists([NotNull] FsPath path);
 
 		[NotNull]
 		Task<bool> FileExists([NotNull] FsPath path);
@@ -39,7 +40,9 @@ namespace Simulated._Fs
 		[NotNull]
 		Task Overwrite([NotNull] FsPath path, [NotNull] byte[] newContents);
 
-		void DeleteFile([NotNull] FsPath path);
+		[NotNull]
+		Task DeleteFile([NotNull] FsPath path);
+
 		[NotNull]
 		Task MoveFile([NotNull] FsPath src, [NotNull] FsPath dest);
 

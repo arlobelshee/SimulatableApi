@@ -4,7 +4,9 @@
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
 using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using Simulated.Tests.zzTestHelpers;
 
@@ -22,7 +24,8 @@ namespace Simulated.Tests.FileSystemNavigation
 		[Test]
 		public void TempFolderShouldNotDisclosePathInformation()
 		{
-			FsPath.TempFolder.ToString().Should()
+			FsPath.TempFolder.ToString()
+				.Should()
 				.Be("{Temp folder}");
 		}
 
@@ -30,13 +33,15 @@ namespace Simulated.Tests.FileSystemNavigation
 		public void TempFolderInternalAccessShouldGiveFullPathInformation()
 		{
 			FsPath.TempFolder._Absolute.Should()
-				.Be(Path.GetTempPath().TrimEnd('\\'));
+				.Be(Path.GetTempPath()
+					.TrimEnd('\\'));
 		}
 
+		[NotNull]
 		[Test]
-		public void TempFolderShouldInitiallyExist()
+		public async Task TempFolderShouldInitiallyExist()
 		{
-			TestSubject.TempDirectory.Exists.Should()
+			(await TestSubject.TempDirectory.Exists).Should()
 				.BeTrue();
 		}
 	}

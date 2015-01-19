@@ -29,12 +29,12 @@ namespace Simulated.Tests.QueryBasicProperties
 				.Be(baseName);
 		}
 
-		[Test]
-		public void DirectoriesKnowWhetherTheyExist()
+		[NotNull,Test]
+		public async Task DirectoriesKnowWhetherTheyExist()
 		{
-			BaseFolder.Exists.Should()
+			(await BaseFolder.Exists).Should()
 				.BeFalse();
-			BaseFolder.Parent.Exists.Should()
+			(await BaseFolder.Parent.Exists).Should()
 				.BeTrue();
 		}
 

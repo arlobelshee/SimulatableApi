@@ -18,7 +18,7 @@ namespace Simulated.Tests.zzTestHelpers
 	{
 		public static void ShouldExist([NotNull] this FsDirectory dir)
 		{
-			dir.Exists.Should()
+			dir.Exists.Result.Should()
 				.BeTrue();
 		}
 
@@ -39,7 +39,7 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldNotExist([NotNull] this FsDirectory dir)
 		{
-			dir.Exists.Should()
+			dir.Exists.Result.Should()
 				.BeFalse();
 		}
 
@@ -51,7 +51,7 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldBeDir([NotNull] this _IFsDisk disk, [NotNull] FsPath dir)
 		{
-			disk.DirExists(dir)
+			disk.DirExists(dir).Result
 				.Should()
 				.BeTrue();
 		}
@@ -92,7 +92,7 @@ namespace Simulated.Tests.zzTestHelpers
 
 		public static void ShouldNotBeDir([NotNull] this _IFsDisk disk, [NotNull] FsPath path)
 		{
-			disk.DirExists(path)
+			disk.DirExists(path).Result
 				.Should()
 				.BeFalse();
 		}

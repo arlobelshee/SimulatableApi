@@ -35,8 +35,9 @@ namespace Simulated._Fs
 		///    Gets a value indicating whether this <see cref="FsDirectory" /> exists.
 		/// </summary>
 		/// <value> <c>true</c> if it exists; otherwise, <c>false</c> . </value>
+		[NotNull]
 		[PublicApi]
-		public bool Exists
+		public Task<bool> Exists
 		{
 			get { return _allFiles._Disk.DirExists(_path); }
 		}
@@ -114,7 +115,8 @@ namespace Simulated._Fs
 		///    Regardless of the previous state of the file system, results in a directory no longer existing at this object's
 		///    Path.
 		/// </summary>
-		[NotNull,PublicApi]
+		[NotNull]
+		[PublicApi]
 		public Task EnsureDoesNotExist()
 		{
 			return _allFiles._Disk.DeleteDir(_path)

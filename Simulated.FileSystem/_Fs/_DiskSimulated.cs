@@ -18,10 +18,10 @@ namespace Simulated._Fs
 		[NotNull] private readonly Dictionary<FsPath, _Node> _data = new Dictionary<FsPath, _Node>();
 		[NotNull] private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		public bool DirExists(FsPath path)
+		public Task<bool> DirExists(FsPath path)
 		{
-			return _GetStorage(path)
-				.Kind == _StorageKind.Directory;
+			return (_GetStorage(path)
+				.Kind == _StorageKind.Directory).AsTask();
 		}
 
 		public Task<bool> FileExists(FsPath path)
@@ -103,7 +103,9 @@ namespace Simulated._Fs
 			};
 		}
 
-		public void DeleteFile(FsPath path)
+#pragma warning disable 1998
+		public async Task DeleteFile(FsPath path)
+#pragma warning restore 1998
 		{
 			var storageKind = _GetStorage(path)
 				.Kind;

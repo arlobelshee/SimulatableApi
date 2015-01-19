@@ -22,7 +22,7 @@ namespace Simulated.Tests.zzTestHelpers
 		[NotNull] private _BlockedWork _timeslice = new _BlockedWork();
 		[NotNull] private readonly List<string> _log = new List<string>();
 
-		public bool DirExists(FsPath path)
+		public Task<bool> DirExists(FsPath path)
 		{
 			return Impl.DirExists(path);
 		}
@@ -66,9 +66,9 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.DeleteDir(path);
 		}
 
-		public void DeleteFile(FsPath path)
+		public Task DeleteFile(FsPath path)
 		{
-			Impl.DeleteFile(path);
+			return Impl.DeleteFile(path);
 		}
 
 		public Task MoveFile(FsPath src, FsPath dest)

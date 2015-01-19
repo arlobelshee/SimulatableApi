@@ -45,9 +45,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var filePath = newPath/"file.txt";
 			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
 			await TestSubject.CreateDir(newPath);
-			TestSubject.DirExists(newPath)
-				.Should()
-				.BeTrue();
+			TestSubject.ShouldBeDir(newPath);
 			TestSubject.ShouldBeFile(filePath, ArbitraryFileContents);
 		}
 
@@ -80,7 +78,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var newPath = BaseFolder/"sub.txt";
 			await TestSubject.Overwrite(newPath, ArbitraryFileContents);
-			TestSubject.DeleteFile(newPath);
+			await TestSubject.DeleteFile(newPath);
 			TestSubject.ShouldNotExist(newPath);
 		}
 
@@ -119,7 +117,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var dirName = BaseFolder/"sub";
 			await TestSubject.CreateDir(dirName);
-			Action deleteFile = () => TestSubject.DeleteFile(dirName);
+			Action deleteFile = () => TestSubject.DeleteFile(dirName).Wait();
 			deleteFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format("Failed to delete the file '{0}' because it is a directory.", dirName));
 		}
