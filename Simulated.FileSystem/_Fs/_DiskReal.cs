@@ -27,7 +27,7 @@ namespace Simulated._Fs
 
 		public async Task<string> TextContents(FsPath path)
 		{
-			_ValidatePathForReadingFile(path);
+			await _ValidatePathForReadingFile(path).ConfigureAwait(false);
 			using (var contents = File.OpenText(path._Absolute))
 			{
 				return await contents.ReadToEndAsync()
@@ -40,7 +40,7 @@ namespace Simulated._Fs
 			const int bufferSize = 1024*10;
 			return _Make.Observable<byte[]>(async ctx =>
 			{
-				_ValidatePathForReadingFile(path);
+				await _ValidatePathForReadingFile(path).ConfigureAwait(false);
 				using (var contents = File.OpenRead(path._Absolute))
 				{
 					var buffer = new byte[bufferSize];
@@ -79,8 +79,7 @@ namespace Simulated._Fs
 		public async Task DeleteDir(FsPath path)
 #pragma warning restore 1998
 		{
-			if (FileExists(path)
-				.TemporaryUnwrapWhileIRefactorIncrementally())
+			if (await FileExists(path))
 				throw new BadStorageRequest(string.Format(UserMessages.DeleteErrorDeletedFileAsDirectory, path));
 			if (DirExists(path))
 				Directory.Delete(path._Absolute, true);
@@ -113,30 +112,25 @@ namespace Simulated._Fs
 			File.Delete(path._Absolute);
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public async Task MoveFile(FsPath src, FsPath dest)
 		{
 			if (DirExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedDirectoryAsFile, src._Absolute, dest._Absolute));
-			if (!FileExists(src)
-				.TemporaryUnwrapWhileIRefactorIncrementally())
+			if (!await FileExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute, dest._Absolute));
-			if (FileExists(dest)
-				.TemporaryUnwrapWhileIRefactorIncrementally() || DirExists(dest))
+			if (await FileExists(dest) || DirExists(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent)
-				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			await CreateDir(dest.Parent);
 			File.Move(src._Absolute, dest._Absolute);
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+		public async Task MoveDir(FsPath src, FsPath dest)
 		{
-			if (FileExists(src)
-				.TemporaryUnwrapWhileIRefactorIncrementally())
+			if (await FileExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMovedFileAsDirectory, src._Absolute));
 			if (!DirExists(src))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorMissingSource, src._Absolute));
-			if (FileExists(dest)
-				.TemporaryUnwrapWhileIRefactorIncrementally() || DirExists(dest))
+			if (await FileExists(dest) || DirExists(dest))
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
 			Directory.Move(src._Absolute, dest._Absolute);
 		}
@@ -149,12 +143,12 @@ namespace Simulated._Fs
 				.Select(p => path/Path.GetFileName(p));
 		}
 
-		private void _ValidatePathForReadingFile([NotNull] FsPath path)
+		[NotNull]
+		private async Task _ValidatePathForReadingFile([NotNull] FsPath path)
 		{
 			if (DirExists(path))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorPathIsDirectory, path));
-			if (!FileExists(path)
-				.TemporaryUnwrapWhileIRefactorIncrementally())
+			if (!await FileExists(path).ConfigureAwait(false))
 				throw new BadStorageRequest(string.Format(UserMessages.ReadErrorFileNotFound, path));
 		}
 	}

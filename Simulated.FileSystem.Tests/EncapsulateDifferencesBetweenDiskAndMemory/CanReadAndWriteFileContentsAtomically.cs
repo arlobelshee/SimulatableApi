@@ -41,13 +41,13 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			TestSubject.ShouldBeFile(fileName, contents);
 		}
 
-		[Test]
+		[NotNull,Test]
 		[TestCaseSource("FileFormats")]
-		public void WritingToFileInMissingDirectoryShouldCreateParentDirs(FileFormat fileFormat)
+		public async Task WritingToFileInMissingDirectoryShouldCreateParentDirs(FileFormat fileFormat)
 		{
 			var fileName = BaseFolder/"parent"/"file.txt";
-			var writeToFile = _PickFileWriter(fileFormat, fileName);
-			writeToFile(ArbitraryFileContents);
+			var writeToFile = _PickFileWriter(fileFormat, fileName, ArbitraryFileContents);
+			await writeToFile();
 			TestSubject.ShouldBeDir(BaseFolder/"parent");
 		}
 
@@ -57,9 +57,8 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var fileName = BaseFolder/"parent"/"file.txt";
 			await TestSubject.CreateDir(fileName);
-			var writeToFile = _PickFileWriter(fileFormat, fileName);
-			Action overwrite = () => writeToFile(ArbitraryFileContents);
-			overwrite.ShouldThrow<BadStorageRequest>()
+			var writeToFile = _PickFileWriter(fileFormat, fileName, ArbitraryFileContents);
+			writeToFile.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(UserMessages.WriteErrorPathIsDirectory, fileName._Absolute));
 		}
 
@@ -136,15 +135,14 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		[NotNull]
-		private Action<string> _PickFileWriter(FileFormat fileFormat, [NotNull] FsPath fileName)
+		private Func<Task> _PickFileWriter(FileFormat fileFormat, [NotNull] FsPath fileName, [NotNull] string contents)
 		{
 			switch (fileFormat)
 			{
 				case FileFormat.Text:
-					return contents => TestSubject.Overwrite(fileName, contents)
-						.Wait();
+					return () => TestSubject.Overwrite(fileName, contents);
 				case FileFormat.Binary:
-					return contents => TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(contents)).Wait();
+					return () => TestSubject.Overwrite(fileName, Encoding.UTF8.GetBytes(contents));
 				default:
 					throw new NotImplementedException(string.Format("Test does not support {0}.", fileFormat));
 			}

@@ -24,7 +24,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var newRoot = BaseFolder/"new";
 			var filePath = originalRoot/"something"/"file.txt";
 			await TestSubject.Overwrite(filePath, ArbitraryFileContents);
-			TestSubject.MoveDir(originalRoot, newRoot);
+			await TestSubject.MoveDir(originalRoot, newRoot);
 			TestSubject.ShouldBeDir(newRoot);
 			TestSubject.ShouldNotExist(originalRoot);
 			TestSubject.ShouldBeFile(newRoot/"something"/"file.txt", ArbitraryFileContents);
@@ -37,7 +37,7 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 			var originalFile = BaseFolder/"something"/"file.txt";
 			var dest = BaseFolder/"new_path"/"file_new.txt";
 			await TestSubject.Overwrite(originalFile, ArbitraryFileContents);
-			TestSubject.MoveFile(originalFile, dest);
+			await TestSubject.MoveFile(originalFile, dest);
 			TestSubject.ShouldBeDir(BaseFolder/"new_path");
 			TestSubject.ShouldNotExist(originalFile);
 			TestSubject.ShouldBeFile(dest, ArbitraryFileContents);
@@ -50,26 +50,15 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		{
 			var src = BaseFolder/srcName;
 			var dest = BaseFolder/destName;
-			Action move = () =>
-			{
-				switch (operationToAttempt)
-				{
-					case MoveKind.Directory:
-						TestSubject.MoveDir(src, dest);
-						break;
-					case MoveKind.File:
-						TestSubject.MoveFile(src, dest);
-						break;
-					default:
-						throw new NotImplementedException(string.Format("Test not yet written for operation {0}.", operationToAttempt));
-				}
-			};
+			var move = _MoveImplOfRequestedKind(operationToAttempt, src, dest);
 			move.ShouldThrow<BadStorageRequest>()
 				.WithMessage(string.Format(expectedError, src._Absolute, dest._Absolute));
 		}
 
 		private const string DestBlockingDir = "dest_blocking_dir";
+
 		private const string DestBlockingFile = "dest_blocking_file.txt";
+
 		private const string DestUnblocked = "dest_new";
 
 		[NotNull]
@@ -104,8 +93,24 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 		}
 
 		private const string SrcDir = "src_dir";
+
 		private const string SrcFile = "src_file.txt";
+
 		private const string SrcMissing = "src_missing";
+
+		[NotNull]
+		private Func<Task> _MoveImplOfRequestedKind(MoveKind operationToAttempt, [NotNull] FsPath src, [NotNull] FsPath dest)
+		{
+			switch (operationToAttempt)
+			{
+				case MoveKind.Directory:
+					return () => TestSubject.MoveDir(src, dest);
+				case MoveKind.File:
+					return () => TestSubject.MoveFile(src, dest);
+				default:
+					throw new NotImplementedException(string.Format("Test not yet written for operation {0}.", operationToAttempt));
+			}
+		}
 	}
 
 	public class FilesAndDirectoriesCanBeMovedDiskFs : FilesAndDirectoriesCanBeMoved

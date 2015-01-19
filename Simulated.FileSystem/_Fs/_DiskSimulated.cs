@@ -114,7 +114,7 @@ namespace Simulated._Fs
 			_data.Remove(path);
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public async Task MoveFile(FsPath src, FsPath dest)
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;
@@ -125,12 +125,13 @@ namespace Simulated._Fs
 			if (_GetStorage(dest)
 				.Kind != _StorageKind.Missing)
 				throw new BadStorageRequest(string.Format(UserMessages.MoveErrorDestinationBlocked, src._Absolute, dest._Absolute));
-			CreateDir(dest.Parent)
-				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			await CreateDir(dest.Parent);
 			_MoveItemImpl(src, dest);
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+#pragma warning disable 1998
+		public async Task MoveDir(FsPath src, FsPath dest)
+#pragma warning restore 1998
 		{
 			var srcKind = _GetStorage(src)
 				.Kind;

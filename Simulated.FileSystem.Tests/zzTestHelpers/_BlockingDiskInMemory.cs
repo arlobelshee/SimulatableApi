@@ -71,14 +71,14 @@ namespace Simulated.Tests.zzTestHelpers
 			Impl.DeleteFile(path);
 		}
 
-		public void MoveFile(FsPath src, FsPath dest)
+		public Task MoveFile(FsPath src, FsPath dest)
 		{
-			Impl.MoveFile(src, dest);
+			return Impl.MoveFile(src, dest);
 		}
 
-		public void MoveDir(FsPath src, FsPath dest)
+		public Task MoveDir(FsPath src, FsPath dest)
 		{
-			Impl.MoveDir(src, dest);
+			return Impl.MoveDir(src, dest);
 		}
 
 		public IEnumerable<FsPath> FindFiles(FsPath path, string searchPattern)
