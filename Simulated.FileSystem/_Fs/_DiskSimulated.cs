@@ -66,10 +66,13 @@ namespace Simulated._Fs
 			});
 		}
 
-		public Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
+		public Task Overwrite(FsPath path, string newContents)
 		{
-			return Task.Run(() =>
+			return new Task(() =>
 			{
+				if (_GetStorage(path)
+					.Kind == _StorageKind.Directory)
+					throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
 				CreateDir(path.Parent)
 					.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 				_data[path] = new _Node(_StorageKind.File)
@@ -81,6 +84,9 @@ namespace Simulated._Fs
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
+			if (_GetStorage(path)
+				.Kind == _StorageKind.Directory)
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
 			CreateDir(path.Parent)
 				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			_data[path] = new _Node(_StorageKind.File)

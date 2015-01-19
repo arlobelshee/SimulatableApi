@@ -3,7 +3,6 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -21,6 +20,13 @@ namespace Simulated._Fs
 		{
 			job.RunSynchronously();
 			job.Wait();
+		}
+
+		[NotNull]
+		public static Task StartSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)
+		{
+			job.Start();
+			return job;
 		}
 
 		public static void RunSynchronouslyAsCheapHackUntilIFixScheduling([NotNull] this Task job)

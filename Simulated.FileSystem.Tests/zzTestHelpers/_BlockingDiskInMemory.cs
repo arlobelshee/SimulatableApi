@@ -61,14 +61,14 @@ namespace Simulated.Tests.zzTestHelpers
 			return Impl.CreateDir(path);
 		}
 
-		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
+		public async Task Overwrite(FsPath path, string newContents)
 		{
 			const string operation = "write text contents";
 			var myTimeslice = _timeslice;
 			_Log(myTimeslice, Wait, operation, path);
 			await myTimeslice;
 			_Log(myTimeslice, Starting, operation, path);
-			await myTimeslice.Executing(Impl.OverwriteNeedsToBeMadeDelayStart(path, newContents));
+			Impl.Overwrite(path, newContents).RunAndWait();
 			_Log(myTimeslice, Finished, operation, path);
 		}
 

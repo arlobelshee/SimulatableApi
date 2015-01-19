@@ -33,17 +33,22 @@ namespace Simulated._Fs
 			return Kind.ConflictsWith(other.Kind);
 		}
 
-		public void Execute()
+		public virtual void Execute()
 		{
 			_work.ContinueWith(result =>
 			{
 				result.ContinueWith(done =>
 				{
-					if (Completed != null)
-						Completed(this);
+					_AnnounceCompleted();
 				});
 			});
 			_work.Start(TaskScheduler.Default);
+		}
+
+		protected void _AnnounceCompleted()
+		{
+			if (Completed != null)
+				Completed(this);
 		}
 
 		public override string ToString()
@@ -52,15 +57,25 @@ namespace Simulated._Fs
 		}
 
 		[NotNull]
-		public static _DiskChange Make([NotNull] _DiskChangeKind kind, [NotNull] Task<Task> work)
+		public static _DiskChange Make<T>([NotNull] _DiskChangeKind kind, [NotNull] Task<Task<T>> work)
 		{
 			return new _DiskChange(kind, work);
 		}
 
 		[NotNull]
-		public static _DiskChange Make<T>([NotNull] _DiskChangeKind kind, [NotNull] Task<Task<T>> work)
+		public static _DiskChange Make([NotNull] _DiskChangeKind kind, [NotNull] Task work)
 		{
-			return new _DiskChange(kind, work);
+			return new _DiskChangeForAsyncDisk(kind, work);
+		}
+
+		private class _DiskChangeForAsyncDisk : _DiskChange
+		{
+			public _DiskChangeForAsyncDisk([NotNull] _DiskChangeKind kind, [NotNull] Task work):base(kind, work) {}
+			public override void Execute()
+			{
+				_work.ContinueWith(result => _AnnounceCompleted());
+				_work.Start(TaskScheduler.Default);
+			}
 		}
 	}
 }

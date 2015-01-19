@@ -31,7 +31,7 @@ namespace Simulated._Fs
 		Task CreateDir([NotNull] FsPath path);
 
 		[NotNull]
-		Task OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] string newContents);
+		Task Overwrite([NotNull] FsPath path, [NotNull] string newContents);
 
 		void OverwriteNeedsToBeMadeDelayStart([NotNull] FsPath path, [NotNull] byte[] newContents);
 		[NotNull]

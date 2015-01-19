@@ -17,16 +17,16 @@ namespace Simulated.Tests.EncapsulateDifferencesBetweenDiskAndMemory
 	[TestFixture]
 	public abstract class LocateExistingStructures : DiskTestBase
 	{
-		[NotNull,Test]
+		[Test]
 		[TestCase("matches.*", new[] {"matches.txt", "matches.jpg"})]
 		[TestCase("*.*", new[] {"matches.txt", "matches.jpg", "no_match.txt"})]
 		[TestCase("*.txt", new[] {"matches.txt", "no_match.txt"})]
 		[TestCase("matches.txt", new[] {"matches.txt"})]
-		public async Task FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
+		public void FileMatchingShouldMatchStarPatterns([NotNull] string searchPattern, [NotNull] string[] expectedMatches)
 		{
-			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"matches.txt", ArbitraryFileContents);
-			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"matches.jpg", ArbitraryFileContents);
-			await TestSubject.OverwriteNeedsToBeMadeDelayStart(BaseFolder/"no_match.txt", ArbitraryFileContents);
+			TestSubject.Overwrite(BaseFolder/"matches.txt", ArbitraryFileContents).RunAndWait();
+			TestSubject.Overwrite(BaseFolder/"matches.jpg", ArbitraryFileContents).RunAndWait();
+			TestSubject.Overwrite(BaseFolder/"no_match.txt", ArbitraryFileContents).RunAndWait();
 			TestSubject.FindFilesNeedsToBeMadeDelayStart(BaseFolder, searchPattern)
 				.Should()
 				.BeEquivalentTo(expectedMatches.Select(m => BaseFolder/m));

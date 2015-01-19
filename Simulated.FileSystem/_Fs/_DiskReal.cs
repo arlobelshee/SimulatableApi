@@ -68,18 +68,27 @@ namespace Simulated._Fs
 
 		public Task CreateDir(FsPath path)
 		{
-			return new Task(() =>
-			{
-				if (File.Exists(path._Absolute))
-					throw new BadStorageRequest(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, path));
-				Directory.CreateDirectory(path._Absolute);
-			});
+			return new Task(() => _CreateDir(path));
 		}
 
-		public async Task OverwriteNeedsToBeMadeDelayStart(FsPath path, string newContents)
+		private static void _CreateDir([NotNull] FsPath path)
 		{
-			CreateDir(path.Parent)
-				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
+			if (File.Exists(path._Absolute))
+				throw new BadStorageRequest(string.Format(UserMessages.CreateErrorCreatedDirectoryOnTopOfFile, path));
+			Directory.CreateDirectory(path._Absolute);
+		}
+
+		public Task Overwrite(FsPath path, string newContents)
+		{
+			return new Task(() => _Overwrite(path, newContents).Wait());
+		}
+
+		[NotNull]
+		private static async Task _Overwrite([NotNull] FsPath path, [NotNull] string newContents)
+		{
+			if (Directory.Exists(path._Absolute))
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
+			_CreateDir(path.Parent);
 			using (var contents = File.CreateText(path._Absolute))
 			{
 				await contents.WriteAsync(newContents)
@@ -89,6 +98,8 @@ namespace Simulated._Fs
 
 		public void OverwriteNeedsToBeMadeDelayStart(FsPath path, byte[] newContents)
 		{
+			if (Directory.Exists(path._Absolute))
+				throw new BadStorageRequest(string.Format(UserMessages.WriteErrorPathIsDirectory, path._Absolute));
 			CreateDir(path.Parent)
 				.RunSynchronouslyAsCheapHackUntilIFixScheduling();
 			File.WriteAllBytes(path._Absolute, newContents);

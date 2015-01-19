@@ -105,7 +105,7 @@ namespace Simulated._Fs
 		[PublicApi]
 		public Task Overwrite([NotNull] string newContents)
 		{
-			return _allFiles._Disk.OverwriteNeedsToBeMadeDelayStart(_path, newContents);
+			return _allFiles._Disk.Overwrite(_path, newContents).StartSynchronouslyAsCheapHackUntilIFixScheduling();
 		}
 
 		/// <summary>

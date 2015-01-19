@@ -3,7 +3,6 @@
 // 
 // Copyright 2011, Arlo Belshee. All rights reserved. See LICENSE.txt for usage.
 
-using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
@@ -32,7 +31,7 @@ namespace Simulated._Fs
 
 		public void Overwrite([NotNull] FsPath location, [NotNull] string contents)
 		{
-			var work = new Task<Task>(() => _storage.OverwriteNeedsToBeMadeDelayStart(location, contents));
+			var work = _storage.Overwrite(location, contents);
 			_Schedule(_DiskChange.Make(_Op.WriteFile(location), work));
 		}
 
